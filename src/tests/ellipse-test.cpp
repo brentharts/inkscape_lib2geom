@@ -169,12 +169,26 @@ TEST(EllipseTest, LineIntersection) {
 }
 
 TEST(EllipseTest, EllipseIntersection) {
-    Ellipse e1(Point(300, 300), Point(212, 70), -0.785);
-    Ellipse e2(Point(250, 300), Point(230, 90), 1.321);
+    Ellipse e1;
+    Ellipse e2;
+    std::vector<ShapeIntersection> xs;
 
-    std::vector<ShapeIntersection> xs = e1.intersect(e2);
-
+    e1.set(Point(300, 300), Point(212, 70), -0.785);
+    e2.set(Point(250, 300), Point(230, 90), 1.321);
+    xs = e1.intersect(e2);
     EXPECT_EQ(xs.size(), 4ul);
+    EXPECT_intersections_valid(e1, e2, xs, 1e-10);
+
+    e1.set(Point(0, 0), Point(1, 1), 0);
+    e2.set(Point(0, 1), Point(1, 1), 0);
+    xs = e1.intersect(e2);
+    EXPECT_EQ(xs.size(), 2ul);
+    EXPECT_intersections_valid(e1, e2, xs, 1e-10);
+
+    e1.set(Point(0, 0), Point(1, 1), 0);
+    e2.set(Point(1, 0), Point(1, 1), 0);
+    xs = e1.intersect(e2);
+    EXPECT_EQ(xs.size(), 2ul);
     EXPECT_intersections_valid(e1, e2, xs, 1e-10);
 }
 
