@@ -71,7 +71,7 @@ Point RotatedRect::midpoint() const {
     return Geom::middle_point(corner(0), corner(2));
 }
 
-Rect RotatedRect::boundingBox() const {
+Rect RotatedRect::bounds() const {
     Rect result;
     for (int i=0;i<4;i++){
         result.expandTo(corner(i));

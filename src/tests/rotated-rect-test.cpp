@@ -83,10 +83,10 @@ TEST(RotatedRectTest, intersects_aligned) {
     EXPECT_TRUE(rotated_rect.intersects(Rect(-0.1, 0.5, 1.2, 0.6)));
 }
 
-TEST(RotatedRectTest, boundingBox) {
+TEST(RotatedRectTest, bounds) {
     auto r = Rect::from_xywh(1.260, 0.547, 8.523, 11.932);
     auto rrect = RotatedRect::from_rect_rotate(r, Rotate::from_degrees(15.59));
-    auto bbox = rrect.boundingBox();
+    auto bbox = rrect.bounds();
     auto expected_bbox = Rect::from_xywh(-0.186, -0.378, 11.415, 13.783);
     for (int i = 0; i < 4; i++) {
         EXPECT_TRUE(Geom::are_near(bbox.corner(i), expected_bbox.corner(i), 1e-3));

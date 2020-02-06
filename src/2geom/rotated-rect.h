@@ -53,7 +53,7 @@ public:
 
     Point midpoint() const;
 
-    Rect boundingBox() const;
+    Rect bounds() const;
 
     ///Returns diagonal length
     Coord diameter() const;
