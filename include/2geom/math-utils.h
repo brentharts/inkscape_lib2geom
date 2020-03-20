@@ -94,6 +94,38 @@ inline void sincos(double angle, double &sin_, double &cos_) {
 #endif
 }
 
+/** @brief Simultaneously compute a sine and a cosine of the same angle.
+ * This function can be up to 2 times faster than separate computation, depending
+ * on the platform. It uses the non-standard library function __sincospi() if available.
+ * @param x    Multiple of PI
+ * @param sin_ Variable that will store the sine
+ * @param cos_ Variable that will store the cosine */
+inline void sincospi(double x, double &sin_, double &cos_) {
+#ifdef HAVE_SINCOSPI
+    __sincospi(x, &sin_, &cos_);
+#else
+    Coord remainder = std::fmod(x, 2.0);
+    if (remainder < 0) {
+        remainder += 2.0; // precise operation on multiples of 2 power fractions (e.g. 0.75)
+    }
+    if (remainder==0.0) {
+        cos_ = 1;
+        sin_ = 0;
+    } else if (remainder==0.5) {
+        cos_ = 0;
+        sin_ = 1;
+    } else if (remainder==1.0) {
+        cos_ = -1;
+        sin_ = 0;
+    } else if (remainder==1.5) {
+        cos_ = 0;
+        sin_ = -1;
+    } else {
+        Geom::sincos(x*M_PI, sin_, cos_);
+    }
+#endif
+}
+
 } // end namespace Geom
 
 #endif // LIB2GEOM_SEEN_MATH_UTILS_H

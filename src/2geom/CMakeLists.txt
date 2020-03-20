@@ -166,6 +166,16 @@ add_library(2geom ${LIB_TYPE}
     ${2GEOM_INCLUDE_DIR}/2geom/utils.h
 )
 
+check_cxx_source_compiles("#include <math.h>\nint main() { double a=0.5,b=0.5,c=0.5; sincos(a, &b, &c); return 0; }" HAVE_SINCOS)
+if(HAVE_SINCOS)
+    target_compile_definitions(2geom PUBLIC -DHAVE_SINCOS)
+endif()
+
+check_cxx_source_compiles("#include <math.h>\nint main() { double a=0.5,b=0.5,c=0.5; __sincospi(a, &b, &c); return 0; }" HAVE_SINCOSPI)
+if(HAVE_SINCOSPI)
+    target_compile_definitions(2geom PUBLIC -DHAVE_SINCOSPI)
+endif()
+
 # make lib for 2geom
 target_include_directories(2geom
     PUBLIC

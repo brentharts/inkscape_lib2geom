@@ -52,10 +52,6 @@ if (2GEOM_TESTING)
 endif()
 
 
-check_cxx_source_compiles("#include <math.h>\nint main() { double a=0.5,b=0.5,c=0.5; sincos(a, &b, &c); return 0; }" HAVE_SINCOS)
-if(HAVE_SINCOS)
-    add_definitions(-DHAVE_SINCOS)
-endif()
 if(GSL_FOUND)
     add_definitions(-DHAVE_GSL)
 endif()
