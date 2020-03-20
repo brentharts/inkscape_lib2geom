@@ -92,6 +92,10 @@ public:
      * The angle is specified in radians, in the mathematical convention (increasing
      * counter-clockwise from +X). */
     static Point polar(Coord angle);
+    /** @brief Construct an unit vector from its angle in turns units (1 turn = 2 pi).
+     * The angle is specified in the mathematical convention (increasing
+     * counter-clockwise from +X). */
+    static Point from_turns(Coord turns);
     /// @}
 
     /// @name Access the coordinates of a point

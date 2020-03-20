@@ -68,21 +68,30 @@ namespace Geom {
 
 Point Point::polar(Coord angle) {
     Point ret;
-    Coord remainder = Angle(angle).radians0();
-    if (are_near(remainder, 0) || are_near(remainder, 2*M_PI)) {
+    sincos(angle, ret[Y], ret[X]);
+    return ret;
+}
+
+Point Point::from_turns(Coord turns) {
+    Point ret;
+    Coord remainder = std::fmod(turns, 1.0);
+    if (remainder < 0) {
+        remainder += 1; // precise operation on multiples of 2 power fractions (e.g. 0.75)
+    }
+    if (remainder==0.0) {
         ret[X] = 1;
         ret[Y] = 0;
-    } else if (are_near(remainder, M_PI/2)) {
+    } else if (remainder==0.25) {
         ret[X] = 0;
         ret[Y] = 1;
-    } else if (are_near(remainder, M_PI)) {
+    } else if (remainder==0.5) {
         ret[X] = -1;
         ret[Y] = 0;
-    } else if (are_near(remainder, 3*M_PI/2)) {
+    } else if (remainder==0.75) {
         ret[X] = 0;
         ret[Y] = -1;
     } else {
-        sincos(angle, ret[Y], ret[X]);
+        sincos(turns*2*M_PI, ret[Y], ret[X]);
     }
     return ret;
 }
