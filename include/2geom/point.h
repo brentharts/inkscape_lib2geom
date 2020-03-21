@@ -95,7 +95,7 @@ public:
     /** @brief Construct an unit vector from \a x*PI angle.
      * The angle is specified in the mathematical convention (increasing
      * counter-clockwise from +X). */
-    static Point polarpi(Coord x);
+    static Point polar_pi(Coord x);
     /// @}
 
     /// @name Access the coordinates of a point

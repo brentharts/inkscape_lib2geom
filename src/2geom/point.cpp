@@ -72,7 +72,7 @@ Point Point::polar(Coord angle) {
     return ret;
 }
 
-Point Point::polarpi(Coord x) {
+Point Point::polar_pi(Coord x) {
     Point ret;
     sincospi(x, ret[Y], ret[X]);
     return ret;
