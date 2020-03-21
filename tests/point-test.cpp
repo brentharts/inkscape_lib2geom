@@ -33,6 +33,7 @@
 
 #include <gtest/gtest.h>
 #include <2geom/point.h>
+#include <vector>
 
 namespace Geom {
 
@@ -47,7 +48,7 @@ TEST(PointTest, Normalize) {
 }
 
 TEST(PointTest, ScalarOps) {
-    Point a(1,2);
+    Point a(1, 2);
     EXPECT_EQ(a * 2, Point(2, 4));
     EXPECT_EQ(2 * a, Point(2, 4));
     EXPECT_EQ(a / 2, Point(0.5, 1));
@@ -64,6 +65,43 @@ TEST(PointTest, Rounding) {
     EXPECT_TRUE(a.ceil() == aceil);
     EXPECT_TRUE(a.floor() == afloor);
     EXPECT_TRUE(a.round() == around);
+}
+
+
+TEST(PointTest, polar_pi) {
+    auto x = std::vector<double>{0, 0.5, 1.0, 1.5, 2.0};
+    auto expected = std::vector<Geom::Point>{
+            Geom::Point{1, 0},
+            Geom::Point{0, 1},
+            Geom::Point{-1, 0},
+            Geom::Point{0, -1},
+            Geom::Point{1, 0},
+    };
+
+#ifdef HAVE_SINCOSPI
+    const bool do_eighth_check = true;
+#else
+    const bool do_eighth_check = false;
+#endif
+    if (do_eighth_check) {
+        const double sqrt2_2 = 0.707106781186547524400844362104849039284835937688474036588L;
+        auto x8 = std::vector<double>{0.25, 0.75, 1.25, 1.75};
+        auto expected8 = std::vector<Geom::Point>{
+                Geom::Point{sqrt2_2, sqrt2_2},
+                Geom::Point{-sqrt2_2, sqrt2_2},
+                Geom::Point{-sqrt2_2, -sqrt2_2},
+                Geom::Point{sqrt2_2, -sqrt2_2},
+        };
+        x.insert(x.end(), x8.begin(), x8.end());
+        expected.insert(expected.end(), expected8.begin(), expected8.end());
+    }
+
+    for (int i = 0; i < expected.size(); i++) {
+        EXPECT_EQ(Point::polar_pi(x[i]    ), expected[i]) << "Point::polar_pi(" << x[i] << ")";
+        EXPECT_EQ(Point::polar_pi(x[i]+100), expected[i]) << "Point::polar_pi(" << x[i]+100 << ")";
+        EXPECT_EQ(Point::polar_pi(x[i]-2  ), expected[i]) << "Point::polar_pi(" << x[i]-2 << ")";
+    }
+
 }
 
 } // end namespace Geom
