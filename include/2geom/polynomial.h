@@ -60,7 +60,7 @@ public:
         Poly result;
         const unsigned out_size = std::max(size(), p.size());
         const unsigned min_size = std::min(size(), p.size());
-        //result.reserve(out_size);
+        result.reserve(out_size);
 
         for(unsigned i = 0; i < min_size; i++) {
             result.push_back((*this)[i] + p[i]);

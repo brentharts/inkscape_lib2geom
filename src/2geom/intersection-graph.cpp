@@ -235,6 +235,7 @@ void PathIntersectionGraph::_removeDegenerateIntersections()
 
 void PathIntersectionGraph::_verify()
 {
+#ifndef NDEBUG
     for (unsigned w = 0; w < 2; ++w) {
         for (unsigned li = 0; li < _components[w].size(); ++li) {
             IntersectionList &xl = _components[w][li].xlist;
@@ -245,6 +246,7 @@ void PathIntersectionGraph::_verify()
             }
         }
     }
+#endif
 }
 
 PathVector PathIntersectionGraph::getUnion()
