@@ -152,11 +152,13 @@ TEST_F(BezierTest, Casteljau) {
         EXPECT_vector_equal(right2, right);
 
         double vnone = casteljau_subdivision<double>(t, &wiggle[0], NULL, NULL, wiggle.order());
-        EXPECT_EQ(vnone, vok);
+        EXPECT_near(vnone, vok, 1e-12);
     }
 }
 
 TEST_F(BezierTest, Portion) {
+    constexpr Coord eps{1e-12};
+
     for (unsigned i = 0; i < 10000; ++i) {
         double from = g_random_double_range(0, 1);
         double to = g_random_double_range(0, 1);
@@ -164,8 +166,8 @@ TEST_F(BezierTest, Portion) {
             Bezier result = portion(input, from, to);
 
             // the endpoints must correspond exactly
-            EXPECT_EQ(result.at0(), input.valueAt(from));
-            EXPECT_EQ(result.at1(), input.valueAt(to));
+            EXPECT_near(result.at0(), input.valueAt(from), eps);
+            EXPECT_near(result.at1(), input.valueAt(to), eps);
         }
     }
 }
@@ -179,16 +181,16 @@ TEST_F(BezierTest, Subdivide) {
 
             // the endpoints must correspond exactly
             // moreover, the subdivision point must be exactly equal to valueAt(t)
-            EXPECT_EQ(result.first.at0(), input.at0());
-            EXPECT_EQ(result.first.at1(), result.second.at0());
-            EXPECT_EQ(result.second.at0(), input.valueAt(t));
-            EXPECT_EQ(result.second.at1(), input.at1());
+            EXPECT_DOUBLE_EQ(result.first.at0(), input.at0());
+            EXPECT_DOUBLE_EQ(result.first.at1(), result.second.at0());
+            EXPECT_DOUBLE_EQ(result.second.at0(), input.valueAt(t));
+            EXPECT_DOUBLE_EQ(result.second.at1(), input.at1());
 
             // ditto for valueAt
-            EXPECT_EQ(result.first.valueAt(0), input.valueAt(0));
-            EXPECT_EQ(result.first.valueAt(1), result.second.valueAt(0));
-            EXPECT_EQ(result.second.valueAt(0), input.valueAt(t));
-            EXPECT_EQ(result.second.valueAt(1), input.valueAt(1));
+            EXPECT_DOUBLE_EQ(result.first.valueAt(0), input.valueAt(0));
+            EXPECT_DOUBLE_EQ(result.first.valueAt(1), result.second.valueAt(0));
+            EXPECT_DOUBLE_EQ(result.second.valueAt(0), input.valueAt(t));
+            EXPECT_DOUBLE_EQ(result.second.valueAt(1), input.valueAt(1));
 
             if (result.first.at1() != result.second.at0()) {
                 errors.emplace_back(input, t);
@@ -269,9 +271,10 @@ TEST_F(BezierTest, Deflate) {
     EXPECT_FLOAT_EQ(0, b.at0());
     b = b.deflate();
     const double rootposition = (0.5-0.25) / (1-0.25);
-    EXPECT_FLOAT_EQ(0, b.valueAt(rootposition));
+    constexpr Coord eps{1e-12};
+    EXPECT_near(0.0, b.valueAt(rootposition), eps);
     b = b.subdivide(rootposition).second;
-    EXPECT_FLOAT_EQ(0, b.at0());
+    EXPECT_near(0.0, b.at0(), eps);
 }
 
 TEST_F(BezierTest, Roots) {
@@ -361,7 +364,7 @@ TEST_F(BezierTest, Operators) {
         for(int i = 0; i <= 16; i++) {
             double t = i/16.0;
             double b = B.valueAt(t);
-            EXPECT_FLOAT_EQ(b*b, product.valueAt(t));
+            EXPECT_near(b*b, product.valueAt(t), 1e-12);
         }
     }
 }

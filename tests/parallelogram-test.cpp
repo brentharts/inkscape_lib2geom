@@ -106,13 +106,13 @@ TEST(ParallelogramTest, area)
 {
     Rect r(2, 4, 7, 8);
     Parallelogram p(r);
-    EXPECT_EQ(p.area(), r.area());
+    EXPECT_DOUBLE_EQ(p.area(), r.area());
     p *= Rotate(M_PI / 4.0); // 45°
-    EXPECT_EQ(p.area(), r.area());
+    EXPECT_DOUBLE_EQ(p.area(), r.area());
     p *= HShear(2);
-    EXPECT_EQ(p.area(), r.area());
+    EXPECT_DOUBLE_EQ(p.area(), r.area());
     p *= Scale(2);
-    EXPECT_EQ(p.area(), r.area() * 4);
+    EXPECT_DOUBLE_EQ(p.area(), r.area() * 4);
 }
 
 class ParallelogramTest
