@@ -60,6 +60,8 @@ To build 2Geom, you will need:
 * [Boost](http://www.boost.org/) (headers only)
 * [glib](https://wiki.gnome.org/Projects/GLib)
 * [GNU Scientific Library](http://www.gnu.org/software/gsl/)
+* [double-conversion](https://github.com/google/double-conversion)
+* [cairo](https://www.cairographics.org/)
 * [Ragel](http://www.colm.net/open-source/ragel/) (if you want to modify the SVG path parser)
 * [GTK+ 2](http://www.gtk.org/) (for demo programs)
 
