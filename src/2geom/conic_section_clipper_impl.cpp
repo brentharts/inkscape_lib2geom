@@ -29,6 +29,8 @@
  * the specific language governing rights and limitations.
  */
 
+#include <optional>
+
 #ifndef CLIP_WITH_CAIRO_SUPPORT
     #include <2geom/conic_section_clipper.h>
 #endif
@@ -386,7 +388,7 @@ bool CLIPPER_CLASS::clip (std::vector<RatQuad> & arcs)
 
         DBGINFO ("CLIP: degenerate section conic")
 
-        boost::optional<LineSegment> ls1 = Geom::clip (l1, R);
+        std::optional<LineSegment> ls1 = Geom::clip (l1, R);
         if (ls1)
         {
             if (ls1->isDegenerate())
@@ -402,7 +404,7 @@ bool CLIPPER_CLASS::clip (std::vector<RatQuad> & arcs)
             }
         }
 
-        boost::optional<LineSegment> ls2 = Geom::clip (l2, R);
+        std::optional<LineSegment> ls2 = Geom::clip (l2, R);
         if (ls2)
         {
             if (ls2->isDegenerate())
@@ -445,7 +447,7 @@ bool CLIPPER_CLASS::clip (std::vector<RatQuad> & arcs)
     {
         // if the ellipse centre is inside the rectangle
         // then so it is the ellipse
-        boost::optional<Point> c = cs.centre();
+        std::optional<Point> c = cs.centre();
         if (c && R.contains (*c))
         {
             DBGPRINT ("CLIP: ellipse with centre", *c)

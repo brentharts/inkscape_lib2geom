@@ -45,7 +45,7 @@
 #include <2geom/numeric/symmetric-matrix-fs.h>
 #include <2geom/numeric/symmetric-matrix-fs-operation.h>
 
-#include <boost/optional/optional.hpp>
+#include <optional>
 
 #include <string>
 #include <vector>
@@ -268,7 +268,7 @@ public:
     xAx operator*(double const &b) const;
 
     std::vector<Point> crossings(Rect r) const;
-    boost::optional<RatQuad> toCurve(Rect const & bnd) const;
+    std::optional<RatQuad> toCurve(Rect const & bnd) const;
     std::vector<double> roots(Point d, Point o) const;
 
     std::vector<double> roots(Line const &l) const;
@@ -277,7 +277,7 @@ public:
 
     Geom::Affine hessian() const;
 
-    boost::optional<Point> bottom() const;
+    std::optional<Point> bottom() const;
 
     Interval extrema(Rect r) const;
 
@@ -336,11 +336,11 @@ public:
 
     /*
      *  Compute the centre of symmetry of the conic section when it exists,
-     *  else it return an uninitialized boost::optional<Point> instance.
+     *  else it return an uninitialized std::optional<Point> instance.
      */
-    boost::optional<Point> centre() const
+    std::optional<Point> centre() const
     {
-        typedef boost::optional<Point> opt_point_t;
+        typedef std::optional<Point> opt_point_t;
 
         double d = coeff(1) * coeff(1) - 4 * coeff(0) * coeff(2);
         if (are_near (d, 0))  return opt_point_t();

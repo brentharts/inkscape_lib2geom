@@ -40,7 +40,6 @@
 #ifndef LIB2GEOM_SEEN_RECT_H
 #define LIB2GEOM_SEEN_RECT_H
 
-#include <boost/optional.hpp>
 #include <2geom/affine.h>
 #include <2geom/interval.h>
 #include <2geom/int-rect.h>

@@ -39,7 +39,7 @@
 #include <vector>
 #include <2geom/rect.h>
 #include <2geom/sweep-bounds.h>
-#include <boost/optional/optional.hpp>
+#include <optional>
 #include <2geom/pathvector.h>
 
 namespace Geom {
@@ -61,7 +61,7 @@ struct Crossing {
     bool onIx(unsigned ix) const { return a == ix || b == ix; }
 };
 
-typedef boost::optional<Crossing> OptCrossing;
+typedef std::optional<Crossing> OptCrossing;
 
 
 /*

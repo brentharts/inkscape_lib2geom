@@ -38,6 +38,7 @@
 #include <iterator>
 #include <algorithm>
 #include <iostream>
+#include <boost/optional.hpp>
 #include <boost/operators.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/shared_ptr.hpp>

@@ -16,6 +16,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <optional>
 
 #include <toys/path-cairo.h>
 #include <toys/toy-framework-2.h>
@@ -264,7 +265,7 @@ class Conic5: public Toy {
                 cairo_restore(cr);
             }
 
-            boost::optional<RatQuad> orq = oxo.toCurve(rh.pos);
+            std::optional<RatQuad> orq = oxo.toCurve(rh.pos);
             if(orq) {
                 RatQuad rq = *orq;
                 draw_hull(cr, rq);

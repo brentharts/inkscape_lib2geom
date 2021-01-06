@@ -40,7 +40,6 @@
 
 #include <algorithm>
 #include <valarray>
-#include <boost/optional.hpp>
 #include <2geom/choose.h>
 #include <2geom/coord.h>
 #include <2geom/d2.h>

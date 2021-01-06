@@ -39,12 +39,13 @@
 #include <utility>
 #include <sstream>
 #include <stdexcept>
+#include <optional>
 
 namespace Geom
 {
 
 LineSegment intersection(Line l, Rect r) {
-    boost::optional<LineSegment> seg = l.clip(r);
+    std::optional<LineSegment> seg = l.clip(r);
     if (seg) {
         return *seg;
     } else {
@@ -507,13 +508,13 @@ xAx xAx::operator*(double const &b) const {
   return res;
 }
 
-  boost::optional<RatQuad> xAx::toCurve(Rect const & bnd) const {
+  std::optional<RatQuad> xAx::toCurve(Rect const & bnd) const {
   std::vector<Point> crs = crossings(bnd);
   if(crs.size() == 1) {
       Point A = crs[0];
       Point dA = rot90(gradient(A));
       if(L2sq(dA) <= 1e-10) { // perhaps a single point?
-          return boost::optional<RatQuad> ();
+          return std::optional<RatQuad> ();
       }
       LineSegment ls = intersection(Line::from_origin_and_vector(A, dA), bnd);
       return RatQuad::fromPointsTangents(A, dA, ls.pointAt(0.5), ls[1], dA);
@@ -558,7 +559,7 @@ xAx xAx::operator*(double const &b) const {
       }
     }
   }
-  return boost::optional<RatQuad>();
+  return std::optional<RatQuad>();
 }
 
   std::vector<double> xAx::roots(Point d, Point o) const {
@@ -624,7 +625,7 @@ Geom::Affine xAx::hessian() const {
 }
 
 
-boost::optional<Point> solve(double A[2][2], double b[2]) {
+std::optional<Point> solve(double A[2][2], double b[2]) {
     double const determ = det(A);
     if (determ !=  0.0) { // hopeful, I know
         Geom::Coord const ideterm = 1.0 / determ;
@@ -632,11 +633,11 @@ boost::optional<Point> solve(double A[2][2], double b[2]) {
         return Point ((A[1][1]*b[0]  -A[0][1]*b[1]),
                       (-A[1][0]*b[0] +  A[0][0]*b[1]))* ideterm;
     } else {
-        return boost::optional<Point>();
+        return std::optional<Point>();
     }
 }
 
-boost::optional<Point> xAx::bottom() const {
+std::optional<Point> xAx::bottom() const {
     double A[2][2] = {{2*c[0], c[1]},
                       {c[1], 2*c[2]}};
     double b[2] = {-c[3], -c[4]};
@@ -659,7 +660,7 @@ Interval xAx::extrema(Rect r) const {
   ext |= quad_ex(c[0], c[1]*k+c[3],  (c[2]*k + c[4])*k + c[5], r[X]);
   k = r[Y].max();
   ext |= quad_ex(c[0], c[1]*k+c[3],  (c[2]*k + c[4])*k + c[5], r[X]);
-  boost::optional<Point> B0 = bottom();
+  std::optional<Point> B0 = bottom();
   if (B0 && r.contains(*B0))
     ext.expandTo(0);
   return ext;

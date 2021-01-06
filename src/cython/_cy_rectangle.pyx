@@ -182,7 +182,7 @@ cdef class cy_GenericOptInterval:
     >>>     print C.min()
 
     This class represents GenericOptInterval with python object boundaries.
-    It tries to model behaviour of boost::optional.
+    It tries to model behaviour of std::optional.
     """
 
     cdef GenericOptInterval[WrappedPyObject]* thisptr
@@ -571,7 +571,7 @@ cdef class cy_OptInterval:
     >>>     print C.min()
 
     This class represents OptInterval. It tries to model behaviour of
-    boost::optional.
+    std::optional.
     """
 
     def __cinit__(self, u = None, v = None):
@@ -908,7 +908,7 @@ cdef class cy_OptIntInterval:
     >>>     print C.min()
 
     This class represents OptIntInterval. It tries to model behaviour of
-    boost::optional.
+    std::optional.
     """
 
     cdef OptIntInterval* thisptr
@@ -1549,7 +1549,7 @@ cdef class cy_OptRect:
     """Class representing optionally empty rect in real plane.
 
     This class corresponds to OptRect in 2geom, and it tries to mimic
-    the behaviour of boost::optional. In addition to OptRect methods,
+    the behaviour of std::optional. In addition to OptRect methods,
     this class passes calls for Rect methods to underlying Rect class,
     or throws ValueError when it's empty.
     """
@@ -1989,7 +1989,7 @@ cdef class cy_OptIntRect:
     """Class representing optionally empty rect in with integer coordinates.
 
     This class corresponds to OptIntRect in 2geom, and it tries to mimic
-    the behaviour of boost::optional. In addition to OptIntRect methods,
+    the behaviour of std::optional. In addition to OptIntRect methods,
     this class passes calls for IntRect methods to underlying IntRect class,
     or throws ValueError when it's empty.
     """

@@ -35,7 +35,7 @@
 #define LIB2GEOM_SEEN_LINE_H
 
 #include <cmath>
-#include <boost/optional.hpp>
+#include <optional>
 #include <2geom/bezier-curve.h> // for LineSegment
 #include <2geom/rect.h>
 #include <2geom/crossing.h>
@@ -284,7 +284,7 @@ public:
     }
 
     /// Return the portion of the line that is inside the given rectangle
-    boost::optional<LineSegment> clip(Rect const &r) const;
+    std::optional<LineSegment> clip(Rect const &r) const;
 
     /** @brief Create a ray starting at the specified time value.
      * The created ray will go in the direction of the line's vector (in the direction
@@ -522,7 +522,7 @@ LineSegment projection(LineSegment const &seg, Line const &line)
 }
 
 inline
-boost::optional<LineSegment> clip(Line const &l, Rect const &r) {
+std::optional<LineSegment> clip(Line const &l, Rect const &r) {
     return l.clip(r);
 }
 

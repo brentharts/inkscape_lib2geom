@@ -44,6 +44,7 @@
 #include <2geom/line.h>
 
 //#include <iomanip>
+#include <optional>
 
 
 using namespace Geom;
@@ -566,7 +567,7 @@ class ConicSectionToy : public Toy
         xAx dc = cs.dual();
         // we need some trick to make the dual visible in the window
         std::string dckind = dc.categorise();
-        boost::optional<Point> T = dc.centre();
+        std::optional<Point> T = dc.centre();
         if (T)  dc = dc.translate (-*T);
         dc = dc.scale (1e-5, 1e-5);
         dc = dc.translate (Point(width/2, height/2));

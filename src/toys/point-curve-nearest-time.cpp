@@ -238,7 +238,7 @@ private:
     	        }
     	        else
     	        {
-                    //boost::optional<PathVectorTime>
+                    //std::optional<PathVectorTime>
                     double s = 0, e = 1;
                     draw_cross(cr, pathv[0].pointAt(s));
                     draw_cross(cr, pathv[0].pointAt(e));

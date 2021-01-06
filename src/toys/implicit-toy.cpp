@@ -14,7 +14,6 @@
 #include <algorithm>
 #include <ctime>
 
-#include <boost/optional.hpp>
 #include <boost/function.hpp>
 
 

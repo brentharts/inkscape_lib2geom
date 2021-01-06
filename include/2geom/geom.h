@@ -38,13 +38,13 @@
 
 #include <vector>
 #include <2geom/forward.h>
-#include <boost/optional/optional.hpp>
+#include <optional>
 #include <2geom/bezier-curve.h>
 #include <2geom/line.h>
 
 namespace Geom {
 
-boost::optional<Geom::LineSegment>
+std::optional<Geom::LineSegment>
 rect_line_intersect(Geom::Rect &r,
                     Geom::LineSegment ls);
 

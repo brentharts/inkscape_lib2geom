@@ -29,6 +29,7 @@
 #include <boost/python.hpp>
 #include <boost/python/implicit.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include <optional>
 
 #include "py2geom.h"
 #include "helpers.h"
@@ -96,7 +97,7 @@ static tuple wrap_rq_split(Geom::RatQuad const & rq) {
 }
 
 static object wrap_xax_to_curve(Geom::xAx const & xax, Geom::Rect const & r) {
-    boost::optional<Geom::RatQuad> oc = xax.toCurve(r);
+    std::optional<Geom::RatQuad> oc = xax.toCurve(r);
     return oc?object(*oc):object();
 }
 

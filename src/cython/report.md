@@ -225,7 +225,7 @@ correcting the largest mistakes.
 
 I would also discuss design of API bit more, since mapping the C++ sometimes
 turned out to be cumbersome from python's perspective. Often, I would spend
-lots of time thinking through some detail (Iterator for Path, boost::optional,
+lots of time thinking through some detail (Iterator for Path, std::optional,
 most of the templated classes), only doing ad-hoc solution at the end in
 order to I to keep progressing.
 

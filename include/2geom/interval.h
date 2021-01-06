@@ -38,7 +38,6 @@
 #define LIB2GEOM_SEEN_INTERVAL_H
 
 #include <boost/none.hpp>
-#include <boost/optional.hpp>
 #include <boost/operators.hpp>
 #include <2geom/coord.h>
 #include <2geom/math-utils.h>

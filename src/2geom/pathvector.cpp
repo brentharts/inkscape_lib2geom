@@ -36,6 +36,7 @@
 #include <2geom/pathvector.h>
 #include <2geom/svg-path-writer.h>
 #include <2geom/sweeper.h>
+#include <optional>
 
 namespace Geom {
 
@@ -238,9 +239,9 @@ int PathVector::winding(Point const &p) const
     return wind;
 }
 
-boost::optional<PathVectorTime> PathVector::nearestTime(Point const &p, Coord *dist) const
+std::optional<PathVectorTime> PathVector::nearestTime(Point const &p, Coord *dist) const
 {
-    boost::optional<PathVectorTime> retval;
+    std::optional<PathVectorTime> retval;
 
     Coord mindist = infinity();
     for (size_type i = 0; i < size(); ++i) {

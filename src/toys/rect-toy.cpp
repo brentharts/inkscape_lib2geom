@@ -39,6 +39,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 
 using namespace Geom;
 
@@ -197,7 +198,7 @@ class LineToy : public Toy
         cairo_stroke(cr);
 
 
-        boost::optional<LineSegment> ls = rect_line_intersect(r1, LineSegment(p5.pos, p6.pos));
+        std::optional<LineSegment> ls = rect_line_intersect(r1, LineSegment(p5.pos, p6.pos));
         *notify << "intersects: " << ((ls)?"true":"false") << std::endl;
         if(ls) {
             draw_handle(cr, (*ls)[0]);

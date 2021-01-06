@@ -16,6 +16,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <optional>
 
 #include <toys/path-cairo.h>
 #include <toys/toy-framework-2.h>
@@ -203,7 +204,7 @@ class Conic6: public Toy {
             xAx xC0 = C1*t + C2*s;
             //::draw(cr, xC0, screen_rect); // degen
             
-            boost::optional<Point> oB0 = xC0.bottom();
+            std::optional<Point> oB0 = xC0.bottom();
             
             Point B0 = *oB0;
             //*notify << B0 << " = " << C1.gradient(B0);

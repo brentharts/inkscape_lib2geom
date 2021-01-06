@@ -37,7 +37,7 @@
 #include <vector>
 #include <algorithm>
 #include <boost/operators.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 #include <boost/range/iterator_range.hpp>
 
 namespace Geom {
@@ -281,7 +281,7 @@ private:
     /// Take a vector of points and produce a pruned sorted vector.
     template <typename Iter>
     static void _prune(Iter first, Iter last, std::vector<Point> &out) {
-        boost::optional<Point> ymin, ymax, xmin, xmax;
+        std::optional<Point> ymin, ymax, xmin, xmax;
         for (Iter i = first; i != last; ++i) {
             Point p = *i;
             if (!ymin || Point::LexLess<Y>()(p, *ymin)) {

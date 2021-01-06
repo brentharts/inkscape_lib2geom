@@ -29,6 +29,7 @@
  */
 
 #include <algorithm>
+#include <optional>
 #include <2geom/line.h>
 #include <2geom/math-utils.h>
 
@@ -147,7 +148,7 @@ Coord Line::root(Coord v, Dim2 d) const
     }
 }
 
-boost::optional<LineSegment> Line::clip(Rect const &r) const
+std::optional<LineSegment> Line::clip(Rect const &r) const
 {
     Point v = vector();
     // handle horizontal and vertical lines first,
@@ -167,14 +168,14 @@ boost::optional<LineSegment> Line::clip(Rect const &r) const
                 return LineSegment(b, a);
             }
         } else {
-            return boost::none;
+            return std::nullopt;
         }
     }
 
     Interval xpart(root(r[X].min(), X), root(r[X].max(), X));
     Interval ypart(root(r[Y].min(), Y), root(r[Y].max(), Y));
     if (!xpart.isFinite() || !ypart.isFinite()) {
-        return boost::none;
+        return std::nullopt;
     }
 
     OptInterval common = xpart & ypart;
@@ -183,7 +184,7 @@ boost::optional<LineSegment> Line::clip(Rect const &r) const
         LineSegment result(r.clamp(p1), r.clamp(p2));
         return result;
     } else {
-        return boost::none;
+        return std::nullopt;
     }
 
     /* old implementation using coefficients:

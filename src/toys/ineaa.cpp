@@ -9,6 +9,7 @@
 #include <aa.h>
 #include <complex>
 #include <algorithm>
+#include <optional>
 
 using std::vector;
 using namespace Geom;
@@ -24,7 +25,7 @@ struct PtLexCmp{
 
 // draw ax + by + c = 0
 void draw_line_in_rect(cairo_t*cr, Rect &r, Point n, double c) {
-    boost::optional<Geom::LineSegment> ls =
+    std::optional<Geom::LineSegment> ls =
         rect_line_intersect(r, Line::fromNormalDistance(n, c));
     
     if(ls) {
@@ -38,7 +39,7 @@ void draw_line_in_rect(cairo_t*cr, Rect &r, Point n, double c) {
 void fill_line_in_rect(cairo_t*cr, Rect &r, Point n, double c) {
     ConvexHull ch;
     
-    boost::optional<Geom::LineSegment> ls =
+    std::optional<Geom::LineSegment> ls =
         rect_line_intersect(r, Line::fromNormalDistance(n, c));
     
     if(ls) {
@@ -67,7 +68,7 @@ OptRect tighten(Rect &r, Point n, Interval lu) {
     for(int i = 0; i < 2; i++) {
         double c = lu[i];
     
-        boost::optional<Geom::LineSegment> ls =
+        std::optional<Geom::LineSegment> ls =
             rect_line_intersect(r, Line::fromNormalDistance(n, c));
     
         if(ls) {

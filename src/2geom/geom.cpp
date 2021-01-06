@@ -5,6 +5,7 @@
 #include <2geom/geom.h>
 #include <2geom/point.h>
 #include <algorithm>
+#include <optional>
 #include <2geom/rect.h>
 
 using std::swap;
@@ -328,7 +329,7 @@ rect_line_intersect(Geom::Point const &c0, Geom::Point const &c1,
  * of \a c0, \a c1 (i.e., the vectors \a r1 - \a r0 and \a p1 - \a p0 point into the same
  * direction).
  */
-boost::optional<LineSegment>
+std::optional<LineSegment>
 rect_line_intersect(Geom::Rect &r,
                     Geom::LineSegment ls)
 {
@@ -338,10 +339,10 @@ rect_line_intersect(Geom::Rect &r,
     if(results.size() == 2) {
         return LineSegment(results[0], results[1]);
     } 
-    return boost::optional<LineSegment>();
+    return std::optional<LineSegment>();
 }
 
-boost::optional<LineSegment>
+std::optional<LineSegment>
 rect_line_intersect(Geom::Rect &r,
                     Geom::Line l)
 {

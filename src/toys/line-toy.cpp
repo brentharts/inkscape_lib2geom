@@ -36,6 +36,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 
 using namespace Geom;
 
@@ -670,7 +671,7 @@ class LineToy : public Toy
         cairo_rectangle(cr, r);
         cairo_stroke(cr);
 
-        boost::optional<LineSegment> seg = l.clip(r);
+        std::optional<LineSegment> seg = l.clip(r);
         if (seg) {
             cairo_set_source_rgba(cr, 1, 0, 0, 1);
             draw_line_seg(cr, seg->initialPoint(), seg->finalPoint());

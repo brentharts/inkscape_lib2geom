@@ -42,6 +42,7 @@
 #include <2geom/sweeper.h>
 #include <algorithm>
 #include <limits>
+#include <boost/optional.hpp>
 
 using std::swap;
 using namespace Geom::PathInternal;

@@ -34,6 +34,7 @@
 #ifndef LIB2GEOM_SEEN_PATHVECTOR_H
 #define LIB2GEOM_SEEN_PATHVECTOR_H
 
+#include <optional>
 #include <boost/concept/requires.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/range/algorithm/equal.hpp>
@@ -269,7 +270,7 @@ public:
      * This is simply the sum of winding numbers for constituent paths. */
     int winding(Point const &p) const;
 
-    boost::optional<PathVectorTime> nearestTime(Point const &p, Coord *dist = NULL) const;
+    std::optional<PathVectorTime> nearestTime(Point const &p, Coord *dist = NULL) const;
     std::vector<PathVectorTime> allNearestTimes(Point const &p, Coord *dist = NULL) const;
 
     std::vector<Point> nodes() const;

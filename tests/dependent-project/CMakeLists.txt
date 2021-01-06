@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(test_dep_2geom CXX C)
+set(CMAKE_CXX_STANDARD 17)
 
 option(2GEOM_AS_SUBPROJECT "include 2geom as subproject" OFF)
 
