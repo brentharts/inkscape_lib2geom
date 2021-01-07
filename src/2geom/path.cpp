@@ -42,7 +42,7 @@
 #include <2geom/sweeper.h>
 #include <algorithm>
 #include <limits>
-#include <boost/optional.hpp>
+#include <optional>
 
 using std::swap;
 using namespace Geom::PathInternal;
@@ -797,7 +797,7 @@ void Path::appendPortionTo(Path &ret, double from, double to) const
 }
 
 void Path::appendPortionTo(Path &target, PathInterval const &ival,
-                           boost::optional<Point> const &p_from, boost::optional<Point> const &p_to) const
+                           std::optional<Point> const &p_from, std::optional<Point> const &p_to) const
 {
     assert(ival.pathSize() == size_closed());
 

@@ -33,8 +33,7 @@
 
 #include <cassert>
 #include <iostream>
-#include <boost/none.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 #include <2geom/coord.h>
 
 namespace Geom {
@@ -252,14 +251,14 @@ inline GenericInterval<C> unify(GenericInterval<C> const &a, GenericInterval<C> 
  */
 template <typename C>
 class GenericOptInterval
-    : public boost::optional<typename CoordTraits<C>::IntervalType>
+    : public std::optional<typename CoordTraits<C>::IntervalType>
     , boost::orable< GenericOptInterval<C>
     , boost::andable< GenericOptInterval<C>
       > >
 {
     typedef typename CoordTraits<C>::IntervalType CInterval;
     typedef typename CoordTraits<C>::OptIntervalType OptCInterval;
-    typedef boost::optional<CInterval> Base;
+    typedef std::optional<CInterval> Base;
 public:
     /// @name Create optionally empty intervals.
     /// @{
@@ -314,7 +313,7 @@ public:
                 return;
             }
         }
-        (*static_cast<Base*>(this)) = boost::none;
+        (*static_cast<Base*>(this)) = std::nullopt;
     }
     GenericOptInterval<C> &operator|=(OptCInterval const &o) {
         unionWith(o);

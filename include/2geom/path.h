@@ -38,7 +38,7 @@
 #include <iterator>
 #include <algorithm>
 #include <iostream>
-#include <boost/optional.hpp>
+#include <optional>
 #include <boost/operators.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/shared_ptr.hpp>
@@ -588,20 +588,20 @@ public:
      * The closing segment of the target path will be modified. */
     void appendPortionTo(Path &p, PathTime const &from, PathTime const &to, bool cross_start = false) const {
         PathInterval ival(from, to, cross_start, size_closed());
-        appendPortionTo(p, ival, boost::none, boost::none);
+        appendPortionTo(p, ival, std::nullopt, std::nullopt);
     }
 
     /** @brief Append a subset of this path to another path.
      * This version allows you to explicitly pass a PathInterval. */
     void appendPortionTo(Path &p, PathInterval const &ival) const {
-        appendPortionTo(p, ival, boost::none, boost::none);
+        appendPortionTo(p, ival, std::nullopt, std::nullopt);
     }
 
     /** @brief Append a subset of this path to another path, specifying endpoints.
      * This method is for use in situations where endpoints of the portion segments
      * have to be set exactly, for instance when computing Boolean operations. */
     void appendPortionTo(Path &p, PathInterval const &ival,
-                         boost::optional<Point> const &p_from, boost::optional<Point> const &p_to) const;
+                         std::optional<Point> const &p_from, std::optional<Point> const &p_to) const;
 
     Path portion(Coord f, Coord t) const {
         Path ret;

@@ -42,7 +42,7 @@
 
 #include <limits>
 #include <iostream>
-#include <boost/optional.hpp>
+#include <optional>
 #include <2geom/coord.h>
 
 namespace Geom {
@@ -340,7 +340,7 @@ public:
  */
 template <typename C>
 class GenericOptRect
-    : public boost::optional<typename CoordTraits<C>::RectType>
+    : public std::optional<typename CoordTraits<C>::RectType>
     , boost::equality_comparable< typename CoordTraits<C>::OptRectType
     , boost::equality_comparable< typename CoordTraits<C>::OptRectType, typename CoordTraits<C>::RectType
     , boost::orable< typename CoordTraits<C>::OptRectType
@@ -353,7 +353,7 @@ class GenericOptRect
     typedef typename CoordTraits<C>::PointType CPoint;
     typedef typename CoordTraits<C>::RectType CRect;
     typedef typename CoordTraits<C>::OptRectType OptCRect;
-    typedef boost::optional<CRect> Base;
+    typedef std::optional<CRect> Base;
 public:
     typedef CInterval D1Value;
     typedef CInterval &D1Reference;
@@ -444,7 +444,7 @@ public:
         if (x && y) {
             *this = CRect(*x, *y);
         } else {
-            *(static_cast<Base*>(this)) = boost::none;
+            *(static_cast<Base*>(this)) = std::nullopt;
         }
     }
     /** @brief Leave only the area overlapping with the argument.
@@ -454,7 +454,7 @@ public:
         if (b) {
             intersectWith(*b);
         } else {
-            *(static_cast<Base*>(this)) = boost::none;
+            *(static_cast<Base*>(this)) = std::nullopt;
         }
     }
     /** @brief Create or enlarge the rectangle to contain the given point.
