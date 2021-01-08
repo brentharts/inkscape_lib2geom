@@ -30,7 +30,7 @@ class IntersectDataTester: public Toy {
     std::vector<PointSetHandle> paths_handles;
     std::vector<Slider> sliders;
 
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         cairo_set_source_rgba (cr, 0., 0., 0, 1);
         cairo_set_line_width (cr, 1);
         
@@ -65,9 +65,9 @@ class IntersectDataTester: public Toy {
         Crossings cs = crossings(p0, p1);
         
         
-            for(unsigned int i = 0; i < cs.size(); i++) {
-                *notify << cs[i].ta << ", " << cs[i].tb << '\n';
-                Point cp =p0(cs[i].ta);
+            for(auto & c : cs) {
+                *notify << c.ta << ", " << c.tb << '\n';
+                Point cp =p0(c.ta);
                 //draw_circ(cr, cp);
                 //cairo_stroke(cr);
                 double p0pt = nearest_time(cp, pieces[0]);
@@ -88,9 +88,9 @@ class IntersectDataTester: public Toy {
 	  D2<SBasis> dist = pieces[endi]-pieces[0].at1();
 	  *notify << dist << "\n";
 	  vector<double> locs = roots(dot(dist,dist) - SBasis(r*r));
-	  for(unsigned i = 0; i < locs.size(); i++) {
+	  for(double loc : locs) {
 	    //draw_circ(cr, pieces[endi](locs[i]));
-	    *notify  << locs[i] << ' ';
+	    *notify  << loc << ' ';
 	  }
 	  if(locs.size()) {
 	    std::sort(locs.begin(), locs.end());
@@ -109,7 +109,7 @@ class IntersectDataTester: public Toy {
     IntersectDataTester(int paths, int curves_in_path, int degree) :
         nb_paths(paths), nb_curves_per_path(curves_in_path), degree(degree) {
         for (int i = 0; i < nb_paths; i++){
-            paths_handles.push_back(PointSetHandle());
+            paths_handles.emplace_back();
         }
         for(int i = 0; i < nb_paths; i++){
             for(int j = 0; j < (nb_curves_per_path*degree)+1; j++){
@@ -117,9 +117,9 @@ class IntersectDataTester: public Toy {
             }
             handles.push_back(&paths_handles[i]);
         }
-        sliders.push_back(Slider(0.0, 100.0, 1, 30.0, "min radius"));
-        sliders.push_back(Slider(0.0, 100.0, 1, 0.0, "ray chooser"));
-        sliders.push_back(Slider(0.0, 100.0, 1, 0.0, "area chooser"));
+        sliders.emplace_back(0.0, 100.0, 1, 30.0, "min radius");
+        sliders.emplace_back(0.0, 100.0, 1, 0.0, "ray chooser");
+        sliders.emplace_back(0.0, 100.0, 1, 0.0, "area chooser");
         handles.push_back(&(sliders[0]));
         handles.push_back(&(sliders[1]));
         handles.push_back(&(sliders[2]));
@@ -128,7 +128,7 @@ class IntersectDataTester: public Toy {
         sliders[2].geometry(Point(50, 80), 250);
     }
 
-    void first_time(int /*argc*/, char** /*argv*/) {
+    void first_time(int /*argc*/, char** /*argv*/) override {
 
     }
 };

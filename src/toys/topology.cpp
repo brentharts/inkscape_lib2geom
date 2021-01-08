@@ -136,9 +136,9 @@ public:
     void printArea(unsigned i){
         std::printf("area %u: ", i);
         printBoundary(areas[i].boundary);
-        for (unsigned j=0; j<areas[i].inner_boundaries.size(); j++){
+        for (auto & inner_boundarie : areas[i].inner_boundaries){
             std::printf(", ");
-            printBoundary(areas[i].inner_boundaries[j]);
+            printBoundary(inner_boundarie);
         }
         std::printf("\n");
     }
@@ -298,12 +298,12 @@ public:
     //TODO: systematically check for connected boundaries before returning?
     void addAreaBoundaryPiece(unsigned a, OrientedEdge const &f){
         if ( areas[a].boundary.size()>0 && prolongate( areas[a].boundary, f ) ) return;
-        for ( unsigned i=0; i<areas[a].inner_boundaries.size(); i++){
+        for (auto & inner_boundarie : areas[a].inner_boundaries){
 //            printBoundary(areas[a].inner_boundaries[i]);
 //            printf(" matches ");
 //            printOrientedEdge(f);
 //            printf("?");
-            if ( areas[a].inner_boundaries[i].size()>0 && prolongate( areas[a].inner_boundaries[i], f) ) return;
+            if ( inner_boundarie.size()>0 && prolongate( inner_boundarie, f) ) return;
 //            printf("no. (%u vs %u)", target(areas[a].inner_boundaries[i].back(), true), source(f, true));
         }
         Boundary new_comp(true);
@@ -342,9 +342,9 @@ public:
     //-------------------------------
 
     void renameArea(unsigned oldi, unsigned newi){
-        for (unsigned e=0; e<edges.size(); e++){
-            if ( edges[e].left  == oldi ) edges[e].left  = newi;
-            if ( edges[e].right == oldi ) edges[e].right = newi;
+        for (auto & edge : edges){
+            if ( edge.left  == oldi ) edge.left  = newi;
+            if ( edge.right == oldi ) edge.right = newi;
         }
     }
     void deleteArea(unsigned a0){//ptrs would definitely be helpful here...
@@ -376,8 +376,8 @@ public:
         if ( areas[a].boundary.size()!=0 ){//this is not the unbounded component...
             bndary.push_back( boundaryToPath(areas[a].boundary ) );
         }
-        for (unsigned j = 0; j < areas[a].inner_boundaries.size(); j++){
-            bndary.push_back( boundaryToPath(areas[a].inner_boundaries[j]) );
+        for (auto & inner_boundarie : areas[a].inner_boundaries){
+            bndary.push_back( boundaryToPath(inner_boundarie) );
         }
         return bndary;
     }
@@ -398,8 +398,8 @@ public:
         }else{
             bndary =  boundaryToPath(areas[a].boundary);
         }
-        for (unsigned j = 0; j < areas[a].inner_boundaries.size(); j++){
-            bndary.append( boundaryToPath(areas[a].inner_boundaries[j]));
+        for (auto & inner_boundarie : areas[a].inner_boundaries){
+            bndary.append( boundaryToPath(inner_boundarie));
             bndary.appendNew<LineSegment>( bndary.initialPoint() );
         }
         bndary.close();
@@ -469,9 +469,9 @@ public:
         }
     }
     void drawKnownEdges( cairo_t *cr){
-        for (unsigned v=0; v<vertices.size(); v++){
-            for (unsigned e=0; e<vertices[v].boundary.size(); e++){
-                drawEdge(cr, vertices[v].boundary[e].edge);
+        for (auto & vertice : vertices){
+            for (unsigned e=0; e<vertice.boundary.size(); e++){
+                drawEdge(cr, vertice.boundary[e].edge);
             }
         }
     }

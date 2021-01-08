@@ -207,8 +207,8 @@ std::vector<double> roots(Piecewise<SBasis> const &f){
     for (unsigned i=0; i<f.size(); i++){
         std::vector<double> rts=roots(f.segs[i]);
 
-        for (unsigned r=0; r<rts.size(); r++){
-            result.push_back(f.mapToDomain(rts[r], i));
+        for (double rt : rts){
+            result.push_back(f.mapToDomain(rt, i));
         }
     }
     return result;

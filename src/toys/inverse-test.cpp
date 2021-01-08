@@ -94,7 +94,7 @@ class InverseTester: public Toy {
   int size;
     PointSetHandle hand;
 
-  void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+  void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
     
       for (int i=0;i<size;i++){
           hand.pts[i    ][0]=150+15*(i-size);
@@ -149,7 +149,7 @@ public:
     size=4;
     if(hand.pts.empty()) {
       for(int i = 0; i < 2*size; i++)
-	hand.pts.push_back(Geom::Point(0,150+150+uniform()*300*0));
+	hand.pts.emplace_back(0,150+150+uniform()*300*0);
     }
     hand.pts[0][1]=300;
     hand.pts[size][1]=150;

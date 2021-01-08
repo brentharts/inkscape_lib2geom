@@ -58,7 +58,7 @@ Piecewise< D2<SBasis> > zaggy(Interval intv, double dt, double radius) {
 class BoolOps: public Toy {
     PathVector pv;
     PointHandle offset_handle;
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         Geom::Translate t(offset_handle.pos);
         
         cairo_set_line_width(cr, 1);
@@ -69,8 +69,8 @@ class BoolOps: public Toy {
         cairo_stroke(cr);
 	
         cairo_set_source_rgb(cr, 0,0,0);
-	for(unsigned i = 0; i < pv.size(); i++) {
-	  Piecewise<D2<SBasis> > B = pv[i].toPwSb();
+	for(const auto & i : pv) {
+	  Piecewise<D2<SBasis> > B = i.toPwSb();
 	  Piecewise<D2<SBasis> > n = rot90(unitVector(derivative(B)));
 	  Piecewise<SBasis > al = arcLengthSb(B);
 	  
@@ -91,12 +91,12 @@ class BoolOps: public Toy {
 	  cairo_path(cr, zz_path*t);
 	  cairo_stroke(cr);
 	}        
-        for(unsigned i = 0; i < pv.size(); i++) {
-            if(pv[i].size() == 0) {
+        for(const auto & i : pv) {
+            if(i.size() == 0) {
                 *notify << "naked moveto;";
             } else 
-            for(unsigned j = 0; j < pv[i].size(); j++) {
-                const Curve* c = &pv[i][j];
+            for(const auto & j : i) {
+                const Curve* c = &j;
                 *notify << typeid(*c).name() << ';' ;
             }
         }
@@ -106,7 +106,7 @@ class BoolOps: public Toy {
     public:
     BoolOps () {}
 
-    void first_time(int argc, char** argv) {
+    void first_time(int argc, char** argv) override {
         const char *path_b_name="star.svgd";
         if(argc > 1)
             path_b_name = argv[1];

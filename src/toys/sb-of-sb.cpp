@@ -21,8 +21,8 @@ SBasis toSBasis(SBasisOf<double> const &f){
 }
 SBasisOf<double> toSBasisOfDouble(SBasis const &f){
     SBasisOf<double> result;
-    for (unsigned i=0; i<f.size(); i++){
-        result.push_back(LinearOf<double>(f[i][0],f[i][1]));
+    for (auto i : f){
+        result.push_back(LinearOf<double>(i[0],i[1]));
     }
     return result;
 }
@@ -347,18 +347,18 @@ sbofsb_cubic_solve(SBasisOf<SBasisOf<double> > const &f, Geom::Point const &A, G
 class SBasis0fSBasisToy: public Toy {
     PointSetHandle hand;
     PointSetHandle cut_hand;
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         
         double slider_top = width/4.;
         double slider_bot = width*3./4.;
         double slider_margin = width/8.;
         if(hand.pts.empty()) {
-            hand.pts.push_back(Geom::Point(width*3./16., 3*width/4.));
+            hand.pts.emplace_back(width*3./16., 3*width/4.);
             hand.pts.push_back(hand.pts[0] + Geom::Point(width/2., 0));
             hand.pts.push_back(hand.pts[0] + Geom::Point(width/8., -width/12.));
             hand.pts.push_back(hand.pts[0] + Geom::Point(0,-width/4.));
-            hand.pts.push_back(Geom::Point(slider_margin,slider_bot));
-            hand.pts.push_back(Geom::Point(width-slider_margin,slider_top));
+            hand.pts.emplace_back(slider_margin,slider_bot);
+            hand.pts.emplace_back(width-slider_margin,slider_top);
         }
         
         hand.pts[4][X] = slider_margin;

@@ -227,8 +227,8 @@ public:
         sufficient_stats ss;
         ss.Sx = ss.Sy = ss.Sxx = ss.Sxy = ss.Syy = 0;
         ac_ss.push_back(ss);
-        for(unsigned l = 0; l < input.size(); l++) {
-            ss += input[l];
+        for(auto & l : input) {
+            ss += l;
             ac_ss.push_back(ss);
         }
     }
@@ -329,9 +329,9 @@ void parse_data(vector<vector<Point> >& paths,
     }
     Rect bounds = *bld_bounds.result();
     //cout << bounds.min() << " - " << bounds.max() << endl;
-    for(unsigned i = 0; i < paths.size(); i++) {
-        for(unsigned j = 0; j < paths[i].size();j++) {
-            paths[i][j] = map_point(paths[i][j], bounds, 
+    for(auto & path : paths) {
+        for(auto & j : path) {
+            j = map_point(j, bounds, 
                                     Point(0,512), Point(512*bounds[0].extent()/bounds[1].extent(),0));
         }
     }
@@ -363,15 +363,15 @@ void parse_data(vector<vector<Point> >& paths,
 void extremePoints(vector<Point> const & pts, Point const & dir, 
                    Point & min, Point & max) {
     double minProj = DBL_MAX, maxProj = -DBL_MAX;
-    for(unsigned i=0;i<pts.size();i++) {
-        double p = dot(pts[i],dir);
+    for(auto pt : pts) {
+        double p = dot(pt,dir);
         if(p < minProj) {
             minProj = p;
-            min = pts[i];
+            min = pt;
         }
         if(p > maxProj) {
             maxProj = p;
-            max = pts[i];
+            max = pt;
         }
     }
 } 
@@ -402,7 +402,7 @@ void fit::test() {
         Point c = dot(max,d)*d;
         Point start = a+b;
         Point end = a+c;
-        lines.push_back(make_pair(start,end));
+        lines.emplace_back(start,end);
         thickness.push_back(1);
     }
     thickness[best] = 4;
@@ -414,7 +414,7 @@ void fit::schematised_merging(unsigned number_of_directions) {
     blocks.resize(N);
     for(unsigned i = 0; i<number_of_directions ; i++) {
         double t = M_PI*i/float(number_of_directions);
-        angles.push_back(Point(cos(t),sin(t)));
+        angles.emplace_back(cos(t),sin(t));
     }
     // pairs
     for(unsigned i = 0; i < N; i++) {
@@ -529,7 +529,7 @@ void fit::schematised_merging(unsigned number_of_directions) {
                     assert(c);
                     end = ln.pointAt(c->ta);
                 }                
-                lines.push_back(make_pair(start,end));
+                lines.emplace_back(start,end);
             }
             prev = beg;
             beg = b.next;
@@ -816,9 +816,9 @@ public:
   vector<PointSetHandle> metro_lines;
   PointHandle directions;
   
-  virtual bool should_draw_numbers() { return false; }
+  bool should_draw_numbers() override { return false; }
   
-  virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+  void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
     double slider_margin = 20;
     double slider_top = 20;
     double slider_bot = 200;
@@ -873,7 +873,7 @@ public:
     Toy::draw(cr, notify, width, height, save,timer_stream);
   }
 
-    void first_time(int argc, char** argv) {
+    void first_time(int argc, char** argv) override {
         string location_file_name("data/london-locations.csv");
         string path_file_name("data/london.txt");
         if(argc > 2) {
@@ -882,14 +882,14 @@ public:
         }
         cout << location_file_name << ", " << path_file_name << endl;
         parse_data(paths, location_file_name, path_file_name);
-        for(unsigned i=0;i<paths.size();i++) {
-            metro_lines.push_back(PointSetHandle());
-            for(unsigned j=0;j<paths[i].size();j++) {
-                metro_lines.back().push_back(paths[i][j]);
+        for(auto & path : paths) {
+            metro_lines.emplace_back();
+            for(auto & j : path) {
+                metro_lines.back().push_back(j);
             }
         }
-        for(unsigned i=0;i<metro_lines.size();i++) {
-            handles.push_back(&metro_lines[i]);
+        for(auto & metro_line : metro_lines) {
+            handles.push_back(&metro_line);
         }
         handles.push_back(&directions);
     }

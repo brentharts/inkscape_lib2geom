@@ -57,7 +57,7 @@ class RootFinderComparer: public Toy {
 public:
     PointSetHandle psh;
     
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         std::vector<Geom::Point> trans;
         trans.resize(psh.size());
         for(unsigned i = 0; i < handles.size(); i++) {
@@ -188,8 +188,8 @@ public:
         std::copy(solutions.begin(), solutions.end(), std::ostream_iterator<double >(*notify, ","));
         *notify << "solver 1d bernstein subdivision accuracy:"
                  << std::endl;
-        for(unsigned i = 0; i < solutions.size(); i++) {
-            *notify << solutions[i] << ":" << eval_bernstein(ys, solutions[i], trans.size()) << ",";
+        for(double solution : solutions) {
+            *notify << solution << ":" << eval_bernstein(ys, solution, trans.size()) << ",";
         }
         tm.ask_for_timeslice();
         tm.start();
@@ -200,8 +200,8 @@ public:
         std::copy(solutions.begin(), solutions.end(), std::ostream_iterator<double>(*notify, ",\t"));
         *notify << "\n time = " << als_time << std::endl;
 #endif        
-        for(unsigned i = 0; i < solutions.size(); i++) {
-            double x = test_sb[0](solutions[i]);
+        for(double solution : solutions) {
+            double x = test_sb[0](solution);
             draw_cross(cr, Geom::Point(x, height/2));
             
         }

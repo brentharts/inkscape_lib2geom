@@ -105,8 +105,8 @@ class IntersectDataTester: public Toy {
         }else{
             bndary =  boundaryToPath(topo.areas[a].boundary);
         }
-        for (unsigned j = 0; j < topo.areas[a].inner_boundaries.size(); j++){
-            bndary.append( boundaryToPath(topo.areas[a].inner_boundaries[j]));
+        for (auto & inner_boundarie : topo.areas[a].inner_boundaries){
+            bndary.append( boundaryToPath(inner_boundarie));
             bndary.appendNew<LineSegment>( bndary.initialPoint() );
         }
         bndary.close();
@@ -125,8 +125,8 @@ class IntersectDataTester: public Toy {
         double r,g,b;
 
         int winding = 0;
-        for (unsigned k=0; k<topo.areas[a].windings.size(); k++){
-            winding += topo.areas[a].windings[k];
+        for (int k : topo.areas[a].windings){
+            winding += k;
         }
 
         //convertHSVtoRGB(0, 1., .5 + winding/10, r,g,b);
@@ -235,7 +235,7 @@ class IntersectDataTester: public Toy {
         }
     }
 
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         *notify<<"line command args: svgd file or (nb paths, nb curves/path, degree of curves).\n";
         cairo_set_source_rgba (cr, 0., 0., 0, 1);
         cairo_set_line_width (cr, 1);
@@ -296,10 +296,10 @@ class IntersectDataTester: public Toy {
 
 
     void initSliders(){
-        sliders.push_back(Slider(0.0, 1, 0, 0.0, "intersection chooser"));
-        sliders.push_back(Slider(0.0, 1, 0, 0.0, "ray chooser"));
-        sliders.push_back(Slider(0.0, 1, 0, 0.0, "area chooser"));
-        sliders.push_back(Slider(-5.0, 2, 0, 0.0, "tolerance chooser"));
+        sliders.emplace_back(0.0, 1, 0, 0.0, "intersection chooser");
+        sliders.emplace_back(0.0, 1, 0, 0.0, "ray chooser");
+        sliders.emplace_back(0.0, 1, 0, 0.0, "area chooser");
+        sliders.emplace_back(-5.0, 2, 0, 0.0, "tolerance chooser");
 
         handles.push_back(&(sliders[0]));
         handles.push_back(&(sliders[1]));
@@ -326,7 +326,7 @@ class IntersectDataTester: public Toy {
                 cmd_line_paths[i].appendNew<LineSegment>(cmd_line_paths[i].initialPoint() );
             }
             Point p = cmd_line_paths[i].initialPoint();
-            paths_handles.push_back(PointSetHandle());
+            paths_handles.emplace_back();
             paths_handles[i].push_back(p);
             handles.push_back( &paths_handles[i] );
         }        
@@ -349,21 +349,21 @@ class IntersectDataTester: public Toy {
     IntersectDataTester(){
         nb_paths=3; nb_curves_per_path = 5; degree = 1;
 
-        paths_handles.push_back(PointSetHandle());
+        paths_handles.emplace_back();
         paths_handles[0].push_back(100,100);
         paths_handles[0].push_back(100,200);
         paths_handles[0].push_back(300,200);
         paths_handles[0].push_back(300,100);
         paths_handles[0].push_back(100,100);
 
-        paths_handles.push_back(PointSetHandle());
+        paths_handles.emplace_back();
         paths_handles[1].push_back(120,190);
         paths_handles[1].push_back(200,210);
         paths_handles[1].push_back(280,190);
         paths_handles[1].push_back(200,300);
         paths_handles[1].push_back(120,190);
 
-        paths_handles.push_back(PointSetHandle());
+        paths_handles.emplace_back();
         paths_handles[2].push_back(180,150);
         paths_handles[2].push_back(200,140);
         paths_handles[2].push_back(220,150);
@@ -378,11 +378,11 @@ class IntersectDataTester: public Toy {
     }
 
 
-    void first_time(int /*argc*/, char** /*argv*/) {
+    void first_time(int /*argc*/, char** /*argv*/) override {
         nb_steps = -1;
     }
 
-    void key_hit(GdkEventKey *e)
+    void key_hit(GdkEventKey *e) override
     {
         char choice = std::toupper(e->keyval);
         switch ( choice )

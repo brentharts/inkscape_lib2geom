@@ -98,22 +98,22 @@ class Worm {
 class Intro: public Toy {
     int t;
     vector<Worm> worms;
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         t++;
         if(t < 40 && t % 2 == 0) {
-            worms.push_back(Worm(t, uniform(), uniform(), uniform(), uniform() * 200 + 50));
+            worms.emplace_back(t, uniform(), uniform(), uniform(), uniform() * 200 + 50);
         }
 
-        for(unsigned i = 0; i < worms.size(); i++) {
-            worms[i].draw(cr, t);
-            if(uniform() > .999) worms[i].tele(t);
+        for(auto & worm : worms) {
+            worm.draw(cr, t);
+            if(uniform() > .999) worm.tele(t);
         }
         
         Toy::draw(cr, notify, width, height, save,timer_stream);
         redraw();
     }
 
-    virtual int should_draw_bounds() { return 0; }
+    int should_draw_bounds() override { return 0; }
     
     public:
     Intro () {

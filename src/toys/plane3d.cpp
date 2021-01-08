@@ -24,7 +24,7 @@ class Box3d: public Toy {
     PointSetHandle vanishing_points_handles;
     PathVector paths_a;
     
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
 
         Geom::Point orig = origin_handle.pos;
 	cairo_set_source_rgba (cr, 0., 0.125, 0, 1);
@@ -42,15 +42,15 @@ class Box3d: public Toy {
         }
 
         *notify << "Projection matrix:" << endl;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                *notify << tmat[i][j] << " ";
+        for (auto & i : tmat) {
+            for (double j : i) {
+                *notify << j << " ";
             }
             *notify << endl;
         }
 
-        for(unsigned i = 0; i < paths_a.size(); i++) {
-            Piecewise<D2<SBasis> >  path_a_pw = paths_a[i].toPwSb();
+        for(const auto & i : paths_a) {
+            Piecewise<D2<SBasis> >  path_a_pw = i.toPwSb();
 
             D2<Piecewise<SBasis> > B = make_cuts_independent(path_a_pw);
             Piecewise<SBasis> preimage[4];
@@ -75,7 +75,7 @@ class Box3d: public Toy {
         
         Toy::draw(cr, notify, width, height, save,timer_stream);
     }
-    void first_time(int argc, char** argv) {
+    void first_time(int argc, char** argv) override {
         const char *path_a_name="ptitle.svgd";
         if(argc > 1)
             path_a_name = argv[1];

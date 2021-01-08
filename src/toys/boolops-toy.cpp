@@ -25,7 +25,7 @@ public:
         : path_handles_inited(false)
     {}
 
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         if (!path_handles_inited) {
             Rect vp(Point(10,10), Point(width-10, height-10));
             setup_path_handles(vp);
@@ -108,24 +108,24 @@ public:
 
         if (togs[7].on) {
             cairo_set_source_rgb(cr, 0, 1, 1);
-            for (unsigned i = 0; i < wpoints.size(); ++i) {
-                draw_handle(cr, wpoints[i]);
+            for (auto & wpoint : wpoints) {
+                draw_handle(cr, wpoint);
             }
             cairo_stroke(cr);
         }
 
         if (togs[3].on) {
             cairo_set_source_rgb(cr, 0, 1, 0);
-            for (unsigned i = 0; i < ix.size(); ++i) {
-                draw_handle(cr, ix[i]);
+            for (auto & i : ix) {
+                draw_handle(cr, i);
             }
             cairo_stroke(cr);
         }
 
         if (togs[4].on) {
             cairo_set_source_rgb(cr, 1, 0, 0);
-            for (unsigned i = 0; i < dix.size(); ++i) {
-                draw_handle(cr, dix[i]);
+            for (auto & i : dix) {
+                draw_handle(cr, i);
             }
             cairo_stroke(cr);
         }
@@ -156,12 +156,12 @@ public:
         Toy::draw(cr, notify, width, height, save,timer_stream);
     }
 
-    void mouse_pressed(GdkEventButton* e) {
+    void mouse_pressed(GdkEventButton* e) override {
         toggle_events(togs, e);
         Toy::mouse_pressed(e);
     }
 
-    void first_time(int argc, char** argv) {
+    void first_time(int argc, char** argv) override {
         const char *path_a_name="svgd/winding.svgd";
         const char *path_b_name="svgd/star.svgd";
         if(argc > 1)
@@ -197,15 +197,15 @@ public:
         ah = Line(*apts.first, *apts.second);
         bh = Line(*bpts.first, *bpts.second);
 
-        togs.push_back(Toggle("R", true));
-        togs.push_back(Toggle("&", false));
-        togs.push_back(Toggle("B", false));
+        togs.emplace_back("R", true);
+        togs.emplace_back("&", false);
+        togs.emplace_back("B", false);
 
-        togs.push_back(Toggle("X", true));
-        togs.push_back(Toggle("D", true));
-        togs.push_back(Toggle("I", false));
-        togs.push_back(Toggle("O", false));
-        togs.push_back(Toggle("W", false));
+        togs.emplace_back("X", true);
+        togs.emplace_back("D", true);
+        togs.emplace_back("I", false);
+        togs.emplace_back("O", false);
+        togs.emplace_back("W", false);
     }
     
     void setup_path_handles(Rect const &viewport) {
@@ -217,8 +217,8 @@ public:
         path_handles[2] = PointHandle(bht.initialPoint());
         path_handles[3] = PointHandle(bht.finalPoint());
 
-        for (unsigned i = 0; i < 4; ++i) {
-            handles.push_back(&path_handles[i]);
+        for (auto & path_handle : path_handles) {
+            handles.push_back(&path_handle);
         }
         path_handles_inited = true;
     }

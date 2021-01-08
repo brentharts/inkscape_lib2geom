@@ -99,13 +99,13 @@ public:
     Coord operator[](unsigned i) const { return _pt[i]; }
     Coord &operator[](unsigned i) { return _pt[i]; }
 
-    Coord operator[](Dim2 d) const throw() { return _pt[d]; }
-    Coord &operator[](Dim2 d) throw() { return _pt[d]; }
+    Coord operator[](Dim2 d) const noexcept { return _pt[d]; }
+    Coord &operator[](Dim2 d) noexcept { return _pt[d]; }
 
-    Coord x() const throw() { return _pt[X]; }
-    Coord &x() throw() { return _pt[X]; }
-    Coord y() const throw() { return _pt[Y]; }
-    Coord &y() throw() { return _pt[Y]; }
+    Coord x() const noexcept { return _pt[X]; }
+    Coord &x() noexcept { return _pt[X]; }
+    Coord y() const noexcept { return _pt[Y]; }
+    Coord &y() noexcept { return _pt[Y]; }
     /// @}
 
     /// @name Vector operations
@@ -153,12 +153,12 @@ public:
         return *this;
     }
     Point &operator*=(Coord s) {
-        for ( unsigned i = 0 ; i < 2 ; ++i ) _pt[i] *= s;
+        for (double & i : _pt) i *= s;
         return *this;
     }
     Point &operator/=(Coord s) {
         //TODO: s == 0?
-        for ( unsigned i = 0 ; i < 2 ; ++i ) _pt[i] /= s;
+        for (double & i : _pt) i /= s;
         return *this;
     }
     /// @}
@@ -198,8 +198,8 @@ public:
     /// @{
     /** @brief Check whether both coordinates are finite. */
     bool isFinite() const {
-        for ( unsigned i = 0 ; i < 2 ; ++i ) {
-            if(!std::isfinite(_pt[i])) return false;
+        for (double i : _pt) {
+            if(!std::isfinite(i)) return false;
         }
         return true;
     }

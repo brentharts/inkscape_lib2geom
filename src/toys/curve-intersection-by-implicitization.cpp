@@ -101,8 +101,8 @@ void intersect(intersections_info& xs,  D2<SBasis> const& A, D2<SBasis> const& B
     if (A[0].size() > B[0].size())
     {
         intersect(xs, B, A);
-        for (size_t i = 0; i < xs.size(); ++i)
-            swap(xs[i].t0, xs[i].t1);
+        for (auto & x : xs)
+            swap(x.t0, x.t1);
 
         return;
     }
@@ -168,11 +168,11 @@ void intersect(intersections_info& xs,  D2<SBasis> const& A, D2<SBasis> const& B
     pt.reserve(sol.size());
     std::vector<Point> points;
     points.reserve(sol.size());
-    for (size_t i = 0; i < sol.size(); ++i)
+    for (double & i : sol)
     {
-        if (sol[i] >= 0 && sol[i] <= 1)
+        if (i >= 0 && i <= 1)
         {
-            pt.push_back(sol[i]);
+            pt.push_back(i);
             points.push_back(B(pt.back()));
         }
     }
@@ -231,7 +231,7 @@ class IntersectImplicit : public Toy
 {
 
     void draw( cairo_t *cr, std::ostringstream *notify,
-               int width, int height, bool save, std::ostringstream *timer_stream)
+               int width, int height, bool save, std::ostringstream *timer_stream) override
     {
         cairo_set_line_width (cr, 0.3);
         cairo_set_source_rgba (cr, 0.8, 0., 0, 1);
@@ -244,9 +244,9 @@ class IntersectImplicit : public Toy
         cairo_stroke(cr);
 
         intersect(xs, A, B);
-        for (size_t i = 0; i < xs.size(); ++i)
+        for (auto & x : xs)
         {
-            draw_handle(cr, xs[i].p);
+            draw_handle(cr, x.p);
         }
 
         Toy::draw(cr, notify, width, height, save,timer_stream);

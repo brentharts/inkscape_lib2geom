@@ -970,7 +970,7 @@ class PointToBezierTester: public Toy {
     std::vector<Toggle> toggles;
     Piecewise<D2<SBasis > > stroke;
 
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         cairo_save(cr);
 
         cairo_set_source_rgba (cr, 0., 0., 0., 1);
@@ -994,8 +994,8 @@ class PointToBezierTester: public Toy {
       
         if(!mouses.empty()) {
             cairo_move_to(cr, mouses[0]);
-            for(unsigned i = 0; i < mouses.size(); i++) {
-                cairo_line_to(cr, mouses[i]);
+            for(auto & mouse : mouses) {
+                cairo_line_to(cr, mouse);
             }
             cairo_stroke(cr);
         }
@@ -1067,14 +1067,14 @@ class PointToBezierTester: public Toy {
     }
   
 public:
-    void key_hit(GdkEventKey *e) {
+    void key_hit(GdkEventKey *e) override {
         if(e->keyval == 's') toggles[0].toggle();
         redraw();
     }
     vector<Point> mouses;
     int mouse_drag;
     
-    void mouse_pressed(GdkEventButton* e) {
+    void mouse_pressed(GdkEventButton* e) override {
         toggle_events(toggles, e);
         Toy::mouse_pressed(e);
         if(!selected) {
@@ -1084,16 +1084,16 @@ public:
     }
     
     
-    virtual void mouse_moved(GdkEventMotion* e) {
+    void mouse_moved(GdkEventMotion* e) override {
         if(mouse_drag) {
-            mouses.push_back(Point(e->x, e->y));
+            mouses.emplace_back(e->x, e->y);
             redraw();
         } else {
             Toy::mouse_moved(e);
         }
     }
 
-    virtual void mouse_released(GdkEventButton* e) {
+    void mouse_released(GdkEventButton* e) override {
         mouse_drag = 0;
         stroke.clear();
         stroke.push_cut(0);
@@ -1108,8 +1108,8 @@ public:
     PointToBezierTester() {
         adjuster2.pos = Geom::Point(150,300);
         handles.push_back(&adjuster2);
-        toggles.push_back(Toggle("Seq", false));
-        toggles.push_back(Toggle("Linfty", true));
+        toggles.emplace_back("Seq", false);
+        toggles.emplace_back("Linfty", true);
         //}
         //sliders.push_back(Slider(0.0, 1.0, 0.0, 0.0, "t"));
         //handles.push_back(&(sliders[0]));

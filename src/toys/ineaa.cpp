@@ -534,18 +534,18 @@ public:
         }
     }
     
-    void key_hit(GdkEventKey *e) {
+    void key_hit(GdkEventKey *e) override {
         if(e->keyval == 'w') toggles[0].toggle(); else
         if(e->keyval == 'a') toggles[1].toggle(); else
         if(e->keyval == 'q') toggles[2].toggle(); else
         if(e->keyval == 's') toggles[3].toggle();
         redraw();
     }
-    void mouse_pressed(GdkEventButton* e) {
+    void mouse_pressed(GdkEventButton* e) override {
         toggle_events(toggles, e);
         Toy::mouse_pressed(e);
     }
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         cairo_set_source_rgba (cr, 0., 0., 0, 1);
         cairo_set_line_width (cr, 1);
         origin = orig_handle.pos;
@@ -559,13 +559,13 @@ public:
             //recursive_implicit(Rect(Interval(0,width), Interval(0, height)), cr, 3);
             cairo_restore(cr);
             iters = 0;
-            for(int i = 0; i < 4; i++)
-                splits[i] = 0;
+            for(int & split : splits)
+                split = 0;
             show_splits = toggles[0].on;
             eval = trial_eval;
             recursive_implicit(Rect(Interval(0,width), Interval(0, height)), cr, 3);
-            for(int i = 0; i < 4; i++)
-                *notify << splits[i] << " + ";
+            for(int split : splits)
+                *notify << split << " + ";
             *notify << " = " << iters;
         }
         if(1) {

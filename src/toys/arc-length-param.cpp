@@ -29,7 +29,7 @@ public:
     PointSetHandle b2_handle;
     void draw(cairo_t *cr,
 	      std::ostringstream *notify,
-	      int width, int height, bool save, std::ostringstream *timer_stream) {
+	      int width, int height, bool save, std::ostringstream *timer_stream) override {
     
         D2<SBasis> B1 = b1_handle.asBezier();
         D2<SBasis> B2 = b2_handle.asBezier();
@@ -41,8 +41,8 @@ public:
         std::vector< Piecewise<D2<SBasis> > > pieces;
         pieces = fuse_nearby_ends(split_at_discontinuities(B),9);
         Piecewise<D2<SBasis> > C;
-        for (unsigned i=0; i<pieces.size(); i++){
-            C.concat(pieces[i]);
+        for (auto & piece : pieces){
+            C.concat(piece);
         }
 // testing fuse_nearby_ends
 

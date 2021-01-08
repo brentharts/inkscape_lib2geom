@@ -56,8 +56,7 @@ using namespace std;
 std::vector<Point> neighbors(std::vector<Point> const &pts, unsigned idx, double radius){
     std::vector<Point> res;
     Point p0 = pts[idx];
-    for (unsigned i = 0; i<pts.size(); i++){
-        Point p = pts[i];
+    for (auto p : pts){
         if ( L2(p-p0) < radius ) res.push_back(p);
     }
     return res;
@@ -105,10 +104,10 @@ Point massCenter(std::vector<Point> const &pts){
 Line meanSquareLine(std::vector<Point> const &pts){
     Point g = massCenter(pts);
     double a = 0, b = 0, c = 0;
-    for (unsigned i=0; i<pts.size(); i++){
-        a += (pts[i][Y]-g[Y])*(pts[i][Y]-g[Y]);
-        b +=-(pts[i][X]-g[X])*(pts[i][Y]-g[Y]);
-        c += (pts[i][X]-g[X])*(pts[i][X]-g[X]);
+    for (auto pt : pts){
+        a += (pt[Y]-g[Y])*(pt[Y]-g[Y]);
+        b +=-(pt[X]-g[X])*(pt[Y]-g[Y]);
+        c += (pt[X]-g[X])*(pt[X]-g[X]);
     }
     double eigen = ( (a+c) - sqrt((a-c)*(a-c)+4*b*b) )/2; 
     Point u(-b,a-eigen);
@@ -150,9 +149,9 @@ void fuse_close_points(std::vector<Point> &pts, double dist_min){
     if (pts.size()==0) return;
     std::vector<Point> reduced_pts;
     reduced_pts.push_back(pts[0]);
-    for (unsigned i = 0; i<pts.size(); i++){
-        double d = dist_to(reduced_pts, pts[i]);
-        if ( d > dist_min ) reduced_pts.push_back(pts[i]);
+    for (auto & pt : pts){
+        double d = dist_to(reduced_pts, pt);
+        if ( d > dist_min ) reduced_pts.push_back(pt);
     }
     pts = reduced_pts;
     return;
@@ -338,7 +337,7 @@ class SketchFitterToy: public Toy {
     static const char keys[TOTAL_ITEMS];
 
     void fit_empty(){}
-    virtual void first_time(int /*argc*/, char** /*argv*/)
+    void first_time(int /*argc*/, char** /*argv*/) override
     {
         draw_f = &SketchFitterToy::draw_menu;
         fit_f =  &SketchFitterToy::fit_empty;
@@ -380,8 +379,8 @@ class SketchFitterToy: public Toy {
             //for(unsigned i = 0; i < mouses.size(); i++) {
             //    cairo_line_to(cr, mouses[i]);
             //}
-            for(unsigned i = 0; i < mouses.size(); i++) {
-                draw_cross(cr, mouses[i]);
+            for(auto & mouse : mouses) {
+                draw_cross(cr, mouse);
             }
             cairo_set_source_rgba (cr, 0., 0., 0., .25);
             cairo_set_line_width (cr, 0.5);
@@ -390,8 +389,8 @@ class SketchFitterToy: public Toy {
 
         if(!improved_mouses.empty() && toggles[DRAW_IMPROVED_MOUSES].on ) {            
             cairo_move_to(cr, improved_mouses[0]);
-            for(unsigned i = 0; i < improved_mouses.size(); i++) {
-                draw_cross(cr, improved_mouses[i]);
+            for(auto & improved_mouse : improved_mouses) {
+                draw_cross(cr, improved_mouse);
             }
             cairo_set_source_rgba (cr, 1., 0., 0., 1);
             cairo_set_line_width (cr, .75);
@@ -725,7 +724,7 @@ public:
     vector<Point> improved_mouses;
     Piecewise<D2<SBasis > > stroke;
     
-    void mouse_pressed(GdkEventButton* e) {
+    void mouse_pressed(GdkEventButton* e) override {
         //toggle_events(toggles, e);
 	Toy::mouse_pressed(e);
 	if(!selected) {
@@ -736,16 +735,16 @@ public:
 	}
     }
 
-    virtual void mouse_moved(GdkEventMotion* e) {
+    void mouse_moved(GdkEventMotion* e) override {
 	if(mouse_drag) {
-	    mouses.push_back(Point(e->x, e->y));
+	    mouses.emplace_back(e->x, e->y);
 	    redraw();
 	} else {
 	    Toy::mouse_moved(e);
 	}
     }
 
-    virtual void mouse_released(GdkEventButton* e) {
+    void mouse_released(GdkEventButton* e) override {
         mouse_drag = 0;
         if(!mouses.empty()) {            
             (this->*fit_f)();
@@ -773,11 +772,11 @@ public:
         }
         if(!mouses.empty()) {
             cairo_move_to(cr, mouses[0]);
-            for(unsigned i = 0; i < mouses.size(); i++) {
-                cairo_line_to(cr, mouses[i]);
+            for(auto & mouse : mouses) {
+                cairo_line_to(cr, mouse);
             }
-            for(unsigned i = 0; i < mouses.size(); i++) {
-                draw_cross(cr, mouses[i]);
+            for(auto & mouse : mouses) {
+                draw_cross(cr, mouse);
             }
             cairo_set_source_rgba (cr, 0., 0., 0., .25);
             cairo_set_line_width (cr, 0.5);
@@ -785,7 +784,7 @@ public:
         }
     }
 
-    void key_hit(GdkEventKey *e)
+    void key_hit(GdkEventKey *e) override
     {
         char choice = std::toupper(e->keyval);
         switch ( choice )
@@ -835,8 +834,8 @@ public:
         redraw();
     }
 
-    virtual void draw( cairo_t *cr, std::ostringstream *notify,
-                       int width, int height, bool save, std::ostringstream *timer_stream )
+    void draw( cairo_t *cr, std::ostringstream *notify,
+                       int width, int height, bool save, std::ostringstream *timer_stream ) override
     {
         m_width = width;
         m_height = height;

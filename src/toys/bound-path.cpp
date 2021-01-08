@@ -59,7 +59,7 @@ class BoundsPath : public Toy
     
   private:
     void draw( cairo_t *cr, std::ostringstream *notify, 
-               int width, int height, bool save, std::ostringstream *timer_stream)
+               int width, int height, bool save, std::ostringstream *timer_stream) override
     {
         cairo_set_line_width (cr, 0.3);
         m_selection_kind = (unsigned int) (sliders[0].value());
@@ -116,7 +116,7 @@ class BoundsPath : public Toy
     }
     
     
-    void mouse_pressed(GdkEventButton* e)
+    void mouse_pressed(GdkEventButton* e) override
     {
         Point pos(e->x, e->y);
         double d, t;
@@ -239,12 +239,12 @@ class BoundsPath : public Toy
             }
         }
         
-        sliders.push_back(Slider(0, 2, 1, 0, "selection type"));
+        sliders.emplace_back(0, 2, 1, 0, "selection type");
         sliders[0].geometry(Point(10, 20), 50, X);
         sliders[0].formatter(&option_formatter);
         
         Rect toggle_bound(Point(300,20), Point(390, 45));
-        toggles.push_back(Toggle(toggle_bound, "fast/exact", EXACT));
+        toggles.emplace_back(toggle_bound, "fast/exact", EXACT);
         
         handles.push_back(&(sliders[0]));
         handles.push_back(&(toggles[0]));

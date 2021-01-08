@@ -160,8 +160,7 @@ TEST_F(BezierTest, Portion) {
     for (unsigned i = 0; i < 10000; ++i) {
         double from = g_random_double_range(0, 1);
         double to = g_random_double_range(0, 1);
-        for (unsigned i = 0; i < 4; ++i) {
-            Bezier &input = fragments[i];
+        for (auto & input : fragments) {
             Bezier result = portion(input, from, to);
 
             // the endpoints must correspond exactly
@@ -175,8 +174,7 @@ TEST_F(BezierTest, Subdivide) {
     std::vector<std::pair<Bezier, double> > errors;
     for (unsigned i = 0; i < 10000; ++i) {
         double t = g_random_double_range(0, 1e-6);
-        for (unsigned i = 0; i < 4; ++i) {
-            Bezier &input = fragments[i];
+        for (auto & input : fragments) {
             std::pair<Bezier, Bezier> result = input.subdivide(t);
 
             // the endpoints must correspond exactly
@@ -193,7 +191,7 @@ TEST_F(BezierTest, Subdivide) {
             EXPECT_EQ(result.second.valueAt(1), input.valueAt(1));
 
             if (result.first.at1() != result.second.at0()) {
-                errors.push_back(std::pair<Bezier,double>(input, t));
+                errors.emplace_back(input, t);
             }
         }
     }
@@ -256,8 +254,8 @@ Bezier linear_root(double t) {
 // Constructs a Bezier with roots at the locations in x
 Bezier array_roots(vector<double> x) {
     Bezier b(1);
-    for(unsigned i = 0; i < x.size(); i++) {
-        b = multiply(b, linear_root(x[i]));
+    for(double i : x) {
+        b = multiply(b, linear_root(i));
     }
     return b;
 }
@@ -302,11 +300,11 @@ TEST_F(BezierTest, Roots) {
     tests.push_back(vector_from_array((const double[]){.1,.2,.3,.4,.5,.6}));
     tests.push_back(vector_from_array((const double[]){0.25,0.25,0.25,0.75,0.75,0.75}));
     
-    for(unsigned test_i = 0; test_i < tests.size(); test_i++) {
-        Bezier b = array_roots(tests[test_i]);
+    for(auto & test : tests) {
+        Bezier b = array_roots(test);
         //std::cout << tests[test_i] << ": " << b << std::endl;
         //std::cout << b.roots() << std::endl;
-        EXPECT_vector_near(tests[test_i], b.roots(), eps);
+        EXPECT_vector_near(test, b.roots(), eps);
     }
 }
 
@@ -358,8 +356,7 @@ TEST_F(BezierTest, Operators) {
     EXPECT_TRUE(bounds_local(hump, Interval(0.3, 0.6))->contains(tight_local_bounds));
 
     Bezier Bs[] = {unit, hump, wiggle};
-    for(unsigned i = 0; i < sizeof(Bs)/sizeof(Bezier); i++) {
-        Bezier B = Bs[i];
+    for(auto B : Bs) {
         Bezier product = multiply(B, B);
         for(int i = 0; i <= 16; i++) {
             double t = i/16.0;
@@ -406,7 +403,7 @@ TEST_F(BezierTest, Intersection) {
     std::vector<XTest> tests;
 
     // Example 1
-    tests.push_back(XTest());
+    tests.emplace_back();
     tests.back().a = D2Bez(Bezier(-3.3, -3.3, 0, 3.3, 3.3), Bezier(1.3, -0.7, 2.3, -0.7, 1.3));
     tests.back().b = D2Bez(Bezier(-4.0, -4.0, 0, 4.0, 4.0), Bezier(-0.35, 3.0, -2.6, 3.0, -0.35));
     tests.back().s.resize(4);
@@ -416,7 +413,7 @@ TEST_F(BezierTest, Intersection) {
     tests.back().s[3] = XPt(3.12109, 0.76362, 0.90166, 0.79396);
 
     // Example 2
-    tests.push_back(XTest());
+    tests.emplace_back();
     tests.back().a = D2Bez(Bezier(0, 0, 3, 3), Bezier(0, 14, -9, 5));
     tests.back().b = D2Bez(Bezier(-1, 13, -10, 4), Bezier(4, 4, 1, 1));
     tests.back().s.resize(9);
@@ -431,7 +428,7 @@ TEST_F(BezierTest, Intersection) {
     tests.back().s[8] = XPt(2.99191, 3.82750, 0.96971, 0.14570);
 
     // Example 3
-    tests.push_back(XTest());
+    tests.emplace_back();
     tests.back().a = D2Bez(Bezier(-5, -5, -3, 0, 3, 5, 5), Bezier(0, 3.555, -1, 4.17, -1, 3.555, 0));
     tests.back().b = D2Bez(Bezier(-6, -6, -3, 0, 3, 6, 6), Bezier(3, -0.555, 4, -1.17, 4, -0.555, 3));
     tests.back().s.resize(6);
@@ -443,7 +440,7 @@ TEST_F(BezierTest, Intersection) {
     tests.back().s[5] = XPt(3.64353, 1.49822, 0.76880, 0.72695);
 
     // Example 4
-    tests.push_back(XTest());
+    tests.emplace_back();
     tests.back().a = D2Bez(Bezier(-4, -10, -2, -2, 2, 2, 10, 4), Bezier(0, 6, 6, 0, 0, 6, 6, 0));
     tests.back().b = D2Bez(Bezier(-8, 0, 8), Bezier(1, 6, 1));
     tests.back().s.resize(4);

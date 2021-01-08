@@ -254,7 +254,7 @@ class SbToBezierTester: public Toy {
     PointHandle adjuster, adjuster2;
     std::vector<Toggle> toggles;
 
-  void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+  void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
       cairo_save(cr);
       for(unsigned i = 1; i < path_psh.size(); i++)
           path_psh[i-1]->pts.back() = path_psh[i]->pts[0];
@@ -343,8 +343,8 @@ class SbToBezierTester: public Toy {
       }
       Geom::PathVector vpt = path_from_piecewise(f_as_pw, curve_precision, true);
       unsigned default_number_curves = 0;
-      for(unsigned i = 0; i < vpt.size(); i++) {
-          default_number_curves += vpt[i].size();
+      for(const auto & i : vpt) {
+          default_number_curves += i.size();
       }
       
       *notify << "      segments from default algorithm: "<< default_number_curves <<"\n";
@@ -359,11 +359,11 @@ class SbToBezierTester: public Toy {
   }
   
 public:
-    void key_hit(GdkEventKey *e) {
+    void key_hit(GdkEventKey *e) override {
         if(e->keyval == 's') toggles[0].toggle();
         redraw();
     }
-    void mouse_pressed(GdkEventButton* e) {
+    void mouse_pressed(GdkEventButton* e) override {
         toggle_events(toggles, e);
         Toy::mouse_pressed(e);
     }
@@ -379,8 +379,8 @@ public:
       handles.push_back(&adjuster);
       adjuster2.pos = Geom::Point(150,300);
       handles.push_back(&adjuster2);
-      toggles.push_back(Toggle("Seq", true));
-      toggles.push_back(Toggle("Linfty", true));
+      toggles.emplace_back("Seq", true);
+      toggles.emplace_back("Linfty", true);
       //}
     //sliders.push_back(Slider(0.0, 1.0, 0.0, 0.0, "t"));
     //handles.push_back(&(sliders[0]));

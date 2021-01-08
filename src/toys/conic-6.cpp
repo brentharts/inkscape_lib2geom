@@ -151,12 +151,12 @@ class Conic6: public Toy {
     std::vector<Slider> sliders;
     Point    mouse_sampler;
 
-    virtual void mouse_moved(GdkEventMotion* e) {
+    void mouse_moved(GdkEventMotion* e) override {
         mouse_sampler = Point(e->x, e->y);
         Toy::mouse_moved(e);
     }
     
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         cairo_set_source_rgba (cr, 0., 0., 0, 1);
         cairo_set_line_width (cr, 1);
         Rect screen_rect(Interval(10, width-10), Interval(10, height-10));
@@ -235,14 +235,14 @@ class Conic6: public Toy {
             
             cairo_set_source_rgb(cr, 1, 0., 0.);
             rts = C1.roots(L0);
-            for(unsigned i = 0; i < rts.size(); i++) {
-                Point P = L0.pointAt(rts[i]);
+            for(double rt : rts) {
+                Point P = L0.pointAt(rt);
                 draw_cross(cr, P);
                 *notify << C1.valueAt(P) << "; " << C2.valueAt(P) << "\n";
             }
             rts = C1.roots(L1);
-            for(unsigned i = 0; i < rts.size(); i++) {
-                Point P = L1.pointAt(rts[i]);
+            for(double rt : rts) {
+                Point P = L1.pointAt(rt);
                 draw_cross(cr, P);
                 *notify << C1.valueAt(P) << "; "<< C2.valueAt(P) << "\n";
             }
@@ -253,8 +253,8 @@ class Conic6: public Toy {
         ::draw(cr, C1*sliders[0].value() + C2*sliders[1].value(), screen_rect);
         
         std::vector<Point> res = intersect(C1, C2);
-        for(unsigned i = 0; i < res.size(); i++) {
-            draw_circ(cr, res[i]);
+        for(auto & re : res) {
+            draw_circ(cr, re);
         }
         
         cairo_stroke(cr);
@@ -271,9 +271,9 @@ public:
         }
         handles.push_back(&C1H);
         handles.push_back(&C2H);
-        sliders.push_back(Slider(-1.0, 1.0, 0, 0.0, "a"));
-        sliders.push_back(Slider(-1.0, 1.0, 0, 0.0, "b"));
-        sliders.push_back(Slider(0.0, 5.0, 0, 0.0, "c"));
+        sliders.emplace_back(-1.0, 1.0, 0, 0.0, "a");
+        sliders.emplace_back(-1.0, 1.0, 0, 0.0, "b");
+        sliders.emplace_back(0.0, 5.0, 0, 0.0, "c");
         handles.push_back(&(sliders[0]));
         handles.push_back(&(sliders[1]));
         handles.push_back(&(sliders[2]));
@@ -282,7 +282,7 @@ public:
         sliders[2].geometry(Point(50, 80), 250);
     }
 
-    void first_time(int /*argc*/, char**/* argv*/) {
+    void first_time(int /*argc*/, char**/* argv*/) override {
 
     }
 };

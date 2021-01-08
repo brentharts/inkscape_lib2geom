@@ -37,13 +37,13 @@ public:
     LevelsCrossings(std::vector<std::vector<double> > const &times,
                     Piecewise<D2<SBasis> > const &f,
                     Piecewise<SBasis> const &dx){
-        for (unsigned i=0; i<times.size(); i++){
+        for (const auto & time : times){
             LevelCrossings lcs;
-            for (unsigned j=0; j<times[i].size(); j++){
+            for (double j : time){
                 LevelCrossing lc;
-                lc.pt = f.valueAt(times[i][j]);
-                lc.t = times[i][j];
-                lc.sign = ( dx.valueAt(times[i][j])>0 );
+                lc.pt = f.valueAt(j);
+                lc.t = j;
+                lc.sign = ( dx.valueAt(j)>0 );
                 lc.used = false;
                 lcs.push_back(lc);
             }
@@ -54,8 +54,8 @@ public:
     }
     void flipInOut(){
         for (unsigned i=0; i<size(); i++){
-            for (unsigned j=0; j<(*this)[i].size(); j++){
-                (*this)[i][j].sign = !(*this)[i][j].sign;
+            for (auto & j : (*this)){
+                j.sign = !j.sign;
             }
         }
     }
@@ -191,8 +191,8 @@ std::vector<Point> linearSnake(Piecewise<D2<SBasis> > const &f, double dy,double
     times = cleaned_times;
     for (unsigned i=0; i<times.size(); i++){
         std::cout << "roots on level "<<i<<": ";
-        for (unsigned j=0; j<times[i].size(); j++){
-            std::cout << times[i][j] <<" ";
+        for (double j : times){
+            std::cout << j <<" ";
         }
         std::cout <<"\n";
     }
@@ -270,7 +270,7 @@ public:
     PointSetHandle b2_handle;
     void draw(cairo_t *cr,
 	      std::ostringstream *notify,
-	      int width, int height, bool save, std::ostringstream *timer_stream) {
+	      int width, int height, bool save, std::ostringstream *timer_stream) override {
         for(unsigned i=0; i<NB_SLIDER; i++){
             adjuster[i].pos[X] = 30+i*20;
             if (adjuster[i].pos[Y]<100) adjuster[i].pos[Y] = 100;

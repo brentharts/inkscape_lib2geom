@@ -33,9 +33,10 @@
 
 #ifndef LIB2GEOM_SEEN_SBASIS_H
 #define LIB2GEOM_SEEN_SBASIS_H
-#include <vector>
 #include <cassert>
 #include <iostream>
+#include <utility>
+#include <vector>
 
 #include <2geom/linear.h>
 #include <2geom/interval.h>
@@ -120,8 +121,8 @@ public:
     SBasis(SBasis const &a)
         : d(a.d)
     {}
-    SBasis(std::vector<Linear> const &ls)
-        : d(ls)
+    SBasis(std::vector<Linear> ls)
+        : d(std::move(ls))
     {}
     SBasis(Linear const &bo)
 		: d(1, bo)

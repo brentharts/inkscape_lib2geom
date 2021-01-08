@@ -9,15 +9,15 @@ class Sweep: public Toy {
 public:
     PointSetHandle hand;
     unsigned count_a, count_b;
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         std::vector<Rect> rects_a, rects_b;
         cairo_set_source_rgb(cr, 0,0,0);
 
         for(unsigned i = 0; i < count_a; i++)
-            rects_a.push_back(Rect(hand.pts[i*2], hand.pts[i*2+1]));
+            rects_a.emplace_back(hand.pts[i*2], hand.pts[i*2+1]);
 
         for(unsigned i = 0; i < count_b; i++)
-            rects_b.push_back(Rect(hand.pts[i*2 + count_a*2], hand.pts[i*2+1 + count_a*2]));
+            rects_b.emplace_back(hand.pts[i*2 + count_a*2], hand.pts[i*2+1 + count_a*2]);
         
         {
             std::vector<std::vector<unsigned> > res = sweep_bounds(rects_a);
@@ -57,7 +57,7 @@ public:
         
         Toy::draw(cr, notify, width, height, save,timer_stream);
     }
-    bool should_draw_numbers() { return false; }
+    bool should_draw_numbers() override { return false; }
     public:
     Sweep () {
         count_a = 20;

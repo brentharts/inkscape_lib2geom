@@ -46,7 +46,7 @@ class Box3d: public Toy {
     Piecewise<D2<SBasis> >  path_a_pw;
     PointSetHandle hand;
     
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         orig = hand.pts[7];
 	
         Geom::Point dir(1,-2);
@@ -76,9 +76,9 @@ class Box3d: public Toy {
         }
 
         *notify << "Projection matrix:" << endl;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                *notify << tmat[i][j] << " ";
+        for (auto & i : tmat) {
+            for (double j : i) {
+                *notify << j << " ";
             }
             *notify << endl;
         }
@@ -127,7 +127,7 @@ class Box3d: public Toy {
         
         Toy::draw(cr, notify, width, height, save,timer_stream);
     }
-    void first_time(int argc, char** argv) {
+    void first_time(int argc, char** argv) override {
         const char *path_a_name="star.svgd";
         if(argc > 1)
             path_a_name = argv[1];
@@ -139,15 +139,15 @@ class Box3d: public Toy {
         path_a_pw = path_a.toPwSb();
 
         // Finite images of the three vanishing points and the origin
-        hand.pts.push_back(Point(150,300));
-        hand.pts.push_back(Point(380,40));
-        hand.pts.push_back(Point(550,350));
-        hand.pts.push_back(Point(340,450));
+        hand.pts.emplace_back(150,300);
+        hand.pts.emplace_back(380,40);
+        hand.pts.emplace_back(550,350);
+        hand.pts.emplace_back(340,450);
 
         // Hand.Pts for moving in axes directions
-        hand.pts.push_back(Point(30,300));
-        hand.pts.push_back(Point(45,300));
-        hand.pts.push_back(Point(60,300));
+        hand.pts.emplace_back(30,300);
+        hand.pts.emplace_back(45,300);
+        hand.pts.emplace_back(60,300);
         
         // Box corners
         for (int i = 0; i < 8; ++i) {
@@ -158,16 +158,16 @@ class Box3d: public Toy {
         }
 
         // Origin handle
-	hand.pts.push_back(Point(180,70));
-        togs.push_back(Toggle("S", true));
+	hand.pts.emplace_back(180,70);
+        togs.emplace_back("S", true);
         handles.push_back(&hand);
     }
-    void key_hit(GdkEventKey *e) {
+    void key_hit(GdkEventKey *e) override {
         if(e->keyval == 'c') togs[0].set(1); else
         if(e->keyval == 's') togs[0].set(0);
         redraw();
     }
-    void mouse_pressed(GdkEventButton* e) {
+    void mouse_pressed(GdkEventButton* e) override {
         toggle_events(togs, e);
         Toy::mouse_pressed(e);
     }

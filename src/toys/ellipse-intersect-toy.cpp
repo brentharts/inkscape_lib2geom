@@ -68,7 +68,7 @@ class CircleIntersect : public Toy {
         }
     }
 
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
 
         Rect all(Point(0,0), Point(width, height));
 
@@ -83,8 +83,8 @@ class CircleIntersect : public Toy {
         ea = Ellipse(psh[0].pts[0], Point(r1x, r1y), rot1);
         eb = Ellipse(psh[1].pts[0], Point(r2x, r2y), rot2);
 
-        for (unsigned i = 0; i < 6; ++i) {
-            l[i] = Line(0, 0, 0);
+        for (auto & i : l) {
+            i = Line(0, 0, 0);
         }
 
         cairo_set_line_width(cr, 1.0);
@@ -119,8 +119,8 @@ class CircleIntersect : public Toy {
             }
 
             cairo_set_source_rgb(cr, 1, 0, 0);
-            for (unsigned i = 0; i < result.size(); ++i) {
-                draw_handle(cr, result[i].point());
+            for (auto & i : result) {
+                draw_handle(cr, i.point());
             }
             cairo_stroke(cr);
         } catch(...) {

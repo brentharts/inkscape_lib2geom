@@ -45,8 +45,8 @@ namespace Geom {
 PathVector::size_type PathVector::curveCount() const
 {
     size_type n = 0;
-    for (const_iterator it = begin(); it != end(); ++it) {
-        n += it->size_default();
+    for (const auto & it : *this) {
+        n += it.size_default();
     }
     return n;
 }
@@ -56,16 +56,16 @@ void PathVector::reverse(bool reverse_paths)
     if (reverse_paths) {
         std::reverse(begin(), end());
     }
-    for (iterator i = begin(); i != end(); ++i) {
-        *i = i->reversed();
+    for (auto & i : *this) {
+        i = i.reversed();
     }
 }
 
 PathVector PathVector::reversed(bool reverse_paths) const
 {
     PathVector ret;
-    for (const_iterator i = begin(); i != end(); ++i) {
-        ret.push_back(i->reversed());
+    for (const auto & i : *this) {
+        ret.push_back(i.reversed());
     }
     if (reverse_paths) {
         std::reverse(ret.begin(), ret.end());
@@ -162,10 +162,10 @@ public:
     {
         _records.reserve(a.size() + b.size());
         for (std::size_t i = 0; i < a.size(); ++i) {
-            _records.push_back(PathRecord(a[i], i, 0));
+            _records.emplace_back(a[i], i, 0);
         }
         for (std::size_t i = 0; i < b.size(); ++i) {
-            _records.push_back(PathRecord(b[i], i, 1));
+            _records.emplace_back(b[i], i, 1);
         }
     }
 
@@ -181,15 +181,15 @@ public:
         unsigned w = ii->which;
         unsigned ow = (ii->which + 1) % 2;
 
-        for (ActivePathList::iterator i = _active[ow].begin(); i != _active[ow].end(); ++i) {
-            if (!ii->path->boundsFast().intersects(i->path->boundsFast())) continue;
-            std::vector<PathIntersection> px = ii->path->intersect(*i->path, _precision);
-            for (std::size_t k = 0; k < px.size(); ++k) {
-                PathVectorTime tw(ii->index, px[k].first), tow(i->index, px[k].second);
-                _result.push_back(PVIntersection(
+        for (auto & i : _active[ow]) {
+            if (!ii->path->boundsFast().intersects(i.path->boundsFast())) continue;
+            std::vector<PathIntersection> px = ii->path->intersect(*i.path, _precision);
+            for (auto & k : px) {
+                PathVectorTime tw(ii->index, k.first), tow(i.index, k.second);
+                _result.emplace_back(
                     w == 0 ? tw : tow,
                     w == 0 ? tow : tw,
-                    px[k].point()));
+                    k.point());
             }
         }
         _active[w].push_back(*ii);
@@ -232,9 +232,9 @@ std::vector<PVIntersection> PathVector::intersect(PathVector const &other, Coord
 int PathVector::winding(Point const &p) const
 {
     int wind = 0;
-    for (const_iterator i = begin(); i != end(); ++i) {
-        if (!i->boundsFast().contains(p)) continue;
-        wind += i->winding(p);
+    for (const auto & i : *this) {
+        if (!i.boundsFast().contains(p)) continue;
+        wind += i.winding(p);
     }
     return wind;
 }
@@ -272,7 +272,7 @@ std::vector<PathVectorTime> PathVector::allNearestTimes(Point const &p, Coord *d
             retval.clear();
         }
         if (d <= mindist) {
-            retval.push_back(PathVectorTime(i, pos.curve_index, pos.t));
+            retval.emplace_back(i, pos.curve_index, pos.t);
         }
     }
 

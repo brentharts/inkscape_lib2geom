@@ -169,7 +169,7 @@ struct Crosser {
                 unsigned j = cull[i][jx];
                 unsigned jc = j + a.size();
                 Crossings cr = crossings(a[i], b[j]);
-                for(unsigned k = 0; k < cr.size(); k++) { cr[k].a = i; cr[k].b = jc; }
+                for(auto & k : cr) { k.a = i; k.b = jc; }
                 
                 //Sort & add A-sorted crossings
                 sort_crossings(cr, i);

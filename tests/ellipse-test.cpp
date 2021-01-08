@@ -204,18 +204,18 @@ TEST(EllipseTest, BezierIntersection) {
 
 TEST(EllipseTest, Coefficients) {
     std::vector<Ellipse> es;
-    es.push_back(Ellipse(Point(-15,25), Point(10,15), Angle::from_degrees(45).radians0()));
-    es.push_back(Ellipse(Point(-10,33), Point(40,20), M_PI));
-    es.push_back(Ellipse(Point(10,-33), Point(40,20), Angle::from_degrees(135).radians0()));
-    es.push_back(Ellipse(Point(-10,-33), Point(50,10), Angle::from_degrees(330).radians0()));
+    es.emplace_back(Point(-15,25), Point(10,15), Angle::from_degrees(45).radians0());
+    es.emplace_back(Point(-10,33), Point(40,20), M_PI);
+    es.emplace_back(Point(10,-33), Point(40,20), Angle::from_degrees(135).radians0());
+    es.emplace_back(Point(-10,-33), Point(50,10), Angle::from_degrees(330).radians0());
 
-    for (unsigned i = 0; i < es.size(); ++i) {
+    for (auto & i : es) {
         Coord a, b, c, d, e, f;
-        es[i].coefficients(a, b, c, d, e, f);
+        i.coefficients(a, b, c, d, e, f);
         Ellipse te(a, b, c, d, e, f);
-        EXPECT_near(es[i], te, 1e-10);
+        EXPECT_near(i, te, 1e-10);
         for (Coord t = -5; t < 5; t += 0.125) {
-            Point p = es[i].pointAt(t);
+            Point p = i.pointAt(t);
             Coord eq = a*p[X]*p[X] + b*p[X]*p[Y] + c*p[Y]*p[Y]
               + d*p[X] + e*p[Y] + f;
             EXPECT_NEAR(eq, 0, 1e-10);
@@ -225,20 +225,20 @@ TEST(EllipseTest, Coefficients) {
 
 TEST(EllipseTest, UnitCircleTransform) {
     std::vector<Ellipse> es;
-    es.push_back(Ellipse(Point(-15,25), Point(10,15), Angle::from_degrees(45)));
-    es.push_back(Ellipse(Point(-10,33), Point(40,20), M_PI));
-    es.push_back(Ellipse(Point(10,-33), Point(40,20), Angle::from_degrees(135)));
-    es.push_back(Ellipse(Point(-10,-33), Point(50,10), Angle::from_degrees(330)));
+    es.emplace_back(Point(-15,25), Point(10,15), Angle::from_degrees(45));
+    es.emplace_back(Point(-10,33), Point(40,20), M_PI);
+    es.emplace_back(Point(10,-33), Point(40,20), Angle::from_degrees(135));
+    es.emplace_back(Point(-10,-33), Point(50,10), Angle::from_degrees(330));
 
-    for (unsigned i = 0; i < es.size(); ++i) {
-        EXPECT_near(es[i].unitCircleTransform() * es[i].inverseUnitCircleTransform(), Affine::identity(), 1e-8);
+    for (auto & e : es) {
+        EXPECT_near(e.unitCircleTransform() * e.inverseUnitCircleTransform(), Affine::identity(), 1e-8);
 
         for (Coord t = -1; t < 10; t += 0.25) {
-            Point p = es[i].pointAt(t);
-            p *= es[i].inverseUnitCircleTransform();
+            Point p = e.pointAt(t);
+            p *= e.inverseUnitCircleTransform();
             EXPECT_near(p.length(), 1., 1e-10);
-            p *= es[i].unitCircleTransform();
-            EXPECT_near(es[i].pointAt(t), p, 1e-10);
+            p *= e.unitCircleTransform();
+            EXPECT_near(e.pointAt(t), p, 1e-10);
         }
     }
 }
@@ -274,19 +274,19 @@ TEST(EllipseTest, UnitTangentAt) {
 
 TEST(EllipseTest, BoundsExact) {
     std::vector<Ellipse> es;
-    es.push_back(Ellipse(Point(-15,25), Point(10,15), Angle::from_degrees(45)));
-    es.push_back(Ellipse(Point(-10,33), Point(40,20), M_PI));
-    es.push_back(Ellipse(Point(10,-33), Point(40,20), Angle::from_degrees(111)));
-    es.push_back(Ellipse(Point(-10,-33), Point(50,10), Angle::from_degrees(222)));
+    es.emplace_back(Point(-15,25), Point(10,15), Angle::from_degrees(45));
+    es.emplace_back(Point(-10,33), Point(40,20), M_PI);
+    es.emplace_back(Point(10,-33), Point(40,20), Angle::from_degrees(111));
+    es.emplace_back(Point(-10,-33), Point(50,10), Angle::from_degrees(222));
 
     // for reproducibility
     g_random_set_seed(1234);
 
-    for (unsigned i = 0; i < es.size(); ++i) {
-        Rect r = es[i].boundsExact();
+    for (auto & e : es) {
+        Rect r = e.boundsExact();
         for (unsigned j = 0; j < 10000; ++j) {
             Coord t = g_random_double_range(-M_PI, M_PI);
-            EXPECT_TRUE(r.contains(es[i].pointAt(t)));
+            EXPECT_TRUE(r.contains(e.pointAt(t)));
         }
     }
 

@@ -33,6 +33,7 @@
 #ifndef _GEOM_SL_MULTIPOLY_H_
 #define _GEOM_SL_MULTIPOLY_H_
 
+#include <utility>
 
 #include <2geom/symbolic/unity-builder.h>
 #include <2geom/symbolic/mvpoly-tools.h>
@@ -67,8 +68,8 @@ public:
     {
     }
 
-    MultiPoly(poly_type const& p)
-        : m_poly(p)
+    MultiPoly(poly_type p)
+        : m_poly(std::move(p))
     {
     }
 

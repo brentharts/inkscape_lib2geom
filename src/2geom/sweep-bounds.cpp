@@ -37,21 +37,20 @@ std::vector<std::vector<unsigned> > sweep_bounds(std::vector<Rect> rs, Dim2 d) {
     std::vector<std::vector<unsigned> > pairs(rs.size());
 
     for(unsigned i = 0; i < rs.size(); i++) {
-        events.push_back(Event(rs[i][d].min(), i, false));
-        events.push_back(Event(rs[i][d].max(), i, true));
+        events.emplace_back(rs[i][d].min(), i, false);
+        events.emplace_back(rs[i][d].max(), i, true);
     }
     std::sort(events.begin(), events.end());
 
     std::vector<unsigned> open;
-    for(unsigned i = 0; i < events.size(); i++) {
-        unsigned ix = events[i].ix;
-        if(events[i].closing) {
+    for(auto & event : events) {
+        unsigned ix = event.ix;
+        if(event.closing) {
             std::vector<unsigned>::iterator iter = std::find(open.begin(), open.end(), ix);
             //if(iter != open.end())
             open.erase(iter);
         } else {
-            for(unsigned j = 0; j < open.size(); j++) {
-                unsigned jx = open[j];
+            for(unsigned int jx : open) {
                 if(rs[jx][1-d].intersects(rs[ix][1-d])) {
                     pairs[jx].push_back(ix);
                 }
@@ -84,8 +83,8 @@ std::vector<std::vector<unsigned> > sweep_bounds(std::vector<Rect> a, std::vecto
         events[n].reserve(sz*2);
         for(unsigned i = 0; i < sz; i++) {
             Rect r = n ? b[i] : a[i];
-            events[n].push_back(Event(r[d].min(), i, false));
-            events[n].push_back(Event(r[d].max(), i, true));
+            events[n].emplace_back(r[d].min(), i, false);
+            events[n].emplace_back(r[d].max(), i, true);
         }
         std::sort(events[n].begin(), events[n].end());
     }
@@ -104,8 +103,7 @@ std::vector<std::vector<unsigned> > sweep_bounds(std::vector<Rect> a, std::vecto
             if(n) {
                 //n = 1
                 //opening a B, add to all open a
-                for(unsigned j = 0; j < open[0].size(); j++) {
-                    unsigned jx = open[0][j];
+                for(unsigned int jx : open[0]) {
                     if(a[jx][1-d].intersects(b[ix][1-d])) {
                         pairs[jx].push_back(ix);
                     }
@@ -113,8 +111,7 @@ std::vector<std::vector<unsigned> > sweep_bounds(std::vector<Rect> a, std::vecto
             } else {
                 //n = 0
                 //opening an A, add all open b
-                for(unsigned j = 0; j < open[1].size(); j++) {
-                    unsigned jx = open[1][j];
+                for(unsigned int jx : open[1]) {
                     if(b[jx][1-d].intersects(a[ix][1-d])) {
                         pairs[ix].push_back(jx);
                     }

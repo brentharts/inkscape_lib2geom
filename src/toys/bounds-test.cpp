@@ -28,7 +28,7 @@ static void plot_bar(cairo_t* cr, double height, double vscale=1,double a=0,doub
 class BoundsTester: public Toy {
     unsigned size;
     PointSetHandle hand;
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         
         for (unsigned i=0;i<size;i++){
             hand.pts[i    ][0]=150+15*(i-size);
@@ -78,7 +78,7 @@ This is a multi-root test...
         levels.push_back((300-hand.pts[2*size  ][1]));
         levels.push_back((300-hand.pts[2*size+1][1]));
         levels.push_back((300-hand.pts[2*size+2][1]));
-        for (unsigned i=0;i<levels.size();i++) plot_bar(cr,levels[i]);
+        for (double level : levels) plot_bar(cr,level);
         
         cairo_set_source_rgba (cr, 0., 0.5, 0., 1);
         
@@ -145,11 +145,11 @@ public:
         size=5;
         if(hand.pts.empty()) {
             for(unsigned i = 0; i < 2*size; i++)
-                hand.pts.push_back(Geom::Point(0,150+150+uniform()*300*0));
+                hand.pts.emplace_back(0,150+150+uniform()*300*0);
         }
-        hand.pts.push_back(Geom::Point(150,300+ 50+uniform()*100));
-        hand.pts.push_back(Geom::Point(150,300- 50+uniform()*100));
-        hand.pts.push_back(Geom::Point(150,300-150+uniform()*100));
+        hand.pts.emplace_back(150,300+ 50+uniform()*100);
+        hand.pts.emplace_back(150,300- 50+uniform()*100);
+        hand.pts.emplace_back(150,300-150+uniform()*100);
         handles.push_back(&hand);
     }
 };

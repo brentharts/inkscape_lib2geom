@@ -88,7 +88,7 @@ class LineToy : public Toy
     static const char* menu_items[TOTAL_ITEMS];
     static const char keys[TOTAL_ITEMS];
 
-    virtual void first_time(int /*argc*/, char** /*argv*/)
+    void first_time(int /*argc*/, char** /*argv*/) override
     {
         draw_f = &LineToy::draw_menu;
     }
@@ -119,7 +119,7 @@ class LineToy : public Toy
         p2.pos = Point(450, 450);
         O.pos = Point(50, 400);
 
-        sliders.push_back(Slider(0, 2*M_PI, 0, 0, "angle"));
+        sliders.emplace_back(0, 2*M_PI, 0, 0, "angle");
         sliders[ANGLE_SLIDER].formatter(&angle_formatter);
 
         handles.push_back(&p1);
@@ -573,10 +573,10 @@ class LineToy : public Toy
         std::string label("A");
         cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 1.0);
         cairo_set_line_width(cr, 0.5);
-        for (unsigned int i = 0; i < ip.size(); ++i)
+        for (auto & i : ip)
         {
-            draw_handle(cr, ip[i]);
-            draw_text(cr, ip[i]+op, label.c_str());
+            draw_handle(cr, i);
+            draw_text(cr, i+op, label.c_str());
             label[0] += 1;
         }
         cairo_stroke(cr);
@@ -592,9 +592,9 @@ class LineToy : public Toy
 
         Line l(p1.pos, p2.pos);
         std::vector<double> coeff = l.coefficients();
-        sliders.push_back( Slider(-1, 1, 0, coeff[0], "A"));
-        sliders.push_back( Slider(-1, 1, 0, coeff[1], "B"));
-        sliders.push_back( Slider(-500, 500, 0, coeff[2], "C"));
+        sliders.emplace_back(-1, 1, 0, coeff[0], "A");
+        sliders.emplace_back(-1, 1, 0, coeff[1], "B");
+        sliders.emplace_back(-500, 500, 0, coeff[2], "C");
 
         handles.push_back(&p1);
         handles.push_back(&p2);
@@ -787,7 +787,7 @@ class LineToy : public Toy
         }
     }
 
-    void key_hit(GdkEventKey *e)
+    void key_hit(GdkEventKey *e) override
     {
         char choice = std::toupper(e->keyval);
         switch ( choice )
@@ -843,8 +843,8 @@ class LineToy : public Toy
         redraw();
     }
 
-    virtual void draw( cairo_t *cr, std::ostringstream *notify,
-                       int width, int height, bool save, std::ostringstream *timer_stream)
+    void draw( cairo_t *cr, std::ostringstream *notify,
+                       int width, int height, bool save, std::ostringstream *timer_stream) override
     {
         m_width = width;
         m_height = height;

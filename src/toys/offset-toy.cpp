@@ -41,7 +41,7 @@ static void plot(cairo_t* cr, Piecewise<SBasis> const &f,double vscale=1){
 
     plot[0].cuts.push_back(f.cuts.front());
     plot[0].cuts.push_back(f.cuts.back());
-    plot[0].segs.push_back(Linear(150,450));
+    plot[0].segs.emplace_back(Linear(150,450));
 
     for (unsigned i=1; i<f.size(); i++){
         double t=f.cuts[i],ft=f.segs[i].at0();
@@ -56,7 +56,7 @@ static void plot(cairo_t* cr, Piecewise<SBasis> const &f,double vscale=1){
 class OffsetTester: public Toy {
     PointSetHandle psh;
 
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         D2<SBasis> B = psh.asBezier();
         *notify << "Curve offset:" << endl;
         *notify << " -blue: pointwise plotted offset," << endl;
@@ -80,13 +80,13 @@ class OffsetTester: public Toy {
         
         cairo_path(cr, offset_path);
         cairo_stroke(cr);
-        for(unsigned int pi = 0; pi < offset_path.size(); pi++) {
-            Crossings cs = self_crossings(offset_path[pi]);
-            for(unsigned int i = 0; i < cs.size(); i++) {
-                draw_cross(cr, offset_path[pi].pointAt(cs[i].ta));
+        for(const auto & pi : offset_path) {
+            Crossings cs = self_crossings(pi);
+            for(auto & c : cs) {
+                draw_cross(cr, pi.pointAt(c.ta));
                 std::stringstream s;
-                Point Pa = offset_path[pi].pointAt(cs[i].ta);
-                Point Pb = offset_path[pi].pointAt(cs[i].tb);
+                Point Pa = pi.pointAt(c.ta);
+                Point Pb = pi.pointAt(c.tb);
                 s << L1(Pa - Pb) << std::endl;
                 std::string ss = s.str();
                 draw_text(cr, Pa+Point(3,3), ss.c_str(), false, "Serif 6");

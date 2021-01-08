@@ -32,7 +32,7 @@ public:
     Sb2d2() {
         handles.push_back(&hand);
     }
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         D2<SBasis2d> sb2;
         for(unsigned dim = 0; dim < 2; dim++) {
             sb2[dim].us = 2;
@@ -46,8 +46,8 @@ public:
                 for(unsigned ui = 0; ui < sb2[0].us; ui++)
                     for(unsigned iv = 0; iv < 2; iv++)
                         for(unsigned iu = 0; iu < 2; iu++)
-                            hand.pts.push_back(Geom::Point((2*(iu+ui)/(2.*ui+1)+1)*width/4.,
-                                                          (2*(iv+vi)/(2.*vi+1)+1)*width/4.));
+                            hand.pts.emplace_back((2*(iu+ui)/(2.*ui+1)+1)*width/4.,
+                                                          (2*(iv+vi)/(2.*vi+1)+1)*width/4.);
         
         }
         

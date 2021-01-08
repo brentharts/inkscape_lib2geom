@@ -126,14 +126,14 @@ class RTreeToy: public Toy
 
 
 
-    void draw( cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream ) {
+    void draw( cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream ) override {
         cairo_set_line_width( cr, 1 );
 	    cairo_set_source_rgba( cr, color_shape );
 		cairo_stroke( cr );
 
 		// draw the shapes we save in the rtree
-		for( unsigned i = 0; i < rectangles.size(); i++ ){
-	        rectangles[i].draw( cr, true );
+		for(auto & rectangle : rectangles){
+	        rectangle.draw( cr, true );
 		}
 	    cairo_set_source_rgba( cr, color_shape );
 		cairo_stroke( cr );
@@ -163,8 +163,8 @@ class RTreeToy: public Toy
 		if( drawBB ){
 			for(unsigned color = 0 ; color < rects_level.size() ; color++ ){
 				if( drawBB_color == color || drawBB_color_all ){
-					for(unsigned j = 0 ; j < rects_level[color].size() ; j++ ){
-						cairo_rectangle( cr, rects_level[color][j] );
+					for(auto & j : rects_level){
+						cairo_rectangle( cr, j );
 					}
 					cairo_set_source_rgba( cr, color_rtree_level[color] );
 					cairo_stroke( cr );
@@ -175,7 +175,7 @@ class RTreeToy: public Toy
 		Toy::draw( cr, notify, width, height, save,timer_stream );
     }        
     
-    void mouse_moved( GdkEventMotion* e ){
+    void mouse_moved( GdkEventMotion* e ) override{
 		if(add_new_rect &&
 			( mode == INSERT_MODE || mode == SEARCH_MODE ) )
 		{
@@ -184,7 +184,7 @@ class RTreeToy: public Toy
 		}
 	}
 
-    void mouse_pressed( GdkEventButton* e ) {
+    void mouse_pressed( GdkEventButton* e ) override {
 		Toy::mouse_pressed( e );
 		if(e->button == 1){		// left mouse button
 			if( mode == INSERT_MODE ){
@@ -227,7 +227,7 @@ class RTreeToy: public Toy
 		}
     }
 
-    virtual void mouse_released( GdkEventButton* e ) {
+    void mouse_released( GdkEventButton* e ) override {
 		Toy::mouse_released( e );
 		if( e->button == 1 ) { 		//left mouse button
 			if( mode == INSERT_MODE ) {	
@@ -257,8 +257,8 @@ class RTreeToy: public Toy
 						rtree.search( rect_chosen, &result, rtree.root );
 					}
 					std::cout << "Search results: " << result.size() << std::endl;
-					for(unsigned i = 0; i < result.size(); i++ ){
-						std::cout << result[i] << ", " ;
+					for(int i : result){
+						std::cout << i << ", " ;
 					}
 					std::cout << std::endl;
 
@@ -284,7 +284,7 @@ class RTreeToy: public Toy
     }
 
 
-    void key_hit( GdkEventKey *e )
+    void key_hit( GdkEventKey *e ) override
     {
         char choice = std::toupper( e->keyval );
         switch ( choice )
@@ -384,8 +384,8 @@ class RTreeToy: public Toy
 	void find_rtree_subtrees_bounding_boxes( Geom::RTree tree ){
 		if( tree.root ){
 			// clear existing bounding boxes 
-			for(unsigned color=0; color < rects_level.size(); color++ ){
-				rects_level[color].clear();
+			for(auto & color : rects_level){
+				color.clear();
 			}
 			save_bb( tree.root, 0);
 		}
@@ -397,15 +397,15 @@ class RTreeToy: public Toy
 		if( subtree_root->children_nodes.size() > 0 ){ 
 
 			// descend in each one of the elements and call print_tree
-			for( unsigned i=0; i < subtree_root->children_nodes.size(); i++ ){
-			    Rect r1( subtree_root->children_nodes[ i ].bounding_box );
+			for(auto & children_node : subtree_root->children_nodes){
+			    Rect r1( children_node.bounding_box );
 				rects_level[ depth ].push_back( r1 );
 
 				if( depth == no_of_colors - 1 ){	// if we reached Nth levels of colors, roll back to color 0
-					save_bb( subtree_root->children_nodes[ i ].data, 0);
+					save_bb( children_node.data, 0);
 				}
 				else{
-				    save_bb( subtree_root->children_nodes[ i ].data, depth+1);
+				    save_bb( children_node.data, depth+1);
 				}
 			}
 		}

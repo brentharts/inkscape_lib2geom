@@ -49,16 +49,16 @@ using namespace Geom;
 void points_from_shape(std::vector<Point> &pts, std::string const &shape) {
     pts.clear();
     int x = 0, y = 0;
-    for (unsigned c = 0; c < shape.size(); ++c) {
-        if (shape[c] == '\n') {
+    for (char c : shape) {
+        if (c == '\n') {
             x = 0; ++y;
             continue;
         }
-        if (shape[c] == ' ') {
+        if (c == ' ') {
             ++x;
             continue;
         }
-        pts.push_back(Point(x, y));
+        pts.emplace_back(x, y);
         ++x;
     }
 }
@@ -80,24 +80,24 @@ protected:
 
         std::vector<Point> pts;
 
-        pts.push_back(Point(0,0));
+        pts.emplace_back(0,0);
         point = ConvexHull(pts);
-        pts.push_back(Point(1,0));
+        pts.emplace_back(1,0);
         line = ConvexHull(pts);
-        pts.push_back(Point(0,1));
+        pts.emplace_back(0,1);
         triangle = ConvexHull(pts);
-        pts.push_back(Point(1,1));
+        pts.emplace_back(1,1);
         square = ConvexHull(pts);
         pts.clear();
 
         for(int i = 0; i < 6; i++) {
-            pts.push_back(Point(cos(i*M_PI*2/6), sin(i*M_PI*2/6)));
+            pts.emplace_back(cos(i*M_PI*2/6), sin(i*M_PI*2/6));
         }
         hexagon = ConvexHull(pts);
         pts.clear();
 
         for(int i = 0; i < 6; i++) {
-            pts.push_back(Point(cos((1-i*2)*M_PI/6), sin((1-i*2)*M_PI/6)));
+            pts.emplace_back(cos((1-i*2)*M_PI/6), sin((1-i*2)*M_PI/6));
         }
         antihexagon = ConvexHull(pts);
         pts.clear();
@@ -242,13 +242,13 @@ TEST_F(ConvexHullTest, PointContainment) {
     std::vector<Point> pts;
 
     points_from_shape(pts, gem_shape);
-    for (unsigned i = 0; i < pts.size(); ++i) {
-        EXPECT_TRUE(HullContainsPoint(gem, pts[i]));
+    for (auto & pt : pts) {
+        EXPECT_TRUE(HullContainsPoint(gem, pt));
     }
 
     points_from_shape(pts, diamond_shape);
-    for (unsigned i = 0; i < pts.size(); ++i) {
-        EXPECT_TRUE(HullContainsPoint(diamond, pts[i]));
+    for (auto & pt : pts) {
+        EXPECT_TRUE(HullContainsPoint(diamond, pt));
     }
 
     /*EXPECT_FALSE(null.interiorContains(zero));

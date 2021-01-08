@@ -17,7 +17,7 @@ public:
     Sb2d() {
         handles.push_back(&hand);
     }
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         SBasis2d sb2;
         sb2.us = 2;
         sb2.vs = 2;
@@ -31,8 +31,8 @@ public:
              for(unsigned ui = 0; ui < sb2.us; ui++)
               for(unsigned iv = 0; iv < 2; iv++)
                for(unsigned iu = 0; iu < 2; iu++)
-                   hand.pts.push_back(Geom::Point((2*(iu+ui)/(2.*ui+1)+1)*width/4.,
-                                                 (2*(iv+vi)/(2.*vi+1)+1)*width/4.));
+                   hand.pts.emplace_back((2*(iu+ui)/(2.*ui+1)+1)*width/4.,
+                                                 (2*(iv+vi)/(2.*vi+1)+1)*width/4.);
         
             hand.pts.push_back(Geom::Point(3*width/4., width/4.) + 30*dir);
         }
@@ -60,8 +60,8 @@ public:
         cairo_set_source_rgba (cr, 0., 0.125, 0, 1);
         cairo_stroke(cr);
         if(!save)
-            for(unsigned i = 0; i < display_handles.size(); i++)
-                draw_circ(cr, display_handles[i]);
+            for(auto & display_handle : display_handles)
+                draw_circ(cr, display_handle);
         Toy::draw(cr, notify, width, height, save,timer_stream);
     }
 };

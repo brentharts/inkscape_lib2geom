@@ -323,8 +323,8 @@ private:
  * Prints out all the coordinates. */
 inline std::ostream &operator<< (std::ostream &out_file, const Geom::ConvexHull &in_cvx) {
     out_file << "ConvexHull(";
-    for(unsigned i = 0; i < in_cvx.size(); i++) {
-        out_file << in_cvx[i] << ", ";
+    for(auto i : in_cvx) {
+        out_file << i << ", ";
     }
     out_file << ")";
     return out_file;

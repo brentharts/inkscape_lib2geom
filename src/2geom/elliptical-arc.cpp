@@ -219,12 +219,12 @@ std::vector<Coord> EllipticalArc::roots(Coord v, Dim2 d) const
     }
 
     std::vector<double> arc_sol;
-    for (unsigned int i = 0; i < sol.size(); ++i ) {
+    for (double & i : sol) {
         //std::cerr << "s = " << deg_from_rad(sol[i]);
-        sol[i] = timeAtAngle(sol[i]);
+        i = timeAtAngle(i);
         //std::cerr << " -> t: " << sol[i] << std::endl;
-        if (unit_interval.contains(sol[i])) {
-            arc_sol.push_back(sol[i]);
+        if (unit_interval.contains(i)) {
+            arc_sol.push_back(i);
         }
     }
     return arc_sol;
@@ -463,10 +463,10 @@ std::vector<double> EllipticalArc::allNearestTimes( Point const& p, double from,
         real_sol = solve_reals(coeff);
     }
 
-    for ( unsigned int i = 0; i < real_sol.size(); ++i )
+    for (double & i : real_sol)
     {
-        real_sol[i] = 2 * std::atan(real_sol[i]);
-        if ( real_sol[i] < 0 ) real_sol[i] += 2*M_PI;
+        i = 2 * std::atan(i);
+        if ( i < 0 ) i += 2*M_PI;
     }
     // when s -> Infinity then <D(E)|E-p> -> 0 iff coeff[4] == 0
     // so we add M_PI to the solutions being lim arctan(s) = PI when s->Infinity

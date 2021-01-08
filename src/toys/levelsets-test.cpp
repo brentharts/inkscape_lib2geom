@@ -33,7 +33,7 @@ static void plot_bar(cairo_t* cr, Interval height, double vscale=1,double a=0,do
 
 class BoundsTester: public Toy {
 
-	void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+	void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         
         for (unsigned i=0;i<size;i++){
             hand.pts[i    ][0]=150+15*(i-size);
@@ -70,14 +70,14 @@ class BoundsTester: public Toy {
         hand.pts[2*size  ][Y]=std::max(hand.pts[2*size  ][Y],hand.pts[2*size+1][Y]+2*vtol);
 
         vector<Interval> levels;
-        levels.push_back( Interval(300-(hand.pts[2*size  ][Y]-vtol), 300-(hand.pts[2*size  ][Y]+vtol)) );
-        levels.push_back( Interval(300-(hand.pts[2*size+1][Y]-vtol), 300-(hand.pts[2*size+1][Y]+vtol)) );
-        levels.push_back( Interval(300-(hand.pts[2*size+2][Y]-vtol), 300-(hand.pts[2*size+2][Y]+vtol)) );
+        levels.emplace_back(300-(hand.pts[2*size  ][Y]-vtol), 300-(hand.pts[2*size  ][Y]+vtol) );
+        levels.emplace_back(300-(hand.pts[2*size+1][Y]-vtol), 300-(hand.pts[2*size+1][Y]+vtol) );
+        levels.emplace_back(300-(hand.pts[2*size+2][Y]-vtol), 300-(hand.pts[2*size+2][Y]+vtol) );
 
-        for (unsigned i=0;i<levels.size();i++) plot_bar(cr,levels[i].middle());
+        for (auto & level : levels) plot_bar(cr,level.middle());
         cairo_set_source_rgba( cr, 1., 0., 0., 1);
         cairo_stroke(cr);
-        for (unsigned i=0;i<levels.size();i++) plot_bar(cr,levels[i]);
+        for (auto & level : levels) plot_bar(cr,level);
         cairo_set_source_rgba( cr, 1., 0., 0., .2);
         cairo_fill(cr);
 
@@ -118,11 +118,11 @@ public:
         size=5;
         if(hand.pts.empty()) {
             for(unsigned i = 0; i < 2*size; i++)
-                hand.pts.push_back(Geom::Point(0,150+150+uniform()*300*0));
+                hand.pts.emplace_back(0,150+150+uniform()*300*0);
         }
-        hand.pts.push_back(Geom::Point(150,300+ 50+uniform()*100));
-        hand.pts.push_back(Geom::Point(150,300- 50+uniform()*100));
-        hand.pts.push_back(Geom::Point(150,300-150+uniform()*100));
+        hand.pts.emplace_back(150,300+ 50+uniform()*100);
+        hand.pts.emplace_back(150,300- 50+uniform()*100);
+        hand.pts.emplace_back(150,300-150+uniform()*100);
         handles.push_back(&hand);
     	slider = Slider(-5, 2, 0, 0.5, "tolerance");
     	slider.geometry(Point(50, 20), 250);

@@ -35,7 +35,7 @@ class Conic3: public Toy {
         handles.push_back(&psh);
     }
 
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         cairo_set_source_rgba (cr, 0., 0., 0, 0.8);
         cairo_set_line_width (cr, 0.5);
         cairo_stroke(cr);
@@ -45,8 +45,8 @@ class Conic3: public Toy {
         double angle = Geom::angle_between(a[0], a[1]);
         double len = std::max(Geom::L2(a[0]),
                                 Geom::L2(a[1]));
-        for(int i = 0; i < 2; i++) 
-        a[i] = len*unit_vector(a[i]);
+        for(auto & i : a) 
+        i = len*unit_vector(i);
         *notify << "angle = " << angle;
         *notify << " sinC = " << sinC(angle);
         *notify << " cosC = " << cosC(angle);

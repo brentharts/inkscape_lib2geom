@@ -205,9 +205,9 @@ void derivative(std::vector<Point> & D, std::vector<Point> const& B)
 void normal(std::vector<Point> & N, std::vector<Point> const& B)
 {
     derivative(N,B);
-    for (size_t i = 0; i < N.size(); ++i)
+    for (auto & i : N)
     {
-        N[i] = rot90(N[i]);
+        i = rot90(i);
     }
 }
 
@@ -361,8 +361,8 @@ Interval fat_line_bounds (std::vector<Point> const &c,
                           Line const &l)
 {
     Interval bound(0, 0);
-    for (size_t i = 0; i < c.size(); ++i) {
-        bound.expandTo(signed_distance(c[i], l));
+    for (auto i : c) {
+        bound.expandTo(signed_distance(i, l));
     }
     return bound;
 }
@@ -395,7 +395,7 @@ OptInterval clip_interval (std::vector<Point> const& B,
     for (size_t i = 0; i < B.size(); ++i)
     {
         const double d = signed_distance(B[i], l);
-        D.push_back (Point(i/n, d));
+        D.emplace_back(i/n, d);
     }
     //print(D);
 

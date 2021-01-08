@@ -5,7 +5,7 @@ using namespace Geom;
 
 class CircleIntersect : public Toy {
     PointSetHandle psh[2];
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         Rect all(Point(0, 0), Point(width, height));
         double r = Geom::distance(psh[0].pts[0], psh[0].pts[1]);
 
@@ -24,15 +24,15 @@ class CircleIntersect : public Toy {
 
         // draw intersection points
         cairo_set_source_rgb(cr, 1, 0, 0);
-        for (unsigned i = 0; i < result.size(); ++i) {
-            draw_handle(cr, result[i].point());
+        for (auto & i : result) {
+            draw_handle(cr, i.point());
         }
         cairo_stroke(cr);
 
         // show message
         if (!result.empty()) {
-            for (unsigned i = 0; i < result.size(); ++i) {
-                *notify << result[i].point() << ", ";
+            for (auto & i : result) {
+                *notify << i.point() << ", ";
             }
         } else {
             *notify << "No intersection";

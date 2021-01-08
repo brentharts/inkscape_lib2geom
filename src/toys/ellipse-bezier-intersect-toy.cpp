@@ -9,7 +9,7 @@ using namespace Geom;
 class CircleIntersect : public Toy {
     PointSetHandle eh, bh;
 
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
 
         Rect all(Point(0,0), Point(width, height));
 
@@ -40,8 +40,8 @@ class CircleIntersect : public Toy {
         std::vector<ShapeIntersection> result = e.intersect(b);
 
         cairo_set_source_rgb(cr, 1, 0, 0);
-        for (unsigned i = 0; i < result.size(); ++i) {
-            draw_handle(cr, result[i].point());
+        for (auto & i : result) {
+            draw_handle(cr, i.point());
         }
         cairo_stroke(cr);
 

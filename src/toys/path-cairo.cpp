@@ -15,8 +15,8 @@ void cairo_rectangle(cairo_t *cr, Rect const& r) {
 void cairo_convex_hull(cairo_t *cr, ConvexHull const& ch) {
     if(ch.empty()) return;
     cairo_move_to(cr, ch[ch.size()-1]);
-    for(unsigned i = 0; i < ch.size(); i++) {
-        cairo_line_to(cr, ch[i]);
+    for(auto i : ch) {
+        cairo_line_to(cr, i);
     }
 }
 
@@ -47,8 +47,8 @@ void cairo_curve(cairo_t *cr, Curve const& c) {
         Path sbasis_path = cubicbezierpath_from_sbasis(c.toSBasis(), 0.1);
 
         //recurse to convert the new path resulting from the sbasis to svgd
-        for(Path::iterator iter = sbasis_path.begin(); iter != sbasis_path.end(); ++iter) {
-            cairo_curve(cr, *iter);
+        for(const auto & iter : sbasis_path) {
+            cairo_curve(cr, iter);
         }
     }
 }
@@ -63,8 +63,8 @@ void cairo_path(cairo_t *cr, Path const &p) {
         return;
     }
 
-    for(Path::const_iterator iter(p.begin()), end(p.end()); iter != end; ++iter) {
-        cairo_curve(cr, *iter);
+    for(const auto & iter : p) {
+        cairo_curve(cr, iter);
     }
     if(p.closed())
         cairo_close_path(cr);

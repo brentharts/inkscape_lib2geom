@@ -334,16 +334,16 @@ public:
       public:
         ClosingSegment() : LineSegment() {}
         ClosingSegment(Point const &p1, Point const &p2) : LineSegment(p1, p2) {}
-        virtual Curve *duplicate() const { return new ClosingSegment(*this); }
-        virtual Curve *reverse() const { return new ClosingSegment((*this)[1], (*this)[0]); }
+        Curve *duplicate() const override { return new ClosingSegment(*this); }
+        Curve *reverse() const override { return new ClosingSegment((*this)[1], (*this)[0]); }
     };
 
     class StitchSegment : public LineSegment {
       public:
         StitchSegment() : LineSegment() {}
         StitchSegment(Point const &p1, Point const &p2) : LineSegment(p1, p2) {}
-        virtual Curve *duplicate() const { return new StitchSegment(*this); }
-        virtual Curve *reverse() const { return new StitchSegment((*this)[1], (*this)[0]); }
+        Curve *duplicate() const override { return new StitchSegment(*this); }
+        Curve *reverse() const override { return new StitchSegment((*this)[1], (*this)[0]); }
     };
 
     // Path(Path const &other) - use default copy constructor
@@ -392,7 +392,7 @@ public:
 
     /** @brief Swap contents with another path
      * @todo Add noexcept specifiers for C++11 */
-    void swap(Path &other) throw() {
+    void swap(Path &other) noexcept {
         using std::swap;
         swap(other._data, _data);
         swap(other._closing_seg, _closing_seg);
@@ -401,7 +401,7 @@ public:
     }
     /** @brief Swap contents of two paths.
      * @relates Path */
-    friend inline void swap(Path &a, Path &b) throw() { a.swap(b); }
+    friend inline void swap(Path &a, Path &b) noexcept { a.swap(b); }
 
     /** @brief Access a curve by index */
     Curve const &operator[](size_type i) const { return _data->curves[i]; }

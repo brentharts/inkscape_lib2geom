@@ -435,9 +435,9 @@ std::vector<ShapeIntersection> Ellipse::intersect(Line const &line) const
         Coord K = C*r*r + E*r + F;          // x^0 terms
         std::vector<Coord> xs = solve_quadratic(I, J, K);
 
-        for (unsigned i = 0; i < xs.size(); ++i) {
-            Point p(xs[i], q*xs[i] + r);
-            result.push_back(ShapeIntersection(atan2(p * iuct), line.timeAt(p), p));
+        for (double x : xs) {
+            Point p(x, q*x + r);
+            result.emplace_back(atan2(p * iuct), line.timeAt(p), p);
         }
     } else {
         Coord q = -b/a;
@@ -448,9 +448,9 @@ std::vector<ShapeIntersection> Ellipse::intersect(Line const &line) const
         Coord K = A*r*r + D*r + F;
         std::vector<Coord> xs = solve_quadratic(I, J, K);
 
-        for (unsigned i = 0; i < xs.size(); ++i) {
-            Point p(q*xs[i] + r, xs[i]);
-            result.push_back(ShapeIntersection(atan2(p * iuct), line.timeAt(p), p));
+        for (double x : xs) {
+            Point p(q*x + r, x);
+            result.emplace_back(atan2(p * iuct), line.timeAt(p), p);
         }
     }
     return result;
@@ -521,13 +521,13 @@ std::vector<ShapeIntersection> Ellipse::intersect(Ellipse const &other) const
     if (mus.size() == 3) {
         std::swap(mus[1], mus[0]);
     }
-    for (unsigned i = 0; i < mus.size(); ++i) {
-        Coord aa = mus[i] * A + a;
-        Coord bb = mus[i] * B + b;
-        Coord ee = mus[i] * E + e;
+    for (double i : mus) {
+        Coord aa = i * A + a;
+        Coord bb = i * B + b;
+        Coord ee = i * E + e;
         Coord delta = ee*ee - 4*aa*bb;
         if (delta < 0) continue;
-        mu = mus[i];
+        mu = i;
         break;
     }
 
@@ -598,9 +598,9 @@ std::vector<ShapeIntersection> Ellipse::intersect(D2<Bezier> const &b) const
     std::vector<Coord> r = x.roots();
 
     std::vector<ShapeIntersection> result;
-    for (unsigned i = 0; i < r.size(); ++i) {
-        Point p = b.valueAt(r[i]);
-        result.push_back(ShapeIntersection(timeAt(p), r[i], p));
+    for (double & i : r) {
+        Point p = b.valueAt(i);
+        result.emplace_back(timeAt(p), i, p);
     }
     return result;
 }
@@ -643,9 +643,9 @@ bool are_near(Ellipse const &a, Ellipse const &b, Coord precision)
 
     // Do the actual comparison by computing four points on each ellipse.
     Point tps[] = {Point(1,0), Point(0,1), Point(-1,0), Point(0,-1)};
-    for (unsigned i = 0; i < 4; ++i) {
-        if (!are_near(tps[i] * ac.unitCircleTransform(),
-                      tps[i] * bc.unitCircleTransform(),
+    for (auto & tp : tps) {
+        if (!are_near(tp * ac.unitCircleTransform(),
+                      tp * bc.unitCircleTransform(),
                       precision))
             return false;
     }

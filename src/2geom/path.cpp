@@ -458,8 +458,8 @@ std::vector<PathTime> Path::roots(Coord v, Dim2 d) const
     std::vector<PathTime> res;
     for (unsigned i = 0; i < size(); i++) {
         std::vector<Coord> temp = (*this)[i].roots(v, d);
-        for (unsigned j = 0; j < temp.size(); j++)
-            res.push_back(PathTime(i, temp[j]));
+        for (double j : temp)
+            res.emplace_back(i, j);
     }
     return res;
 }
@@ -499,10 +499,10 @@ public:
         _records.reserve(asz + bsz);
 
         for (std::size_t i = 0; i < asz; ++i) {
-            _records.push_back(CurveRecord(&a[i], i, 0));
+            _records.emplace_back(&a[i], i, 0);
         }
         for (std::size_t i = 0; i < bsz; ++i) {
-            _records.push_back(CurveRecord(&b[i], i, 1));
+            _records.emplace_back(&b[i], i, 1);
         }
 
         OptRect abb = a.boundsFast() | b.boundsFast();
@@ -522,15 +522,15 @@ public:
 
         _active[w].push_back(const_cast<CurveRecord&>(*ii));
 
-        for (ActiveCurveList::iterator i = _active[ow].begin(); i != _active[ow].end(); ++i) {
-            if (!ii->bounds.intersects(i->bounds)) continue;
-            std::vector<CurveIntersection> cx = ii->curve->intersect(*i->curve, _precision);
-            for (std::size_t k = 0; k < cx.size(); ++k) {
-                PathTime tw(ii->index, cx[k].first), tow(i->index, cx[k].second);
-                _result.push_back(PathIntersection(
+        for (auto & i : _active[ow]) {
+            if (!ii->bounds.intersects(i.bounds)) continue;
+            std::vector<CurveIntersection> cx = ii->curve->intersect(*i.curve, _precision);
+            for (auto & k : cx) {
+                PathTime tw(ii->index, k.first), tow(i.index, k.second);
+                _result.emplace_back(
                     w == 0 ? tw : tow,
                     w == 0 ? tow : tw,
-                    cx[k].point()));
+                    k.point());
             }
         }
     }
@@ -566,9 +566,9 @@ std::vector<PathIntersection> Path::intersect(Path const &other, Coord precision
 
     // preprocessing to remove duplicate intersections at endpoints
     std::size_t asz = size(), bsz = other.size();
-    for (std::size_t i = 0; i < result.size(); ++i) {
-        result[i].first.normalizeForward(asz);
-        result[i].second.normalizeForward(bsz);
+    for (auto & i : result) {
+        i.first.normalizeForward(asz);
+        i.second.normalizeForward(bsz);
     }
     std::sort(result.begin(), result.end());
     result.erase(std::unique(result.begin(), result.end()), result.end());
@@ -648,8 +648,8 @@ std::vector<double> Path::allNearestTimes(Point const &_point, double from, doub
     }
     if (si == ei) {
         std::vector<double> all_nearest = _path[si].allNearestTimes(_point, st, et);
-        for (unsigned int i = 0; i < all_nearest.size(); ++i) {
-            all_nearest[i] = si + all_nearest[i];
+        for (double & i : all_nearest) {
+            i = si + i;
         }
         return all_nearest;
     }
@@ -685,8 +685,8 @@ std::vector<double> Path::allNearestTimes(Point const &_point, double from, doub
         all_t = _path[ei].allNearestTimes(_point, 0, et);
         dsq = distanceSq(_point, _path[ei].pointAt(all_t.front()));
         if (mindistsq > dsq) {
-            for (unsigned int i = 0; i < all_t.size(); ++i) {
-                all_t[i] = ei + all_t[i];
+            for (double & i : all_t) {
+                i = ei + i;
             }
             return all_t;
         } else if (mindistsq == dsq) {

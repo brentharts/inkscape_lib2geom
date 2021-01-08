@@ -21,8 +21,8 @@ SBasis toSBasis(SBasisOf<double> const &f){
 }
 SBasisOf<double> toSBasisOfDouble(SBasis const &f){
     SBasisOf<double> result;
-    for (unsigned i=0; i<f.size(); i++){
-        result.push_back(LinearOf<double>(f[i][0],f[i][1]));
+    for (auto i : f){
+        result.push_back(LinearOf<double>(i[0],i[1]));
     }
     return result;
 }
@@ -232,7 +232,7 @@ public:
     PointSetHandle b2_handle;
     void draw(cairo_t *cr,
 	      std::ostringstream *notify,
-	      int width, int height, bool save, std::ostringstream *timer_stream) {
+	      int width, int height, bool save, std::ostringstream *timer_stream) override {
     
         D2<SBasis> B1 = b1_handle.asBezier();
         D2<SBasis> B2 = b2_handle.asBezier();

@@ -71,7 +71,7 @@ static void plot(cairo_t* cr, Piecewise<SBasis> const &f,double vscale=1){
     
     plot[0].cuts.push_back(f.cuts.front());
     plot[0].cuts.push_back(f.cuts.back());
-    plot[0].segs.push_back(Linear(150,450));
+    plot[0].segs.emplace_back(Linear(150,450));
 
     cairo_d2_pw_sb(cr, plot);
 
@@ -88,7 +88,7 @@ double my_inv(double x){return (1./x);}
 class SbCalculusToy: public Toy {
     PWSBHandle pwsbh;
 
-  void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+  void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
 
       //Let the user input sbasis coefs.
       cairo_move_to(cr, Geom::Point(0,300));

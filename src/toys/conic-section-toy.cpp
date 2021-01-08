@@ -71,7 +71,7 @@ class ConicSectionToy : public Toy
     static const char* menu_items[TOTAL_ITEMS];
     static const char keys[TOTAL_ITEMS];
 
-    virtual void first_time(int /*argc*/, char** /*argv*/)
+    void first_time(int /*argc*/, char** /*argv*/) override
     {
         draw_f = &ConicSectionToy::draw_menu;
     }
@@ -375,9 +375,9 @@ class ConicSectionToy : public Toy
         {
             std::cerr << e.what() << std::endl;
         }
-        for ( unsigned int i = 0; i < values.size(); ++i )
+        for (double value : values)
         {
-            Point p(values[i], values[i]);
+            Point p(value, value);
             p[DIM] = p1.pos[DIM];
             draw_handle(cr, p);
         }
@@ -515,9 +515,9 @@ class ConicSectionToy : public Toy
         cairo_set_source_rgba(cr, 0.8, 0.1, 0.1, 1.0);
         cairo_set_line_width (cr, 0.5);
         cairo_rectangle (cr, Rect (Point (100, 100),Point (width-100, height-100)));
-        for (size_t i = 0; i < rq.size(); ++i)
+        for (auto & i : rq)
         {
-            cairo_d2_sb (cr, rq[i].toCubic().toSBasis());
+            cairo_d2_sb (cr, i.toCubic().toSBasis());
         }
         cairo_stroke(cr);
     }
@@ -673,7 +673,7 @@ class ConicSectionToy : public Toy
     }
 
 
-    void key_hit(GdkEventKey *e)
+    void key_hit(GdkEventKey *e) override
     {
         char choice = std::toupper(e->keyval);
         switch ( choice )
@@ -727,9 +727,9 @@ class ConicSectionToy : public Toy
         redraw();
     }
 
-    virtual void draw( cairo_t *cr, std::ostringstream *notify,
+    void draw( cairo_t *cr, std::ostringstream *notify,
                        int width, int height, bool save,
-                       std::ostringstream *timer_stream )
+                       std::ostringstream *timer_stream ) override
     {
         if (timer_stream == 0)  timer_stream = notify;
         m_width = width;

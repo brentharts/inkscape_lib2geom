@@ -41,7 +41,7 @@ double handle_to_sb_t(unsigned i, unsigned n) {
 class Sb1d: public Toy {
 public:
     PointSetHandle hand;
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         cairo_set_source_rgba (cr, 0., 0.5, 0, 1);
         cairo_set_line_width (cr, 1);
         
@@ -58,8 +58,8 @@ public:
         D2<SBasis> B;
         B[0] = Linear(width/4, 3*width/4);
         B[1].resize(hand.pts.size()/2);
-        for(unsigned i = 0; i < B[1].size(); i++) {
-            B[1][i] = Linear(0);
+        for(auto & i : B) {
+            i = Linear(0);
         }
         for(unsigned i = 0; i < hand.pts.size(); i++) {
             handle_to_sb(i, hand.pts.size(), B[1]) = 3*width/4 - hand.pts[i][1];
@@ -93,17 +93,17 @@ public:
         Geom::ConvexHull ch(hand.pts);
     
         cairo_move_to(cr, ch.back());
-        for(unsigned i = 0; i < ch.size(); i++) {
-            cairo_line_to(cr, ch[i]);
+        for(auto i : ch) {
+            cairo_line_to(cr, i);
         }
         Toy::draw(cr, notify, width, height, save,timer_stream);
     }
 public:
 Sb1d () {
-    hand.pts.push_back(Geom::Point(0,450));
+    hand.pts.emplace_back(0,450);
     for(unsigned i = 0; i < 4; i++)
-        hand.pts.push_back(Geom::Point(uniform()*400, uniform()*400));
-    hand.pts.push_back(Geom::Point(0,450));
+        hand.pts.emplace_back(uniform()*400, uniform()*400);
+    hand.pts.emplace_back(0,450);
     handles.push_back(&hand);
 }
 };

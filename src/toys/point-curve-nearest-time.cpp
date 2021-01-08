@@ -77,7 +77,7 @@ class NearestPoints : public Toy
 private:
     PathVector paths_b;
     void draw( cairo_t *cr,	std::ostringstream *notify,
-               int width, int height, bool save, std::ostringstream *timer_stream)
+               int width, int height, bool save, std::ostringstream *timer_stream) override
     {
 
     	Point p = ph.pos;
@@ -119,8 +119,8 @@ private:
                     if ( toggles[0].on )
                     {
                         std::vector<double> t = earc.allNearestTimes(p);
-                        for ( unsigned int i = 0; i < t.size(); ++i )
-                            nps.push_back(earc.pointAt(t[i]));
+                        for (double i : t)
+                            nps.push_back(earc.pointAt(i));
                     }
                     else
                     {
@@ -137,8 +137,8 @@ private:
     	        if ( toggles[0].on )
     	        {
                     std::vector<double> t = Geom::all_nearest_times(p, A);
-                    for ( unsigned int i = 0; i < t.size(); ++i )
-                        nps.push_back(A(t[i]));
+                    for (double i : t)
+                        nps.push_back(A(i));
     	        }
     	        else
     	        {
@@ -170,8 +170,8 @@ private:
     	        if ( toggles[0].on )
     	        {
                     std::vector<double> t = Geom::all_nearest_times(p, pwc);
-                    for ( unsigned int i = 0; i < t.size(); ++i )
-                        nps.push_back(pwc(t[i]));
+                    for (double i : t)
+                        nps.push_back(pwc(i));
     	        }
     	        else
     	        {
@@ -208,8 +208,8 @@ private:
     	        if ( toggles[0].on )
     	        {
                     std::vector<double> t = path.allNearestTimes(p);
-                    for ( unsigned int i = 0; i < t.size(); ++i )
-                        nps.push_back(path.pointAt(t[i]));
+                    for (double i : t)
+                        nps.push_back(path.pointAt(i));
     	        }
     	        else
     	        {
@@ -233,8 +233,8 @@ private:
     	        if ( toggles[0].on )
     	        {
                     std::vector<PathVectorTime> t = pathv.allNearestTimes(p);
-                    for ( unsigned int i = 0; i < t.size(); ++i )
-                        nps.push_back(pathv.pointAt(t[i]));
+                    for (auto & i : t)
+                        nps.push_back(pathv.pointAt(i));
     	        }
     	        else
     	        {
@@ -265,10 +265,10 @@ private:
 
     	if ( toggles[0].on )
     	{
-            for ( unsigned int i = 0; i < nps.size(); ++i )
+            for (auto & np : nps)
             {
                 cairo_move_to(cr, p);
-                cairo_line_to(cr, nps[i]);
+                cairo_line_to(cr, np);
             }
     	}
     	else
@@ -290,7 +290,7 @@ private:
     	Toy::draw(cr, notify, width, height, save,timer_stream);
     }
 
-    void key_hit(GdkEventKey *e)
+    void key_hit(GdkEventKey *e) override
     {
     	choice = e->keyval;
     	switch ( choice )
@@ -333,14 +333,14 @@ private:
     	redraw();
     }
 
-    void mouse_pressed(GdkEventButton* e)
+    void mouse_pressed(GdkEventButton* e) override
     {
         toggle_events(toggles, e);
         Toy::mouse_pressed(e);
     }
 
 public:
-    void first_time(int argc, char** argv) {
+    void first_time(int argc, char** argv) override {
         const char *path_b_name="star.svgd";
         if(argc > 1)
             path_b_name = argv[1];
@@ -352,8 +352,8 @@ public:
         handles.push_back(&psh);
         handles.push_back(&ph);
         ph.pos = Point(uniform()*400, uniform()*400);
-        toggles.push_back( Toggle("ALL NP", false) );
-        toggles.push_back( Toggle("CLOSED", false) );
+        toggles.emplace_back("ALL NP", false );
+        toggles.emplace_back("CLOSED", false );
     }
 
 private:

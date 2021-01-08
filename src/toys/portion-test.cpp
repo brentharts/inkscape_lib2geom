@@ -22,11 +22,11 @@ class PortionTester: public Toy {
     PointSetHandle curve_handle;
     PointHandle sample_point1, sample_point2;
     std::vector<Toggle> toggles;
-    void mouse_pressed(GdkEventButton* e) {
+    void mouse_pressed(GdkEventButton* e) override {
         toggle_events(toggles, e);
         Toy::mouse_pressed(e);
     }
-    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
     
         draw_toggles(cr, toggles);
         D2<SBasis> B = curve_handle.asBezier();
@@ -69,9 +69,9 @@ class PortionTester: public Toy {
   
 public:
     PortionTester(){
-        toggles.push_back(Toggle("Path", true));
+        toggles.emplace_back("Path", true);
         toggles[0].bounds = Rect(Point(10,100), Point(100, 130));
-        toggles.push_back(Toggle("Curve", true));
+        toggles.emplace_back("Curve", true);
         toggles[1].bounds = Rect(Point(10,130), Point(100, 160));
         if(handles.empty()) {
             handles.push_back(&curve_handle);

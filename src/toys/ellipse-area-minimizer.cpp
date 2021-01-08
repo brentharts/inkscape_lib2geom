@@ -232,14 +232,14 @@ class EllipseAreaMinimizer : public Toy
 {
   public:
     void draw( cairo_t *cr, std::ostringstream *notify,
-               int width, int height, bool save, std::ostringstream *timer_stream)
+               int width, int height, bool save, std::ostringstream *timer_stream) override
     {
         Point toggle_sp( 300, height - 50);
         toggles[0].bounds = Rect( toggle_sp, toggle_sp + Point(135,25) );
         ConvexHull ch(psh.pts);
         bool non_convex = false;
-        for(unsigned i = 0; i < psh.pts.size(); i++) {
-            if (ch.contains(psh.pts[i]))
+        for(auto & pt : psh.pts) {
+            if (ch.contains(pt))
                 non_convex = true;
         }
 
@@ -317,7 +317,7 @@ class EllipseAreaMinimizer : public Toy
 
         handles.push_back(&psh);
 
-        toggles.push_back(Toggle("Area/Perimeter", true));
+        toggles.emplace_back("Area/Perimeter", true);
         handles.push_back(&(toggles[0]));
     }
 

@@ -67,7 +67,7 @@ class FindDerivatives : public Toy
     PointSetHandle curve_handle;
     PointHandle sample_point;
 
-    virtual void first_time(int /*argc*/, char** /*argv*/)
+    void first_time(int /*argc*/, char** /*argv*/) override
     {
         draw_f = &FindDerivatives::draw_menu;
     }
@@ -98,7 +98,7 @@ class FindDerivatives : public Toy
         p2.pos = Point(450, 450);
         O.pos = Point(50, 400);
 
-        sliders.push_back(Slider(0, 2*M_PI, 0, 0, "angle"));
+        sliders.emplace_back(0, 2*M_PI, 0, 0, "angle");
         sliders[ANGLE_SLIDER].formatter(&angle_formatter);
 
         handles.push_back(&p1);
@@ -213,8 +213,8 @@ class FindDerivatives : public Toy
         D2<SBasis> deriv = derivative(B);
         SBasis dotp = dot(deriv, rot90(vector));
         std::vector<double> sol = roots(dotp);
-        for (unsigned i = 0; i < sol.size(); ++i) {
-            draw_handle(cr, B.valueAt(sol[i]));         // the solutions are in vector 'sol'
+        for (double i : sol) {
+            draw_handle(cr, B.valueAt(i));         // the solutions are in vector 'sol'
         }
 
         cairo_set_source_rgba (cr, 0.5, 0.2, 0., 0.8);
@@ -227,7 +227,7 @@ class FindDerivatives : public Toy
         handles.push_back(&curve_handle);
         handles.push_back(&sample_point);
 
-        toggles.push_back(Toggle(" tangent / normal ", false));
+        toggles.emplace_back(" tangent / normal ", false);
         handles.push_back(&(toggles[0]));
         for(unsigned i = 0; i < 4; i++)
             curve_handle.push_back(150+uniform()*300,150+uniform()*300);
@@ -248,9 +248,9 @@ class FindDerivatives : public Toy
         std::vector<double> sol = toggles[0].on ?
             find_tangents(sample_point.pos, B)
             : find_normals(sample_point.pos, B);
-        for (unsigned i = 0; i < sol.size(); ++i) {
-            draw_handle(cr, B.valueAt(sol[i]));         // the solutions are in vector 'sol'
-            draw_segment(cr, B.valueAt(sol[i]), sample_point.pos);
+        for (double i : sol) {
+            draw_handle(cr, B.valueAt(i));         // the solutions are in vector 'sol'
+            draw_segment(cr, B.valueAt(i), sample_point.pos);
         }
 
         cairo_set_source_rgba (cr, 0.5, 0.2, 0., 0.8);
@@ -409,7 +409,7 @@ class FindDerivatives : public Toy
         }
     }
 
-    void key_hit(GdkEventKey *e)
+    void key_hit(GdkEventKey *e) override
     {
         char choice = std::toupper(e->keyval);
         switch ( choice )
@@ -434,8 +434,8 @@ class FindDerivatives : public Toy
         redraw();
     }
 
-    virtual void draw( cairo_t *cr, std::ostringstream *notify,
-                       int width, int height, bool save, std::ostringstream *timer_stream)
+    void draw( cairo_t *cr, std::ostringstream *notify,
+                       int width, int height, bool save, std::ostringstream *timer_stream) override
     {
         m_width = width;
         m_height = height;

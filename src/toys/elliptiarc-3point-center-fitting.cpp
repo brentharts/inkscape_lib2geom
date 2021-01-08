@@ -57,11 +57,11 @@ bool make_elliptical_arc( EllipticalArc & ea,
 
 	m.set_all(0);
 	v.set_all(0);
-	for (unsigned int k = 0; k < 3; ++k)
+	for (auto & k : p)
 	{
 		// init_x_y
-		x1 = p[k][X] - centre[X]; x2 = x1 * x1; x3 = x2 * x1; x4 = x3 * x1;
-		y1 = p[k][Y] - centre[Y]; y2 = y1 * y1; y3 = y2 * y1; y4 = y3 * y1;
+		x1 = k[X] - centre[X]; x2 = x1 * x1; x3 = x2 * x1; x4 = x3 * x1;
+		y1 = k[Y] - centre[Y]; y2 = y1 * y1; y3 = y2 * y1; y4 = y3 * y1;
 		x1y1 = x1 * y1;
 		x2y2 = x2 * y2;
 		x3y1 = x3 * y1; x1y3 = x1 * y3;
@@ -212,7 +212,7 @@ class ElliptiArcMaker : public Toy
 {
   private:
 	void draw( cairo_t *cr, std::ostringstream *notify,
-  		       int width, int height, bool save, std::ostringstream *timer_stream)
+  		       int width, int height, bool save, std::ostringstream *timer_stream) override
 	{
 		cairo_set_line_width (cr, 0.3);
 		cairo_set_source_rgb(cr, 0,0,0.3);

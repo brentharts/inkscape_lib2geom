@@ -83,8 +83,8 @@ SBasis linear_root(double t) {
 
 SBasis array_roots(vector<double> x) {
     SBasis b(1);
-    for(unsigned i = 0; i < x.size(); i++) {
-        b = multiply(b, linear_root(x[i]));
+    for(double i : x) {
+        b = multiply(b, linear_root(i));
     }
     return b;
 }
@@ -118,17 +118,17 @@ TEST_F(SBasisTest, Roots) {
     tests.push_back(vector_from_array((const double[]){.1,.2,.3,.4,.5,.6}));
     tests.push_back(vector_from_array((const double[]){0.25,0.25,0.25,0.75,0.75,0.75}));
     
-    for(unsigned test_i = 0; test_i < tests.size(); test_i++) {
-        SBasis b = array_roots(tests[test_i]);
-        std::cout << tests[test_i] << ": " << b << std::endl;
+    for(auto & test : tests) {
+        SBasis b = array_roots(test);
+        std::cout << test << ": " << b << std::endl;
         std::cout << roots(b) << std::endl;
-        EXPECT_vector_near(tests[test_i], roots(b), eps);
+        EXPECT_vector_near(test, roots(b), eps);
     }
 
     vector<Linear> broken;
-    broken.push_back(Linear(0, 42350.1));
-    broken.push_back(Linear(-71082.3, -67071.5));
-    broken.push_back(Linear(1783.41, 796047));
+    broken.emplace_back(0, 42350.1);
+    broken.emplace_back(-71082.3, -67071.5);
+    broken.emplace_back(1783.41, 796047);
     SBasis b(broken);
     Bezier bz;
     sbasis_to_bezier(bz, b);
@@ -148,8 +148,7 @@ TEST_F(SBasisTest, Subdivide) {
     std::vector<std::pair<SBasis, double> > errors;
     for (unsigned i = 0; i < 10000; ++i) {
         double t = g_random_double_range(0, 1e-6);
-        for (unsigned i = 0; i < 4; ++i) {
-            SBasis &input = fragments[i];
+        for (auto & input : fragments) {
             std::pair<SBasis, SBasis> result;
             result.first = portion(input, 0, t);
             result.second = portion(input, t, 1);
@@ -165,7 +164,7 @@ TEST_F(SBasisTest, Subdivide) {
             EXPECT_EQ(result.second.valueAt(1), input.valueAt(1));
 
             if (result.first.at1() != result.second.at0()) {
-                errors.push_back(std::pair<SBasis,double>(input, t));
+                errors.emplace_back(input, t);
             }
         }
     }
@@ -212,8 +211,7 @@ TEST_F(SBasisTest,Operators) {
     EXPECT_TRUE(bounds_local(hump, Interval(0.3, 0.6))->contains(tight_local_bounds));
 
     SBasis Bs[] = {unit, hump, wiggle};
-    for(unsigned i = 0; i < sizeof(Bs)/sizeof(SBasis); i++) {
-        SBasis B = Bs[i];
+    for(auto B : Bs) {
         SBasis product = multiply(B, B);
         for(int i = 0; i <= 16; i++) {
             double t = i/16.0;

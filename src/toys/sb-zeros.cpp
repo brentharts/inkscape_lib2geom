@@ -10,7 +10,7 @@ using namespace Geom;
 
 class SBZeros: public Toy {
     PointSetHandle pB1, pB2;
-    virtual void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) {
+    void draw(cairo_t *cr, std::ostringstream *notify, int width, int height, bool save, std::ostringstream *timer_stream) override {
         D2<SBasis> B1 = pB1.asBezier();
         D2<SBasis> B2 = pB2.asBezier();
         Piecewise<D2<SBasis> >B;
@@ -23,10 +23,10 @@ class SBZeros: public Toy {
         for(int j = 0; j <= 5; j++) {
             for(unsigned d = 0; d < 2; d++) {
                 std::vector<double> r = roots(make_cuts_independent(s[j])[d]);
-                for(unsigned k = 0; k < r.size(); k++) e.push_back(B.valueAt(r[k]));
+                for(double k : r) e.push_back(B.valueAt(k));
             }
         }
-        for(unsigned i = 0; i < e.size(); i++) draw_cross(cr, e[i]);
+        for(auto & i : e) draw_cross(cr, i);
         
         cairo_set_line_width (cr, .5);
         cairo_set_source_rgba (cr, 0., 0.5, 0., 1);
