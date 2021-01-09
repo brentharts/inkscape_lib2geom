@@ -158,13 +158,14 @@ TEST(EllipseTest, LineIntersection) {
     std::vector<ShapeIntersection> xs = e.intersect(l);
 
     ASSERT_EQ(xs.size(), 2ul);
-    EXPECT_FLOAT_EQ(xs[0].point()[X], 0);
-    EXPECT_FLOAT_EQ(xs[0].point()[Y], -2);
-    EXPECT_FLOAT_EQ(xs[1].point()[X], 9./5);
-    EXPECT_FLOAT_EQ(xs[1].point()[Y], 8./5);
 
     // due to numeric imprecision when evaluating Ellipse,
     // the points may deviate by around 2e-16
+    EXPECT_NEAR(xs[0].point()[X], 0, 1e-15);
+    EXPECT_NEAR(xs[0].point()[Y], -2, 1e-15);
+    EXPECT_NEAR(xs[1].point()[X], 9./5, 1e-15);
+    EXPECT_NEAR(xs[1].point()[Y], 8./5, 1e-15);
+
     EXPECT_intersections_valid(e, l, xs, 1e-15);
 }
 
@@ -199,7 +200,7 @@ TEST(EllipseTest, BezierIntersection) {
     std::vector<ShapeIntersection> xs = e.intersect(b);
 
     EXPECT_EQ(xs.size(), 2ul);
-    EXPECT_intersections_valid(e, b, xs, 6e-13);
+    EXPECT_intersections_valid(e, b, xs, 6e-12);
 }
 
 TEST(EllipseTest, Coefficients) {

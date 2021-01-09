@@ -91,10 +91,12 @@ TEST(LineTest, Reflection) {
 
     Point testra = pa * reflecta;
     Point testrb = pb * reflectb;
-    EXPECT_FLOAT_EQ(testra[X], ra[X]);
-    EXPECT_FLOAT_EQ(testra[Y], ra[Y]);
-    EXPECT_FLOAT_EQ(testrb[X], rb[X]);
-    EXPECT_FLOAT_EQ(testrb[Y], rb[Y]);
+
+    constexpr Coord eps{1e-12};
+    EXPECT_near(testra[X], ra[X], eps);
+    EXPECT_near(testra[Y], ra[Y], eps);
+    EXPECT_near(testrb[X], rb[X], eps);
+    EXPECT_near(testrb[Y], rb[Y], eps);
 }
 
 TEST(LineTest, RotationToZero) {
