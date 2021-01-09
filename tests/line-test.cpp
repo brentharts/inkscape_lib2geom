@@ -117,7 +117,6 @@ TEST(LineTest, RotationToZero) {
 }
 
 TEST(LineTest, Coefficients) {
-    GTEST_SKIP() << "This test fails on i686-linux and aarch64-linux";
     std::vector<Line> lines;
     lines.emplace_back(Point(1e9,1e9), Point(1,1));
     //the case below will never work without normalizing the line
