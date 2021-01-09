@@ -108,7 +108,7 @@ TEST(CircleTest, CircleIntersection) {
 
     r3 = b.intersect(c);
     EXPECT_EQ(r3.size(), 2u);
-    EXPECT_intersections_valid(b, c, r3, 3e-15);
+    EXPECT_intersections_valid(b, c, r3, 4e-15);
 
     EXPECT_TRUE(a.intersect(d).empty());
     EXPECT_TRUE(b.intersect(d).empty());
