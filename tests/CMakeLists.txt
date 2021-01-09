@@ -23,6 +23,7 @@ coord-test
 ellipse-test
 elliptical-arc-test
 intersection-graph-test
+interval-test
 line-test
 nl-vector-test
 parallelogram-test

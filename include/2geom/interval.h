@@ -203,16 +203,10 @@ class OptInterval
 {
     typedef GenericOptInterval<Coord> Base;
 public:
-    /// @name Create optionally empty intervals.
-    /// @{
-    /** @brief Create an empty interval. */
-    OptInterval() : Base() {}
-    /** @brief Wrap an existing interval. */
-    OptInterval(Interval const &a) : Base(a) {}
-    /** @brief Create an interval containing a single point. */
-    OptInterval(Coord u) : Base(u) {}
-    /** @brief Create an interval containing a range of numbers. */
-    OptInterval(Coord u, Coord v) : Base(u,v) {}
+    using Base::Base;
+    using Base::operator==;
+    using Base::operator!=;
+
     OptInterval(Base const &b) : Base(b) {}
 
     /** @brief Promote from IntInterval. */

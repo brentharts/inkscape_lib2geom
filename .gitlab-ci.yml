@@ -22,6 +22,7 @@ variables:
     - make -j3
     - make -j3 test
     - make -j3 perf
+    - make py2geom
     - make install
     - ( cd tests/dependent-project ; bash build-and-run.sh )
   cache:

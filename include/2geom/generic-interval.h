@@ -323,6 +323,20 @@ public:
         intersectWith(o);
         return *this;
     }
+
+    // The equality operators inherited from std::optional don't work with derived types, because
+    // the template overload ignores that the devived type is also an optional. It would result in
+    // `GenericInterval() != GenericInterval()` being true.
+    template <typename U, typename = std::enable_if_t<std::is_base_of_v<Base, U>>>
+    bool operator==(U const &other) const
+    {
+        return static_cast<Base const &>(*this) == static_cast<Base const &>(other);
+    }
+    template <typename U, typename = std::enable_if_t<std::is_base_of_v<Base, U>>>
+    bool operator!=(U const &other) const
+    {
+        return static_cast<Base const &>(*this) != static_cast<Base const &>(other);
+    }
 };
 
 /** @brief Intersect two intervals and return a possibly empty range of numbers
