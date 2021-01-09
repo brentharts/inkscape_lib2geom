@@ -38,10 +38,10 @@
 #include <iterator>
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <optional>
 #include <boost/operators.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/shared_ptr.hpp>
 #include <2geom/intersection.h>
 #include <2geom/curve.h>
 #include <2geom/bezier-curve.h>
@@ -841,7 +841,7 @@ private:
     // n.b. takes ownership of curve object
     void do_append(Curve *curve);
 
-    boost::shared_ptr<PathData> _data;
+    std::shared_ptr<PathData> _data;
     ClosingSegment *_closing_seg;
     bool _closed;
     bool _exception_on_stitch;

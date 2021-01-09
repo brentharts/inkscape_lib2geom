@@ -13,8 +13,7 @@
 
 #include <algorithm>
 #include <ctime>
-
-#include <boost/function.hpp>
+#include <functional>
 
 
 using namespace Geom;
@@ -28,7 +27,7 @@ struct PtLexCmp{
 };
 
 //typedef AAF (*implicit_curve_t)(AAF, AAF);
-typedef boost::function<AAF (AAF const&, AAF const&)> implicit_curve_t;
+typedef std::function<AAF (AAF const&, AAF const&)> implicit_curve_t;
 
 // draw ax + by + c = 0
 void draw_line_in_rect(cairo_t*cr, Rect &r, Point n, double c)

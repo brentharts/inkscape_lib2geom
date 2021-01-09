@@ -8,8 +8,8 @@
 #include <toys/path-cairo.h>
 #include <toys/toy-framework-2.h>
 
+#include <algorithm>
 #include <cstdlib>
-#include <boost/algorithm/minmax_element.hpp>
 
 using namespace Geom;
 
@@ -190,9 +190,9 @@ public:
 
         typedef std::vector<Point>::iterator Iter;
         std::pair<Iter, Iter> apts =
-            boost::minmax_element(anodes.begin(), anodes.end(), Point::LexLess<Y>());
+            std::minmax_element(anodes.begin(), anodes.end(), Point::LexLess<Y>());
         std::pair<Iter, Iter> bpts =
-            boost::minmax_element(bnodes.begin(), bnodes.end(), Point::LexLess<Y>());
+            std::minmax_element(bnodes.begin(), bnodes.end(), Point::LexLess<Y>());
 
         ah = Line(*apts.first, *apts.second);
         bh = Line(*bpts.first, *bpts.second);

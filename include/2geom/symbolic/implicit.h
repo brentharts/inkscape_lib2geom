@@ -42,7 +42,7 @@
 
 #include <2geom/exception.h>
 
-#include <boost/array.hpp>
+#include <array>
 
 
 namespace Geom { namespace SL {
@@ -50,9 +50,9 @@ namespace Geom { namespace SL {
 typedef MultiPoly<1, double> MVPoly1;
 typedef MultiPoly<2, double> MVPoly2;
 typedef MultiPoly<3, double> MVPoly3;
-typedef boost::array<MVPoly1, 3> poly_vector_type;
-typedef boost::array<poly_vector_type, 2> basis_type;
-typedef boost::array<double, 3> coeff_vector_type;
+typedef std::array<MVPoly1, 3> poly_vector_type;
+typedef std::array<poly_vector_type, 2> basis_type;
+typedef std::array<double, 3> coeff_vector_type;
 
 namespace detail {
 

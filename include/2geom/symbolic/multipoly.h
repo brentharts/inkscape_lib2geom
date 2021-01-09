@@ -35,12 +35,12 @@
 
 #include <utility>
 
+#include <array>
+#include <functional>
+#include <type_traits>
+
 #include <2geom/symbolic/unity-builder.h>
 #include <2geom/symbolic/mvpoly-tools.h>
-
-#include <boost/bind/bind.hpp> // needed for generating for_each operator argument
-
-
 
 
 namespace Geom { namespace SL {
@@ -84,7 +84,7 @@ public:
     template <size_t M>
     MultiPoly (MultiPoly<M, CoeffT> const& p,
                multi_index_type const& I = multi_index_zero(N-M),
-               typename boost::enable_if_c<(M > 0) && (M < N)>::type* = 0)
+               typename std::enable_if_t<(M > 0) && (M < N)>* = 0)
     {
         Geom::SL::coefficient<N-M-1, poly_type>::set_safe(m_poly, I, p.m_poly);
     }
@@ -191,32 +191,32 @@ public:
      * T can be any type that is able to be + and * with the coefficient type
      */
     template <typename T>
-    T operator() (boost::array<T, N> const& X) const
+    T operator() (std::array<T, N> const& X) const
     {
         return Geom::SL::mvpoly<N, CoeffT>::evaluate(m_poly, X);
     }
 
     template <typename T>
-    typename boost::enable_if_c<(N == 1), T>::type
+    typename std::enable_if_t<(N == 1), T>
     operator() (T const& x0) const
     {
-        boost::array<T, N> X = {{x0}};
+        std::array<T, N> X = {{x0}};
         return Geom::SL::mvpoly<N, CoeffT>::evaluate(m_poly, X);
     }
 
     template <typename T>
-    typename boost::enable_if_c<(N == 2), T>::type
+    typename std::enable_if_t<(N == 2), T>
     operator() (T const& x0, T const& x1) const
     {
-        boost::array<T, N> X = {{x0, x1}};
+        std::array<T, N> X = {{x0, x1}};
         return Geom::SL::mvpoly<N, CoeffT>::evaluate(m_poly, X);
     }
 
     template <typename T>
-    typename boost::enable_if_c<(N == 3), T>::type
+    typename std::enable_if_t<(N == 3), T>
     operator() (T const& x0, T const& x1, T const& x2) const
     {
-        boost::array<T, N> X = {{x0, x1, x2}};
+        std::array<T, N> X = {{x0, x1, x2}};
         return Geom::SL::mvpoly<N, CoeffT>::evaluate(m_poly, X);
     }
 
@@ -238,7 +238,7 @@ public:
     template <size_t M>
     typename mvpoly<M, CoeffT>::type const&
     select (multi_index_type const& I= multi_index_zero(N-M),
-            typename boost::enable_if_c<(M > 0) && (M < N)>::type* = 0) const
+            typename std::enable_if_t<(M > 0) && (M < N)>* = 0) const
     {
         return Geom::SL::coefficient<N-M-1, poly_type>::get_safe(m_poly, I);
     }
@@ -315,14 +315,14 @@ public:
     MultiPoly& operator*=(CoeffT const& c)
     {
         mvpoly<N, CoeffT>::template
-        for_each<0>(m_poly, boost::bind(mvpoly<0, CoeffT>::multiply_to, boost::placeholders::_1, c));
+        for_each<0>(m_poly, std::bind(mvpoly<0, CoeffT>::multiply_to, std::placeholders::_1, c));
         return (*this);
     }
 
     MultiPoly& operator/=(CoeffT const& c)
     {
         mvpoly<N, CoeffT>::template
-        for_each<0>(m_poly, boost::bind(mvpoly<0, CoeffT>::divide_to, boost::placeholders::_1, c));
+        for_each<0>(m_poly, std::bind(mvpoly<0, CoeffT>::divide_to, std::placeholders::_1, c));
         return (*this);
     }
 
@@ -355,7 +355,7 @@ public:
      */
 
     template <size_t M>
-    typename boost::enable_if_c<(M > 0) && (M < N), MultiPoly>::type &
+    typename std::enable_if_t<(M > 0) && (M < N), MultiPoly> &
     operator+= (MultiPoly<M, CoeffT> const& p)
     {
         multi_index_type I = multi_index_zero(N-M);
@@ -364,7 +364,7 @@ public:
     }
 
     template <size_t M>
-    typename boost::enable_if_c<(M > 0) && (M < N), MultiPoly>::type &
+    typename std::enable_if_t<(M > 0) && (M < N), MultiPoly> &
     operator-= (MultiPoly<M, CoeffT> const& p)
     {
         multi_index_type I = multi_index_zero(N-M);
@@ -373,11 +373,11 @@ public:
     }
 
     template <size_t M>
-    typename boost::enable_if_c<(M > 0) && (M < N), MultiPoly>::type &
+    typename std::enable_if_t<(M > 0) && (M < N), MultiPoly> &
     operator*= (MultiPoly<M, CoeffT> const& p)
     {
         mvpoly<N, CoeffT>::template
-        for_each<M>(m_poly, boost::bind(mvpoly<M, CoeffT>::multiply_to, boost::placeholders::_1, p.m_poly));
+        for_each<M>(m_poly, std::bind(mvpoly<M, CoeffT>::multiply_to, std::placeholders::_1, p.m_poly));
         return (*this);
     }
 
@@ -482,7 +482,7 @@ operator<< (MultiPoly<N, CoeffT> const& p, multi_index_type const& I)
 
 template <size_t M, size_t N, typename CoeffT>
 inline
-typename boost::enable_if_c<(M > 0) && (M <= N), MultiPoly<N, CoeffT> >::type
+typename std::enable_if_t<(M > 0) && (M <= N), MultiPoly<N, CoeffT> >
 operator+ (MultiPoly<N, CoeffT> const& p,
            MultiPoly<M, CoeffT> const& q )
 {
@@ -493,7 +493,7 @@ operator+ (MultiPoly<N, CoeffT> const& p,
 
 template <size_t M, size_t N, typename CoeffT>
 inline
-typename boost::enable_if_c<(N > 0) && (M > N), MultiPoly<M, CoeffT> >::type
+typename std::enable_if_t<(N > 0) && (M > N), MultiPoly<M, CoeffT> >
 operator+ (MultiPoly<N, CoeffT> const& p,
            MultiPoly<M, CoeffT> const& q )
 {
@@ -504,7 +504,7 @@ operator+ (MultiPoly<N, CoeffT> const& p,
 
 template <size_t M, size_t N, typename CoeffT>
 inline
-typename boost::enable_if_c<(M > 0) && (M <= N), MultiPoly<N, CoeffT> >::type
+typename std::enable_if_t<(M > 0) && (M <= N), MultiPoly<N, CoeffT> >
 operator- (MultiPoly<N, CoeffT> const& p,
            MultiPoly<M, CoeffT> const& q )
 {
@@ -515,7 +515,7 @@ operator- (MultiPoly<N, CoeffT> const& p,
 
 template <size_t M, size_t N, typename CoeffT>
 inline
-typename boost::enable_if_c<(N > 0) && (M > N), MultiPoly<M, CoeffT> >::type
+typename std::enable_if_t<(N > 0) && (M > N), MultiPoly<M, CoeffT> >
 operator- (MultiPoly<N, CoeffT> const& p,
            MultiPoly<M, CoeffT> const& q )
 {
@@ -527,7 +527,7 @@ operator- (MultiPoly<N, CoeffT> const& p,
 
 template <size_t M, size_t N, typename CoeffT>
 inline
-typename boost::enable_if_c<(M > 0) && (M <= N), MultiPoly<N, CoeffT> >::type
+typename std::enable_if_t<(M > 0) && (M <= N), MultiPoly<N, CoeffT> >
 operator* (MultiPoly<N, CoeffT> const& p,
            MultiPoly<M, CoeffT> const& q )
 {
@@ -538,7 +538,7 @@ operator* (MultiPoly<N, CoeffT> const& p,
 
 template <size_t M, size_t N, typename CoeffT>
 inline
-typename boost::enable_if_c<(N > 0) && (M > N), MultiPoly<M, CoeffT> >::type
+typename std::enable_if_t<(N > 0) && (M > N), MultiPoly<M, CoeffT> >
 operator* (MultiPoly<N, CoeffT> const& p,
            MultiPoly<M, CoeffT> const& q )
 {

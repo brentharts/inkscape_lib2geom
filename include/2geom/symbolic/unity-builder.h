@@ -34,7 +34,7 @@
 #define _GEOM_SL_UNITY_BUILDER_H_
 
 
-#include <boost/type_traits/is_arithmetic.hpp>
+#include <type_traits>
 
 
 
@@ -48,7 +48,7 @@ namespace Geom { namespace SL {
  *  for the type T
  */
 
-template< typename T, bool numeric = boost::is_arithmetic<T>::value >
+template< typename T, bool numeric = std::is_arithmetic<T>::value >
 struct zero
 {};
 
@@ -70,7 +70,7 @@ struct zero<T, true>
  *  for the type T
  */
 
-template< typename T, bool numeric = boost::is_arithmetic<T>::value >
+template< typename T, bool numeric = std::is_arithmetic<T>::value >
 struct one
 {};
 

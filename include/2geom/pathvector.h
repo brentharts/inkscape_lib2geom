@@ -36,7 +36,6 @@
 
 #include <optional>
 #include <boost/concept/requires.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <2geom/forward.h>
 #include <2geom/path.h>

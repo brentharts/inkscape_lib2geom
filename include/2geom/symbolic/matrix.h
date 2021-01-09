@@ -36,6 +36,7 @@
 #define _GEOM_SL_MATRIX_H_
 
 
+#include <array>
 #include <vector>
 #include <map>
 
@@ -133,7 +134,7 @@ operator<< ( std::basic_ostream<charT> & os,
 template <size_t N, typename CoeffT, typename T>
 void polynomial_matrix_evaluate (Matrix<T> & A,
                                  Matrix< MultiPoly<N, CoeffT> > const& M,
-                                 boost::array<T, N> const& X)
+                                 std::array<T, N> const& X)
 {
     A.resize(M.rows(), M.columns());
     for (size_t i = 0; i < M.rows(); ++i)

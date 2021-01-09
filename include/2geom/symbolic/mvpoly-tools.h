@@ -41,11 +41,10 @@
 #include <2geom/symbolic/unity-builder.h>
 #include <2geom/symbolic/polynomial.h>
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/function.hpp>
-#include <boost/array.hpp>
-
+#include <array>
+#include <functional>
 #include <iostream>
+#include <type_traits>
 
 
 namespace Geom { namespace SL {
@@ -152,7 +151,7 @@ struct mvpoly
      */
     template <typename T>
     static
-    T evaluate(type const& p, boost::array<T, N> const& X)
+    T evaluate(type const& p, std::array<T, N> const& X)
     {
         return evaluate_impl<T, 0>(p, X);
     }
@@ -179,8 +178,8 @@ struct mvpoly
     static
     void for_each
         (type & p,
-         boost::function<void (typename mvpoly<M, CoeffT>::type &)> const& op,
-         typename boost::enable_if_c<(M < N)>::type* = 0)
+         std::function<void (typename mvpoly<M, CoeffT>::type &)> const& op,
+         typename std::enable_if_t<(M < N)>* = 0)
     {
         for (size_t k = 0; k <= p.real_degree(); ++k)
         {
@@ -192,8 +191,8 @@ struct mvpoly
     static
     void for_each
         (type & p,
-         boost::function<void (typename mvpoly<M, CoeffT>::type &)> const& op,
-         typename boost::enable_if_c<(M == N)>::type* = 0)
+         std::function<void (typename mvpoly<M, CoeffT>::type &)> const& op,
+         typename std::enable_if_t<(M == N)>* = 0)
     {
         op(p);
     }
@@ -251,7 +250,7 @@ struct mvpoly
 
     template <typename T, size_t i>
     static
-    T evaluate_impl(type const& p, boost::array<T, N+i> const& X)
+    T evaluate_impl(type const& p, std::array<T, N+i> const& X)
     {
 //        T r = zero<T>()();
 //        for (size_t k = p.max_degree(); k > 0; --k)
@@ -291,8 +290,8 @@ struct mvpoly<0, CoeffT>
     static
     void for_each
         (type & p,
-         boost::function<void (typename mvpoly<M, CoeffT>::type &)> const& op,
-         typename boost::enable_if_c<(M == 0)>::type* = 0)
+         std::function<void (typename mvpoly<M, CoeffT>::type &)> const& op,
+         typename std::enable_if_t<(M == 0)>* = 0)
     {
         op(p);
     }
@@ -344,7 +343,7 @@ struct mvpoly<0, CoeffT>
 
     template <typename T, size_t i>
     static
-    T evaluate_impl(type const &p, boost::array<T, i> const &/*X*/)
+    T evaluate_impl(type const &p, std::array<T, i> const &/*X*/)
     {
         return p;
     }

@@ -37,7 +37,6 @@
 #include <algorithm>
 #include <vector>
 #include <boost/intrusive/list.hpp>
-#include <boost/range/algorithm/heap_algorithm.hpp>
 
 namespace Geom {
 
@@ -119,8 +118,8 @@ public:
             _exit_events.push_back(Event(b.min(), i));
         }
 
-        boost::make_heap(_entry_events);
-        boost::make_heap(_exit_events);
+        std::make_heap(_entry_events.begin(), _entry_events.end());
+        std::make_heap(_exit_events.begin(), _exit_events.end());
 
         Event next_entry = _get_next(_entry_events);
         Event next_exit = _get_next(_exit_events);
@@ -163,7 +162,7 @@ private:
             Event e;
             return e;
         }
-        boost::pop_heap(heap);
+        std::pop_heap(heap.begin(), heap.end());
         Event ret = heap.back();
         heap.pop_back();
         return ret;
