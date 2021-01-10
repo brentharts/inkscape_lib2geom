@@ -17,6 +17,8 @@ variables:
     - mkdir -p opt
     - cmake . -DCMAKE_C_COMPILER_LAUNCHER=ccache
               -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+              -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
+              -DCMAKE_BUILD_TYPE=Debug
               -DCMAKE_INSTALL_PREFIX=./opt
               -D2GEOM_BOOST_PYTHON=ON
     - make -j3
