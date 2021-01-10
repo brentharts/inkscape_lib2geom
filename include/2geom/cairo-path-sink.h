@@ -32,6 +32,8 @@
 #ifndef LIB2GEOM_SEEN_CAIRO_PATH_SINK_H
 #define LIB2GEOM_SEEN_CAIRO_PATH_SINK_H
 
+#ifdef HAVE_CAIRO
+
 #include <2geom/path-sink.h>
 #include <cairo.h>
 
@@ -73,6 +75,8 @@ private:
 };
 
 }
+
+#endif
 
 #endif // !LIB2GEOM_SEEN_CAIRO_PATH_SINK_H
 /*

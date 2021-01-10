@@ -29,6 +29,8 @@
  *
  */
 
+#ifdef HAVE_CAIRO
+
 #include <cairo.h>
 #include <2geom/cairo-path-sink.h>
 #include <2geom/elliptical-arc.h>
@@ -110,6 +112,8 @@ void CairoPathSink::closePath()
 void CairoPathSink::flush() {}
 
 } // namespace Geom
+
+#endif
 
 /*
   Local Variables:
