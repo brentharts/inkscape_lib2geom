@@ -20,7 +20,7 @@ concentrates on higher level algorithms and geometric computations.
 
 ## Features List
 
-* C++ 11
+* C++ 17
 * Functional programming style.
 * Points
 * Efficient affine transformations
@@ -56,7 +56,7 @@ concentrates on higher level algorithms and geometric computations.
 
 To build 2Geom, you will need:
 
-* C++ 11
+* C++ 17
 * [Boost](http://www.boost.org/) (headers only)
 * [glib](https://wiki.gnome.org/Projects/GLib)
 * [GNU Scientific Library](http://www.gnu.org/software/gsl/)
@@ -107,7 +107,10 @@ release the library's API/ABI is considered stable:
    security hole makes it completely unavoidable.
 
 Improvements that would break the API/ABI will be noted in our bug
-tracker, for a future Version 2.0 release.
+tracker, for a future release.
+
+2Geom does not follow Semantic Versioning. Instead, version numbers
+match major Inkscape release versions.
 
 
 ## Further information

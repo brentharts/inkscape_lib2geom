@@ -1,3 +1,20 @@
+lib2geom v1.1.0
+===============
+
+2Geom v1.1 is not ABI compatible with v1.0, it switches from
+`boost::optional` to `std::optional`.
+
+Changes:
+
+- Add `Geom::Parallelogram`
+- Add `Geom::PathIteratorSink::inPath()`
+- Add `Geom::are_near_rel()` for `Geom::Point`
+- Move headers to `include` directory
+- Make build system git submodule friendly
+- Fix Python 3 support (py2geom)
+- Remove Python 2 support (py2geom)
+
+
 lib2geom v1.0.0
 ===============
 
