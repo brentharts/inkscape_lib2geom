@@ -134,12 +134,13 @@ TEST_F(BezierTest, Casteljau) {
     unsigned N = wiggle.order() + 1;
     std::vector<Coord> left(N), right(N);
     std::vector<Coord> left2(N), right2(N);
+    double eps = 1e-15;
 
     for (unsigned i = 0; i < 10000; ++i) {
         double t = g_random_double_range(0, 1);
         double vok = bernstein_value_at(t, &wiggle[0], wiggle.order());
         double v = casteljau_subdivision<double>(t, &wiggle[0], &left[0], &right[0], wiggle.order());
-        EXPECT_EQ(v, vok);
+        EXPECT_near(v, vok, eps);
         EXPECT_EQ(left[0], wiggle.at0());
         EXPECT_EQ(left[wiggle.order()], right[0]);
         EXPECT_EQ(right[wiggle.order()], wiggle.at1());
@@ -147,8 +148,8 @@ TEST_F(BezierTest, Casteljau) {
         double vl = casteljau_subdivision<double>(t, &wiggle[0], &left2[0], NULL, wiggle.order());
         double vr = casteljau_subdivision<double>(t, &wiggle[0], NULL, &right2[0], wiggle.order());
         EXPECT_EQ(vl, vok);
-        EXPECT_EQ(vr, vok);
-        EXPECT_vector_equal(left2, left);
+        EXPECT_near(vr, vok, eps);
+        EXPECT_vector_near(left2, left, eps);
         EXPECT_vector_equal(right2, right);
 
         double vnone = casteljau_subdivision<double>(t, &wiggle[0], NULL, NULL, wiggle.order());
