@@ -147,4 +147,4 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/2geom" DESTINATION "${CMA
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/2geom.pc.in
                 ${CMAKE_CURRENT_BINARY_DIR}/2geom.pc @ONLY IMMEDIATE )
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/2geom.pc" DESTINATION lib/pkgconfig)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/2geom.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
