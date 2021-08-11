@@ -6,7 +6,7 @@
  *
  * Copyright 2021 Authors
  *
- * SPDX-License-Identifier: LGPL-2.1-or-later OR MPL-1.1
+ * SPDX-License-Identifier: LGPL-2.1 OR MPL-1.1
  */
 
 #include <2geom/interval.h>
