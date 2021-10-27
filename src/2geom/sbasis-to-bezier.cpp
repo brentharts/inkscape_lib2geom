@@ -240,8 +240,8 @@ void sbasis_to_cubic_bezier (std::vector<Point> & bz, D2<SBasis> const& sb)
 
     midx = 8*midx - 4*bz[0][X] - 4*bz[3][X];  // re-define relative to center
     midy = 8*midy - 4*bz[0][Y] - 4*bz[3][Y];
-    midx_0 = sb[X][1][0] + sb[X][1][1];       // zeroth order estimate
-    midy_0 = sb[Y][1][0] + sb[Y][1][1];
+    midx_0 = sb[X].size() > 1 ? sb[X][1][0] + sb[X][1][1] : 0; // zeroth order estimate
+    midy_0 = sb[Y].size() > 1 ? sb[Y][1][0] + sb[Y][1][1] : 0;
 
     if ((std::abs(xprime[0]) < EPSILON) && (std::abs(yprime[0]) < EPSILON)
     && ((std::abs(xprime[1]) > EPSILON) || (std::abs(yprime[1]) > EPSILON)))  { // degenerate handle at 0 : use distance of closest approach

@@ -221,6 +221,19 @@ TEST_F(SBasisTest,Operators) {
     }
 }
 
+TEST_F(SBasisTest, ToCubicBezier)
+{
+    vector<double> params = { 0, 1, -2, 3 };
+
+    D2<SBasis> sb(wiggle, wiggle);
+    vector<Point> bz;
+    sbasis_to_cubic_bezier(bz, sb);
+    for (int i = 0; i < params.size(); i++) {
+        EXPECT_FLOAT_EQ(bz[i][0], params[i]);
+        EXPECT_FLOAT_EQ(bz[i][1], params[i]);
+    }
+}
+
 /*
   Local Variables:
   mode:c++
