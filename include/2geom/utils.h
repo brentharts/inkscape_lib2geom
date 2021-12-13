@@ -39,6 +39,12 @@
 
 namespace Geom {
 
+// Throw these errors instead of aserting so code can handle them if needed.
+using ErrorCode = int;
+enum Errors : ErrorCode {
+    GEOM_ERR_INTERSECGRAPH,
+};
+
 // proper logical xor
 inline bool logical_xor (bool a, bool b) { return (a || b) && !(a && b); }
 
