@@ -407,14 +407,16 @@ PathVector PathIntersectionGraph::_getResult(bool enter_a, bool enter_b)
             w = i->which;
         }
         result.back().close(true);
-
-        assert(!result.back().empty());
+        if (result.back().empty()) {
+            // std::cerr << "Path is empty" << std::endl;
+            throw GEOM_ERR_INTERSECGRAPH;
+        }
     }
-
-    /*if (n_processed != size() * 2) {
-        std::cerr << "Processed " << n_processed << " intersections, expected " << (size() * 2) << std::endl;
-    }*/
-    assert(n_processed == size() * 2);
+    
+    if (n_processed != size() * 2) {
+        // std::cerr << "Processed " << n_processed << " intersections, expected " << (size() * 2) << std::endl;
+        throw GEOM_ERR_INTERSECGRAPH;
+    }
 
     return result;
 }
