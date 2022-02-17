@@ -452,6 +452,11 @@ void PathIntersectionGraph::_handleNonintersectingPaths(PathVector &result, unsi
         if (path_inside == inside) {
             result.push_back(_pv[w][i]);
         }
+
+        if (!inside) {
+            // no holes on same objects minimize https://gitlab.com/inkscape/inkscape/-/issues/3265
+            result = result.reversed();
+        }
     }
 }
 
