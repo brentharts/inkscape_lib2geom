@@ -361,7 +361,7 @@ PathVector PathIntersectionGraph::_getResult(bool enter_a, bool enter_b)
 
         result.push_back(Path(i->p));
         result.back().setStitching(true);
-
+        bool reverse = false;
         while (i->_proc_hook.is_linked()) {
             ILIter prev = i;
             std::size_t pi = i->pos.path_index;
@@ -370,7 +370,7 @@ PathVector PathIntersectionGraph::_getResult(bool enter_a, bool enter_b)
             // intersection: always go inside
             // a minus b: go inside in b, outside in a
             // b minus a: go inside in a, outside in b
-            bool reverse = false;
+            reverse = false;
             if (w == 0) {
                 reverse = (i->next_edge == INSIDE) ^ enter_a;
             } else {
@@ -407,6 +407,9 @@ PathVector PathIntersectionGraph::_getResult(bool enter_a, bool enter_b)
             w = i->which;
         }
         result.back().close(true);
+        if (reverse){
+            result.back() = result.back().reversed();
+        }
         if (result.back().empty()) {
             // std::cerr << "Path is empty" << std::endl;
             throw GEOM_ERR_INTERSECGRAPH;
@@ -493,3 +496,4 @@ std::ostream &operator<<(std::ostream &os, PathIntersectionGraph const &pig)
   End:
 */
 // vim: filetype=cpp:expandtab:shiftwidth=4:tabstop=8:softtabstop=4:fileencoding=utf-8:textwidth=99 :
+
