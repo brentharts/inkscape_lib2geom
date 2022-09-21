@@ -306,7 +306,8 @@ public:
 
 private:
     void _updateCenterAndAngles();
-    void _filterIntersections(std::vector<ShapeIntersection> &xs, bool is_first) const;
+    std::vector<ShapeIntersection> _filterIntersections(std::vector<ShapeIntersection> &&xs, bool is_first) const;
+    bool _validateIntersection(ShapeIntersection &xing, bool is_first) const;
 
     Point _initial_point, _final_point;
     Ellipse _ellipse;

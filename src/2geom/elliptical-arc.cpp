@@ -563,24 +563,49 @@ std::vector<double> EllipticalArc::allNearestTimes( Point const& p, double from,
 }
 #endif
 
-
-void EllipticalArc::_filterIntersections(std::vector<ShapeIntersection> &xs, bool is_first) const
+/** @brief Convert the passed intersections to curve time parametrization
+ *         and filter out any invalid intersections.
+ */
+std::vector<ShapeIntersection> EllipticalArc::_filterIntersections(std::vector<ShapeIntersection> &&xs,
+                                                                   bool is_first) const
 {
-    Interval unit(0, 1);
-    std::vector<ShapeIntersection>::reverse_iterator i = xs.rbegin(), last = xs.rend();
-    while (i != last) {
-        Coord &t = is_first ? i->first : i->second;
-        constexpr auto eps = 1e-4;
-        assert(are_near_rel(_ellipse.pointAt(t), i->point(), eps));
-        t = timeAtAngle(t);
-        if (!unit.contains(t)) {
-            xs.erase((++i).base());
-            continue;
-        } else {
-            assert(are_near_rel(pointAt(t), i->point(), eps));
-            ++i;
+    std::vector<ShapeIntersection> result;
+    result.reserve(xs.size());
+    for (auto &xing : xs) {
+        if (_validateIntersection(xing, is_first)) {
+            result.emplace_back(std::move(xing));
         }
     }
+    return result;
+}
+
+/** @brief Convert the passed intersection to curve time and check whether the intersection
+ *         is numerically sane.
+ *
+ * @param xing The intersection to convert to curve time and to validate.
+ * @param is_first If true, this arc is the first of the intersected curves; if false, it's second.
+ * @return Whether the intersection is valid.
+ *
+ * Note that the intersection is guaranteed to be converted only if the return value is true.
+ */
+bool EllipticalArc::_validateIntersection(ShapeIntersection &xing, bool is_first) const
+{
+    static auto const UNIT_INTERVAL = Interval(0, 1);
+    constexpr auto EPS = 1e-4;
+
+    Coord &t = is_first ? xing.first : xing.second;
+    if (!are_near_rel(_ellipse.pointAt(t), xing.point(), EPS)) {
+        return false;
+    }
+
+    t = timeAtAngle(t);
+    if (!UNIT_INTERVAL.contains(t)) {
+        return false;
+    }
+    if (!are_near_rel(pointAt(t), xing.point(), EPS)) {
+        return false;
+    }
+    return true;
 }
 
 std::vector<CurveIntersection> EllipticalArc::intersect(Curve const &other, Coord eps) const
@@ -590,32 +615,22 @@ std::vector<CurveIntersection> EllipticalArc::intersect(Curve const &other, Coor
         return ls.intersect(other, eps);
     }
 
-    std::vector<CurveIntersection> result;
-
     if (other.isLineSegment()) {
         LineSegment ls(other.initialPoint(), other.finalPoint());
-        result = _ellipse.intersect(ls);
-        _filterIntersections(result, true);
-        return result;
+        return _filterIntersections(_ellipse.intersect(ls), true);
     }
 
-    BezierCurve const *bez = dynamic_cast<BezierCurve const *>(&other);
-    if (bez) {
-        result = _ellipse.intersect(bez->fragment());
-        _filterIntersections(result, true);
-        return result;
+    if (auto bez = dynamic_cast<BezierCurve const *>(&other)) {
+        return _filterIntersections(_ellipse.intersect(bez->fragment()), true);
     }
 
-    EllipticalArc const *arc = dynamic_cast<EllipticalArc const *>(&other);
-    if (arc) {
-        result = _ellipse.intersect(arc->_ellipse);
-        _filterIntersections(result, true);
-        arc->_filterIntersections(result, false);
-        return result;
+    if (auto arc = dynamic_cast<EllipticalArc const *>(&other)) {
+        auto result = _filterIntersections(_ellipse.intersect(arc->_ellipse), true);
+        return arc->_filterIntersections(std::move(result), false);
     }
 
     // in case someone wants to make a custom curve type
-    result = other.intersect(*this, eps);
+    auto result = other.intersect(*this, eps);
     transpose_in_place(result);
     return result;
 }
