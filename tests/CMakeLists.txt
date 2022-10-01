@@ -34,6 +34,7 @@ polynomial-test
 rect-test
 sbasis-test
 self-intersections-test
+shape-test
 )
 
 foreach(source ${2GEOM_GTESTS_SRC})
