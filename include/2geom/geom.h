@@ -42,6 +42,7 @@
 #include <2geom/bezier-curve.h>
 #include <2geom/line.h>
 
+/** @brief This namespace contains all of lib2geom's functions and classes. */
 namespace Geom {
 
 std::optional<Geom::LineSegment>

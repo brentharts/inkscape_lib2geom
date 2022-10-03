@@ -8,8 +8,8 @@
  * This way, the 'user' can distinguish between groups of exceptions
  * ('user' is the coder that uses lib2geom)
  *
- * Several macro's are defined for easily throwing exceptions 
- * (e.g. THROW_CONTINUITYERROR). 
+ * Several macros are defined for easily throwing exceptions
+ * (e.g., THROW_CONTINUITYERROR).
  */
 /* Copyright 2007 Johan Engelen <goejendaagh@zonnet.nl>
  *

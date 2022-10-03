@@ -1,4 +1,4 @@
-/** Various utility functions.
+/** @file Various utility functions.
  *
  * Copyright 2008 Marco Cecchetti <mrcekets at gmail.com>
  * Copyright 2007 Johan Engelen <goejendaagh@zonnet.nl>
@@ -32,11 +32,10 @@
 
 #include <2geom/utils.h>
 
-
-namespace Geom 
+namespace Geom
 {
 
-// return a vector that contains all the binomial coefficients of degree n 
+// return a vector that contains all the binomial coefficients of degree n
 void binomial_coefficients(std::vector<size_t>& bc, std::size_t n)
 {
     size_t s = n+1;
