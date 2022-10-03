@@ -134,7 +134,7 @@ public:
         inline static Sign const START = false;
         inline static Sign const END   = true;
 
-        Angle azimuth; ///< Angle of the edge's departure.
+        double azimuth; ///< Angle of the edge's departure.
         unsigned index; ///< Index of the edge in the parent graph.
         Sign sign;      ///< Whether this is the start or end of the edge.
         bool invalid = false; ///< Whether this incidence has been marked for deletion.
@@ -1230,6 +1230,7 @@ bool PlanarGraph<EL>::deviatesLeft(Path const &first, Path const &second)
     closed_contour.setStitching(true);
     closed_contour.append(c[0]->portion(0, nearest[0]));
     closed_contour = closed_contour.reversed();
+    closed_contour.setStitching(true);
     closed_contour.append(c[1]->portion(0, nearest[1]));
     closed_contour.close();
     return !path_direction(closed_contour); // Reverse to match the convention that y-axis is up.
