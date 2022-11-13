@@ -1,3 +1,14 @@
+lib2geom v1.2.2
+===============
+
+2Geom v1.2.2 is a point release providing minor bugfixes.
+Its ABI is compatible with v1.2.
+
+Changes:
+
+- Do not raise assertions when intersecting `Geom::EllipticalArc`s.
+
+
 lib2geom v1.1.0
 ===============
 
