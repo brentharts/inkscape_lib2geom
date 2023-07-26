@@ -245,18 +245,20 @@ TEST(EllipticalArcTest, BezierIntersection) {
 
 TEST(EllipticalArcTest, ExpandToTransformedTest)
 {
-    auto test_curve = [] (EllipticalArc const &c) {
-        constexpr int N = 50;
+    auto test_curve = [] (EllipticalArc const &c, bool with_initial_bbox) {
+        constexpr int N = 200;
         for (int i = 0; i < N; i++) {
             auto angle = 2 * M_PI * i / N;
             auto transform = Affine(Rotate(angle)) * Scale(0.9, 1.2);
 
+            auto const box0 = with_initial_bbox ? Rect::from_xywh(10 * std::sin(angle * 13), 10 * std::sin(angle * 17), 5.0, 5.0) : OptRect();
+
             auto copy = std::unique_ptr<Curve>(c.duplicate());
             *copy *= transform;
-            auto box1 = copy->boundsExact();
+            auto box1 = copy->boundsExact() | box0;
 
             auto pt = c.initialPoint() * transform;
-            auto box2 = Rect(pt, pt);
+            auto box2 = Rect(pt, pt) | box0;
             c.expandToTransformed(box2, transform);
 
             for (auto i : { X, Y }) {
@@ -266,10 +268,12 @@ TEST(EllipticalArcTest, ExpandToTransformedTest)
         }
     };
 
-    test_curve(EllipticalArc(Point(0, 0), 1.0, 2.0, 0.0, false, false, Point(1, 1)));
-    test_curve(EllipticalArc(Point(0, 0), 3.0, 2.0, M_PI / 6, false, false, Point(1, 1)));
-    test_curve(EllipticalArc(Point(0, 0), 1.0, 2.0, M_PI / 5, true, true, Point(1, 1)));
-    test_curve(EllipticalArc(Point(1, 0), 1.0, 0.0, M_PI / 5, false, false, Point(1, 1)));
-    test_curve(EllipticalArc(Point(1, 0), 0.0, 0.0, 0.0, false, false, Point(2, 0)));
-    test_curve(EllipticalArc(Point(1, 0), 0.0, 0.0, 0.0, false, false, Point(1, 0)));
+    for (auto b : { false, true }) {
+        test_curve(EllipticalArc(Point(0, 0), 1.0, 2.0, 0.0, false, false, Point(1, 1)), b);
+        test_curve(EllipticalArc(Point(0, 0), 3.0, 2.0, M_PI / 6, false, false, Point(1, 1)), b);
+        test_curve(EllipticalArc(Point(0, 0), 1.0, 2.0, M_PI / 5, true, true, Point(1, 1)), b);
+        test_curve(EllipticalArc(Point(1, 0), 1.0, 0.0, M_PI / 5, false, false, Point(1, 1)), b);
+        test_curve(EllipticalArc(Point(1, 0), 0.0, 0.0, 0.0, false, false, Point(2, 0)), b);
+        test_curve(EllipticalArc(Point(1, 0), 0.0, 0.0, 0.0, false, false, Point(1, 0)), b);
+    }
 }
