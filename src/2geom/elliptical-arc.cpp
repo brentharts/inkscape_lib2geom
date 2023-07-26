@@ -143,7 +143,7 @@ void EllipticalArc::expandToTransformed(Rect &bbox, Affine const &transform) con
 {
     bbox.expandTo(_final_point * transform);
 
-    if (isChord() || bbox.contains(_ellipse.boundsFast())) {
+    if (isChord()) {
         return;
     }
 
@@ -154,10 +154,11 @@ void EllipticalArc::expandToTransformed(Rect &bbox, Affine const &transform) con
         auto const v = Point(trans[d], trans[d + 2]);
         auto const r = v.length();
         auto const mid = trans[d + 4];
+        auto const interval = Interval(mid - r, mid + r);
 
         if (_angles.isFull()) {
-            bbox[d].unionWith(Interval(mid - r, mid + r));
-        } else {
+            bbox[d].unionWith(interval);
+        } else if (!bbox[d].contains(interval)) {
             auto const angle = Angle(v);
             if (_angles.contains(angle)) {
                 bbox[d].expandTo(mid + r);
