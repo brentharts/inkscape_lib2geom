@@ -18,6 +18,7 @@ angle-test
 bezier-test
 choose-test
 circle-test
+conicsec-test
 convex-hull-test
 coord-test
 ellipse-test
