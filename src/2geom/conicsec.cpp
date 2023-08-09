@@ -456,11 +456,10 @@ xAx xAx::scale(double sx, double sy) const {
 	     c[3]*sx, c[4]*sy, c[5]);
 }
 
-Point xAx::gradient(Point p)  const{
-  double x = p[0];
-  double y = p[1];
-  return Point(2*c[0]*x + c[1]*y + c[3],
-	       c[1]*x + 2*c[2]*y + c[4]);
+Point xAx::gradient(Point p) const
+{
+    auto [x, y] = p;
+    return {2 * c[0] * x + c[1] * y + c[3], c[1] * x + 2 * c [2] * y + c[4]};
 }
 
 xAx xAx::operator-(xAx const &b) const {
