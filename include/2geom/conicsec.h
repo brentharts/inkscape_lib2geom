@@ -508,7 +508,14 @@ public:
 
 };
 
-std::vector<Point> intersect(const xAx & C1, const xAx & C2);
+/** @brief Compute all points of intersection of two conic sections.
+ *         Correctness of the algorithm is not guaranteed if the two conics
+ *         are identical or very close.
+ * @param  first The first conic section.
+ * @param second The second conic section.
+ * @return A vector containing all points where both sections simultaneously evaluate to zero.
+ */
+std::vector<Point> intersect(const xAx &first, const xAx &second);
 
 bool clip (std::vector<RatQuad> & rq, const xAx & cs, const Rect & R);
 

@@ -357,54 +357,127 @@ double xAx_descr(xAx const & C) {
     return det3(mC);
 }
 
+namespace {
+using ResolventCoefficients = std::array<double, 5>;
+using QuadraticCoefficients = std::array<double, 3>;
 
-std::vector<Point> intersect(xAx const & C1, xAx const & C2) {
-    // You know, if either of the inputs are degenerate we should use them first!
-    if(xAx_descr(C1) == 0) {
-        return decompose_degenerate(C1, C2, C1);
-    }
-    if(xAx_descr(C2) == 0) {
-        return decompose_degenerate(C1, C2, C2);
-    }
-    std::vector<Point> res;
-    SBasis T(Linear(-1,1));
-    SBasis S(Linear(1,1));
-    SBasis C[3][3] = {{T*C1.c[0]+S*C2.c[0], (T*C1.c[1]+S*C2.c[1])/2, (T*C1.c[3]+S*C2.c[3])/2},
-                      {(T*C1.c[1]+S*C2.c[1])/2, T*C1.c[2]+S*C2.c[2], (T*C1.c[4]+S*C2.c[4])/2},
-                      {(T*C1.c[3]+S*C2.c[3])/2, (T*C1.c[4]+S*C2.c[4])/2, T*C1.c[5]+S*C2.c[5]}};
+/// Compute the coefficients of powers of y in the x-resultant of the conics with coefficients c1 and c2.
+ResolventCoefficients compute_x_resultant(double const (&c1)[6], double const (&c2)[6])
+{
+    /// Compute the 2×2 minor formed by the given rows of the 6×2 matrix [ c1 | c2 ].
+    auto const minor = [&](uint8_t row1, uint8_t row2) -> double {
+        return c1[row1] * c2[row2] - c2[row1] * c1[row2];
+    };
+    double const m01 = minor(0, 1), m02 = minor(0, 2), m03 = minor(0, 3),
+                 m04 = minor(0, 4), m05 = minor(0, 5), m12 = minor(1, 2),
+                 m15 = minor(1, 5), m34 = minor(3, 4), m35 = minor(3, 5);
+    double const d = minor(2, 3) - minor(1, 4);
 
-    SBasis D = det3(C);
-    std::vector<double> rts = Geom::roots(D);
-    if(rts.empty()) {
-        T = Linear(1,1);
-        S = Linear(-1,1);
-        SBasis C[3][3] = {{T*C1.c[0]+S*C2.c[0], (T*C1.c[1]+S*C2.c[1])/2, (T*C1.c[3]+S*C2.c[3])/2},
-                          {(T*C1.c[1]+S*C2.c[1])/2, T*C1.c[2]+S*C2.c[2], (T*C1.c[4]+S*C2.c[4])/2},
-                          {(T*C1.c[3]+S*C2.c[3])/2, (T*C1.c[4]+S*C2.c[4])/2, T*C1.c[5]+S*C2.c[5]}};
-
-        D = det3(C);
-        rts = Geom::roots(D);
-    }
-    // at this point we have a T and S and perhaps some roots that represent our degenerate conic
-    // Let's just pick one randomly (can we do better?)
-    //for(unsigned i = 0; i < rts.size(); i++) {
-    if(!rts.empty()) {
-        unsigned i = 0;
-        double t = T.valueAt(rts[i]);
-        double s = S.valueAt(rts[i]);
-        xAx xC0 = C1*t + C2*s;
-        //::draw(cr, xC0, screen_rect); // degen
-
-        return decompose_degenerate(C1, C2, xC0);
-
-
-    } else {
-        std::cout << "What?" << std::endl;
-        ;//std::cout << D << "\n";
-    }
-    return res;
+    return {
+        sqr(m02) - m01 * m12,
+        m01 * d - m12 * m03 + 2 * m02 * m04,
+        sqr(m04) + m03 * d - m01 * (m15 + m34) + 2 * m05 * m02,
+        -m03 * (m15 + m34) - m01 * m35 + 2 * m04 * m05,
+        sqr(m05) - m03 * m35
+    };
 }
 
+/** Substitute a fixed value for the specified coordinate of the conic section and return
+ * the coefficients of the resulting quadratic function in the other coordinate. */
+template <Dim2 to_substitute>
+QuadraticCoefficients substitute_value(xAx const &conic, double value)
+{
+    double const (&c)[6] = conic.c;
+    if constexpr (to_substitute == X) {
+        return {c[2], c[1] * value + c[4], c[5] + value * (c[3] + value * c[0])};
+    } else {
+        return {c[0], c[1] * value + c[3], c[5] + value * (c[4] + value * c[2])};
+    }
+}
+
+/** Find the X or Y coordinates of points on the conic with a prescribed value of the other coordinate. */
+template <Dim2 coord_to_find>
+std::vector<Coord> solve_for_coordinate(xAx const &conic, double other_coordinate)
+{
+    auto [a, b, c] = substitute_value<other_dimension(coord_to_find)>(conic, other_coordinate);
+    return solve_quadratic(a, b, c);
+}
+
+double l1_norm_of_coefficients(xAx const &conic)
+{
+    double result = std::abs(conic.c[0]);
+    for (unsigned i = 1; i < 6; ++i) {
+        result += std::abs(conic.c[i]);
+    }
+    return result;
+}
+
+/// Improve the accuracy of an intersection of two conics in place.
+void polish_conic_intersection(xAx const &first, xAx const &second, Point &to_polish)
+{
+    double values[] = {first.valueAt(to_polish), second.valueAt(to_polish)};
+    double old_evaluation = std::abs(values[0]) + std::abs(values[1]);
+
+    unsigned iteration_limit = 8;
+    while (iteration_limit-- && old_evaluation >= std::numeric_limits<double>::min()) {
+        Point const derivative[] = {first.gradient(to_polish), second.gradient(to_polish)};
+        double const jacobian_determinant = derivative[0][0] * derivative[1][1]
+                                          - derivative[0][1] * derivative[1][0];
+        if (std::abs(jacobian_determinant) < 0x1p-20) {
+            return; // We are near a critical point, where Newton method is unstable; abort.
+        }
+
+        // Apply a step of the Newton-Raphson method by subtracting from the old argument
+        // (to_polish) the old value transformed by the inverse Jacobian matrix.
+        Point const candidate = to_polish - (1.0 / jacobian_determinant) * Point{
+            derivative[1][1] * values[0] - derivative[0][1] * values[1],
+            derivative[0][0] * values[1] - derivative[1][0] * values[0]
+        };
+
+        // Recompute the values at the new point
+        values[0] = first.valueAt(candidate);
+        values[1] = second.valueAt(candidate);
+        double new_evaluation = std::abs(values[0]) + std::abs(values[1]);
+
+        if (new_evaluation >= old_evaluation) {
+            // We are not improving things anymore; do not overwrite to_polish
+            return;
+        }
+        old_evaluation = new_evaluation;
+        to_polish = candidate;
+    }
+}
+
+} // anonymous namespace
+
+std::vector<Point> intersect(xAx const &first, xAx const &second)
+{
+    /// Evaluation tolerance relative to the L1 norm of the conic's coefficients.
+    double constexpr tolerance_factor = 0x1p-16;
+    std::vector<Point> result;
+
+    auto [a, b, c, d, e] = compute_x_resultant(first.c, second.c);
+    for (double const y : solve_quartic(a, b, c, d, e)) {
+        auto const first_x_roots  = solve_for_coordinate<X>(first, y);
+        auto const second_x_roots = solve_for_coordinate<X>(second, y);
+
+        bool const more_intersections_with_first = first_x_roots.size() > second_x_roots.size();
+        auto const &primary_intersections = more_intersections_with_first ? second_x_roots : first_x_roots;
+        xAx const &secondary = more_intersections_with_first ? first : second;
+        double const evaluation_threshold = l1_norm_of_coefficients(secondary) * tolerance_factor;
+
+        for (double const x : primary_intersections) {
+            if (std::abs(secondary.evaluate_at(x, y)) < evaluation_threshold) {
+                result.emplace_back(x, y);
+            }
+        }
+    }
+
+    for (Point &intersection : result) {
+        polish_conic_intersection(first, second, intersection);
+    }
+    return result;
+}
 
 xAx xAx::fromPoint(Point p) {
   return xAx(1., 0, 1., -2*p[0], -2*p[1], dot(p,p));
