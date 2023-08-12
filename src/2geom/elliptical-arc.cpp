@@ -369,7 +369,6 @@ Curve *EllipticalArc::reverse() const
     return rarc;
 }
 
-#ifdef HAVE_GSL  // GSL is required for function "solve_reals"
 std::vector<double> EllipticalArc::allNearestTimes( Point const& p, double from, double to ) const
 {
     std::vector<double> result;
@@ -473,31 +472,7 @@ std::vector<double> EllipticalArc::allNearestTimes( Point const& p, double from,
     coeff[1] = 2 * ( -rx2_ry2 + expr1 );
     coeff[0] = -coeff[4];
 
-//  for ( unsigned int i = 0; i < 5; ++i )
-//      std::cerr << "c[" << i << "] = " << coeff[i] << std::endl;
-
-    std::vector<double> real_sol;
-    // gsl_poly_complex_solve raises an error
-    // if the leading coefficient is zero
-    if ( are_near(coeff[4], 0) )
-    {
-        real_sol.push_back(0);
-        if ( !are_near(coeff[3], 0) )
-        {
-            double sq = -coeff[1] / coeff[3];
-            if ( sq > 0 )
-            {
-                double s = std::sqrt(sq);
-                real_sol.push_back(s);
-                real_sol.push_back(-s);
-            }
-        }
-    }
-    else
-    {
-        real_sol = solve_reals(coeff);
-    }
-
+    std::vector<double> real_sol = solve_quartic(coeff[4], coeff[3], coeff[2], coeff[1], coeff[0]);
     for (double & i : real_sol)
     {
         i = 2 * std::atan(i);
@@ -596,7 +571,6 @@ std::vector<double> EllipticalArc::allNearestTimes( Point const& p, double from,
 
     return result;
 }
-#endif
 
 /** @brief Convert the passed intersections to curve time parametrization
  *         and filter out any invalid intersections.
