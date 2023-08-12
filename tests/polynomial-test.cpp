@@ -343,3 +343,31 @@ TEST(PolynomialTest, SolveQuartic_degenerate)
         EXPECT_EQ(degen4, quad_and_zero);
     }
 }
+
+/// Check the correctness of the degree-4 equation solver for biquadratic equations.
+TEST(PolynomialTest, SolveQuartic_biquadratic)
+{
+    g_random_set_seed(0xCAFECAFE);
+    double constexpr epsilon = 1e-9;
+    for (size_t _ = 0; _ < 10'000; ++_) {
+        auto const c = g_random_double_range(-100, 100);
+        auto const e = g_random_double_range(-100, 100);
+        auto const evaluate = [=](double x) -> double { return sqr(sqr(x)) + c * sqr(x) + e; };
+        auto const solutions = solve_quartic(1, 0, c, 0, e);
+
+        size_t expected_number_of_solutions = 0;
+        if (double const Δ = sqr(c) - 4 * e; Δ > 0) {
+            double const sqrt_delta = std::sqrt(Δ);
+            double const smaller_root = -0.5 * (c + sqrt_delta);
+            if (smaller_root >= 0) { // both roots >= 0
+                expected_number_of_solutions = 4;
+            } else if (smaller_root + sqrt_delta >= 0) { // one negative, one positive root
+                expected_number_of_solutions = 2;
+            }
+        }
+        EXPECT_EQ(solutions.size(), expected_number_of_solutions);
+        for (double const x : solutions) {
+            EXPECT_TRUE(are_near(evaluate(x), 0, epsilon));
+        }
+    }
+}

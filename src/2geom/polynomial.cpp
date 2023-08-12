@@ -330,6 +330,18 @@ std::vector<Coord> solve_quartic(Coord a, Coord b, Coord c, Coord d, Coord e)
         std::sort(result.begin(), result.end());
         return result;
     }
+    if (b == 0 && d == 0) { // Biquadratic equation
+        std::vector<Coord> result;
+        for (Coord const squared_root : solve_quadratic(a, c, e)) {
+            if (squared_root >= 0) {
+                double const root = std::sqrt(squared_root);
+                result.push_back(-root);
+                result.push_back(root);
+            }
+        }
+        std::sort(result.begin(), result.end());
+        return result;
+    }
 
     // Divide out by a so that the leading coefficient is 1.
     b /= a;
@@ -338,18 +350,34 @@ std::vector<Coord> solve_quartic(Coord a, Coord b, Coord c, Coord d, Coord e)
     e /= a;
 
     // Solve the resolvent cubic
-    auto const resolvent_solutions = solve_cubic(1, -c, b * d - 4 * e, 4 * c * e - sqr(b) * e - sqr(d));
-    // If there are 3 solutions, pick the middle one, else the first one.
-    auto const y = resolvent_solutions[resolvent_solutions.size() == 3];
-
-    // Find the quadratic factors
-    auto linear_terms = solve_quadratic(1, -b, c - y);
-    auto constant_terms = solve_quadratic(1, -y, e);
-    if (linear_terms.size() < 2 || constant_terms.size() < 2) {
-        return {}; // There are no roots
+    auto resolvent_solutions = solve_cubic(1, -c, b * d - 4 * e, 4 * c * e - sqr(b) * e - sqr(d));
+    // If there are 3 solutions, start with the middle one, else the first one.
+    if (resolvent_solutions.size() == 3) {
+        std::swap(resolvent_solutions[0], resolvent_solutions[1]);
     }
 
-    {
+    std::vector<double> linear_terms, constant_terms;
+    bool factored = false;
+    for (double const y : resolvent_solutions) {
+        // Find the quadratic factors
+        linear_terms = solve_quadratic(1, -b, c - y);
+        constant_terms = solve_quadratic(1, -y, e);
+        if (!linear_terms.empty() && !constant_terms.empty()) {
+            factored = true;
+            break;
+        }
+    }
+    if (!factored) {
+        return {};
+    }
+    if (linear_terms.size() > constant_terms.size()) {
+        constant_terms.push_back(constant_terms.back());
+    } else if (constant_terms.size() > linear_terms.size()) {
+        linear_terms.push_back(linear_terms.size());
+    }
+    assert(linear_terms.size() == constant_terms.size());
+
+    if (linear_terms.size() == 2) {
         // Reorder constant terms if needed so that they correspond to linear terms
         auto const current_cross = linear_terms[0] * constant_terms[1] + linear_terms[1] * constant_terms[0];
         auto const reordered_cross = linear_terms[0] * constant_terms[0] + linear_terms[1] * constant_terms[1];
@@ -360,7 +388,7 @@ std::vector<Coord> solve_quartic(Coord a, Coord b, Coord c, Coord d, Coord e)
 
     std::vector<Coord> result;
     result.reserve(4);
-    for (size_t i : {0, 1}) {
+    for (size_t i = 0; i < linear_terms.size(); ++i) {
         auto const factor_roots = solve_quadratic(1, linear_terms[i], constant_terms[i]);
         result.insert(result.end(), factor_roots.begin(), factor_roots.end());
     }
