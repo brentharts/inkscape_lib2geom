@@ -369,206 +369,119 @@ Curve *EllipticalArc::reverse() const
     return rarc;
 }
 
-std::vector<double> EllipticalArc::allNearestTimes( Point const& p, double from, double to ) const
+std::vector<double> EllipticalArc::allNearestTimes(Point const& p, double from, double to) const
 {
-    std::vector<double> result;
-
-    if ( from > to ) std::swap(from, to);
-    if ( from < 0 || to > 1 )
-    {
+    if (from > to) std::swap(from, to);
+    if (from < 0 || to > 1) {
         THROW_RANGEERROR("[from,to] interval out of range");
     }
 
-    if ( ( are_near(ray(X), 0) && are_near(ray(Y), 0) )  || are_near(from, to) )
-    {
-        result.push_back(from);
-        return result;
+    if ((are_near(ray(X), 0) && are_near(ray(Y), 0)) || are_near(from, to)) {
+        return {from};
     }
-    else if ( are_near(ray(X), 0) || are_near(ray(Y), 0) )
-    {
+    if (are_near(ray(X), 0) || are_near(ray(Y), 0)) {
+        // The arc is approximately a line segment; use LineSegment::nearestTime().
         LineSegment seg(pointAt(from), pointAt(to));
-        Point np = seg.pointAt( seg.nearestTime(p) );
-        if ( are_near(ray(Y), 0) )
-        {
-            if ( are_near(rotationAngle(), M_PI/2)
-                 || are_near(rotationAngle(), 3*M_PI/2) )
-            {
-                result = roots(np[Y], Y);
-            }
-            else
-            {
-                result = roots(np[X], X);
-            }
-        }
-        else
-        {
-            if ( are_near(rotationAngle(), M_PI/2)
-                 || are_near(rotationAngle(), 3*M_PI/2) )
-            {
-                result = roots(np[X], X);
-            }
-            else
-            {
-                result = roots(np[Y], Y);
-            }
-        }
-        return result;
+        Point np = seg.pointAt(seg.nearestTime(p));
+        bool const upright = are_near(rotationAngle(), M_PI_2) || are_near(rotationAngle(), 3*M_PI_2);
+        Dim2 const better_coord = upright ^ are_near(ray(Y), 0) ? X : Y;
+        return roots(np[better_coord], better_coord);
     }
-    else if ( are_near(ray(X), ray(Y)) )
-    {
-        Point r = p - center();
-        if ( are_near(r, Point(0,0)) )
-        {
+
+    std::vector<double> candidate_times;
+    if (are_near(ray(X), ray(Y))) {
+        // The arc is approximately a circle.
+        LineSegment center_to_p{center(), p};
+        if (are_near(center_to_p.length(Geom::EPSILON), 0)) {
             THROW_INFINITESOLUTIONS(0);
         }
-        // TODO: implement case r != 0
-//      Point np = ray(X) * unit_vector(r);
-//      std::vector<double> solX = roots(np[X],X);
-//      std::vector<double> solY = roots(np[Y],Y);
-//      double t;
-//      if ( are_near(solX[0], solY[0]) || are_near(solX[0], solY[1]))
-//      {
-//          t = solX[0];
-//      }
-//      else
-//      {
-//          t = solX[1];
-//      }
-//      if ( !(t < from || t > to) )
-//      {
-//          result.push_back(t);
-//      }
-//      else
-//      {
-//
-//      }
+
+        // Find intersections with the line passing through p and the center.
+        auto const intersections = _ellipse.intersect(Line(center_to_p));
+        std::transform(intersections.begin(),
+                       intersections.end(),
+                       std::back_inserter(candidate_times),
+                       [=](CurveIntersection const &xing) -> double {
+                           return timeAtAngle(xing.first);
+                       });
+    } else {
+        // General case
+        // If E(t) is the parametrization of the ellipse, we must
+        // solve the equation <E'(t) | E(t) - p> == 0.
+        // Solutions provide min and max distance points (at these points,
+        // the tangent vector is perpendicular to the vector pointing towards p).
+        // After the substitution s = tan(t/2) we get
+        // cos(t) = (1 - s^2) / (1 + s^2),
+        // sin(t) = 2t / (1 + s^2).
+        // Plugging this into the equation, we get a 4th degree equation in s
+        /*
+        *  ry s^4 ((-cy + py) Cos[Phi] + (cx - px) Sin[Phi]) +
+        *  ry ((cy - py) Cos[Phi] + (-cx + px) Sin[Phi]) +
+        *  2 s^3 (rx^2 - ry^2 + (-cx + px) rx Cos[Phi] + (-cy + py) rx Sin[Phi]) +
+        *  2 s (-rx^2 + ry^2 + (-cx + px) rx Cos[Phi] + (-cy + py) rx Sin[Phi])
+        */
+
+        Point const p_c = p - center();
+        double const rx2_ry2 = (ray(X) - ray(Y)) * (ray(X) + ray(Y));
+        Point const polar{Point::polar(rotationAngle())};
+        double const expr1 = ray(X) * dot(p_c, polar);
+        double const leading_coeff = ray(Y) * cross(polar, p_c);
+
+        // Find the values of s
+        candidate_times = solve_quartic(leading_coeff,
+                                        2 * (expr1 + rx2_ry2),
+                                        0,
+                                        2 * (expr1 - rx2_ry2),
+                                        -leading_coeff);
+
+        auto const from_s_to_time = [this](double s) -> double {
+            double t = 2 * std::atan(s);
+            if (t < 0) {
+                t += 2 * M_PI;
+            }
+            return timeAtAngle(t);
+        };
+
+        // Convert to times
+        for (double &i : candidate_times) {
+            i = from_s_to_time(i);
+        }
+
+        // when s -> Infinity then <E'(t) | E(t)-p> -> 0 iff leading_coeff == 0
+        // so we add M_PI to the solutions being lim arctan(s) = PI when s->Infinity
+        if (candidate_times.size() % 2 != 0) {
+            candidate_times.push_back(timeAtAngle(M_PI));
+        }
     }
 
-    // solve the equation <D(E(t),t)|E(t)-p> == 0
-    // that provides min and max distance points
-    // on the ellipse E wrt the point p
-    // after the substitutions:
-    // cos(t) = (1 - s^2) / (1 + s^2)
-    // sin(t) = 2t / (1 + s^2)
-    // where s = tan(t/2)
-    // we get a 4th degree equation in s
-    /*
-     *  ry s^4 ((-cy + py) Cos[Phi] + (cx - px) Sin[Phi]) +
-     *  ry ((cy - py) Cos[Phi] + (-cx + px) Sin[Phi]) +
-     *  2 s^3 (rx^2 - ry^2 + (-cx + px) rx Cos[Phi] + (-cy + py) rx Sin[Phi]) +
-     *  2 s (-rx^2 + ry^2 + (-cx + px) rx Cos[Phi] + (-cy + py) rx Sin[Phi])
-     */
-
-    Point p_c = p - center();
-    double rx2_ry2 = (ray(X) - ray(Y)) * (ray(X) + ray(Y));
-    double sinrot, cosrot;
-    sincos(rotationAngle(), sinrot, cosrot);
-    double expr1 = ray(X) * (p_c[X] * cosrot + p_c[Y] * sinrot);
-    Poly coeff;
-    coeff.resize(5);
-    coeff[4] = ray(Y) * ( p_c[Y] * cosrot - p_c[X] * sinrot );
-    coeff[3] = 2 * ( rx2_ry2 + expr1 );
-    coeff[2] = 0;
-    coeff[1] = 2 * ( -rx2_ry2 + expr1 );
-    coeff[0] = -coeff[4];
-
-    std::vector<double> real_sol = solve_quartic(coeff[4], coeff[3], coeff[2], coeff[1], coeff[0]);
-    for (double & i : real_sol)
-    {
-        i = 2 * std::atan(i);
-        if ( i < 0 ) i += 2*M_PI;
-    }
-    // when s -> Infinity then <D(E)|E-p> -> 0 iff coeff[4] == 0
-    // so we add M_PI to the solutions being lim arctan(s) = PI when s->Infinity
-    if ( (real_sol.size() % 2) != 0 )
-    {
-        real_sol.push_back(M_PI);
-    }
+    // we need to test extreme points too
+    candidate_times.push_back(from);
+    candidate_times.push_back(to);
 
     double mindistsq1 = std::numeric_limits<double>::max();
     double mindistsq2 = std::numeric_limits<double>::max();
     double dsq = 0;
     unsigned int mi1 = 0, mi2 = 0;
-    for ( unsigned int i = 0; i < real_sol.size(); ++i )
-    {
-        dsq = distanceSq(p, pointAtAngle(real_sol[i]));
-        if ( mindistsq1 > dsq )
-        {
+    for (unsigned int i = 0; i < candidate_times.size(); ++i) {
+        if (candidate_times[i] < from || candidate_times[i] > to) {
+            continue;
+        }
+        dsq = distanceSq(p, pointAt(candidate_times[i]));
+        if (mindistsq1 > dsq) {
             mindistsq2 = mindistsq1;
             mi2 = mi1;
             mindistsq1 = dsq;
             mi1 = i;
-        }
-        else if ( mindistsq2 > dsq )
-        {
+        } else if (mindistsq2 > dsq) {
             mindistsq2 = dsq;
             mi2 = i;
         }
     }
 
-    double t = timeAtAngle(real_sol[mi1]);
-    if ( !(t < from || t > to) )
-    {
-        result.push_back(t);
+    std::vector<double> result {candidate_times[mi1]};
+    if (are_near(mindistsq1, mindistsq2))  {
+        result.push_back(candidate_times[mi2]);
     }
-
-    bool second_sol = false;
-    t = timeAtAngle(real_sol[mi2]);
-    if ( real_sol.size() == 4 && !(t < from || t > to) )
-    {
-        if ( result.empty() || are_near(mindistsq1, mindistsq2) )
-        {
-            result.push_back(t);
-            second_sol = true;
-        }
-    }
-
-    // we need to test extreme points too
-    double dsq1 = distanceSq(p, pointAt(from));
-    double dsq2 = distanceSq(p, pointAt(to));
-    if ( second_sol )
-    {
-        if ( mindistsq2 > dsq1 )
-        {
-            result.clear();
-            result.push_back(from);
-            mindistsq2 = dsq1;
-        }
-        else if ( are_near(mindistsq2, dsq) )
-        {
-            result.push_back(from);
-        }
-        if ( mindistsq2 > dsq2 )
-        {
-            result.clear();
-            result.push_back(to);
-        }
-        else if ( are_near(mindistsq2, dsq2) )
-        {
-            result.push_back(to);
-        }
-
-    }
-    else
-    {
-        if ( result.empty() )
-        {
-            if ( are_near(dsq1, dsq2) )
-            {
-                result.push_back(from);
-                result.push_back(to);
-            }
-            else if ( dsq2 > dsq1 )
-            {
-                result.push_back(from);
-            }
-            else
-            {
-                result.push_back(to);
-            }
-        }
-    }
-
     return result;
 }
 
