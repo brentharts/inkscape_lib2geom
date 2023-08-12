@@ -278,7 +278,6 @@ TEST(EllipticalArcTest, ExpandToTransformedTest)
     }
 }
 
-#ifdef HAVE_GSL
 TEST(EllipticalArcTest, AllNearestPoints)
 {
     g_random_set_seed(0xDEADBEEF);
@@ -301,4 +300,28 @@ TEST(EllipticalArcTest, AllNearestPoints)
         }
     }
 }
-#endif
+
+/// Test the special case of allNearestTimes() when the ellipse is a circle.
+TEST(EllipticalArcTest, AllNearestPointsCircle)
+{
+    g_random_set_seed(0xCAFECAFE);
+    for (size_t _ = 0; _ < 4000; _++) {
+        double const radius = g_random_double_range(1.0, 10.0);
+        EllipticalArc const arc{{g_random_double_range(1.0, 5.0), 0.0},
+                                {radius, radius},
+                                 g_random_double_range(-0.5, 0.5), true, g_random_boolean(),
+                                {g_random_double_range(-5.0, -1.0), 0.0}};
+        Point const point{g_random_double_range(-30, 30), g_random_double_range(-30, 30)};
+        auto const found_times = arc.allNearestTimes(point);
+        ASSERT_FALSE(found_times.empty());
+
+        // Evaluate the arc at random points and confirm that the distances are larger.
+        Point const nearest = arc.pointAt(found_times[0]);
+        double const nearest_found_quadrance = distanceSq(nearest, point);
+        for (size_t sample = 0; sample < 25; sample++) {
+            Point const random_eval = arc.pointAt(g_random_double_range(0.0, 1.0));
+            double const quadrance = distanceSq(random_eval, point);
+            EXPECT_GE(quadrance, nearest_found_quadrance);
+        }
+    }
+}
