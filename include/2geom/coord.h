@@ -89,8 +89,8 @@ inline constexpr Coord infinity() { return std::numeric_limits<Coord>::infinity(
 
 /** @brief Nearness predicate for values.
  * @ingroup Primitives */
-inline constexpr bool are_near(Coord a, Coord b, double eps=EPSILON) { return std::abs(a-b) <= eps; }
-inline constexpr bool rel_error_bound(Coord a, Coord b, double eps=EPSILON) { return std::abs(a) <= eps*b; }
+inline bool are_near(Coord a, Coord b, double eps=EPSILON) { return std::abs(a-b) <= eps; }
+inline bool rel_error_bound(Coord a, Coord b, double eps=EPSILON) { return std::abs(a) <= eps*b; }
 
 /** @brief Numerically stable linear interpolation.
  * @ingroup Primitives */
