@@ -31,14 +31,14 @@
  * the specific language governing rights and limitations.
  */
 
-#include <2geom/bezier-curve.h>
-#include <2geom/path-sink.h>
 #include <2geom/basic-intersection.h>
+#include <2geom/bezier-curve.h>
+#include <2geom/bezier-utils.h>
 #include <2geom/nearest-time.h>
+#include <2geom/path-sink.h>
 #include <2geom/polynomial.h>
 
-namespace Geom
-{
+namespace Geom {
 
 /**
  * @class BezierCurve
@@ -121,7 +121,8 @@ bool BezierCurve::isDegenerate() const
     for (unsigned d = 0; d < 2; ++d) {
         Coord ic = inner[d][0];
         for (unsigned i = 1; i < size(); ++i) {
-            if (inner[d][i] != ic) return false;
+            if (inner[d][i] != ic)
+                return false;
         }
     }
     return true;
@@ -152,29 +153,25 @@ void BezierCurve::expandToTransformed(Rect &bbox, Affine const &transform) const
 
 Coord BezierCurve::length(Coord tolerance) const
 {
-    switch (order())
-    {
-    case 0:
-        return 0.0;
-    case 1:
-        return distance(initialPoint(), finalPoint());
-    case 2:
-        {
+    switch (order()) {
+        case 0:
+            return 0.0;
+        case 1:
+            return distance(initialPoint(), finalPoint());
+        case 2: {
             std::vector<Point> pts = controlPoints();
             return bezier_length(pts[0], pts[1], pts[2], tolerance);
         }
-    case 3:
-        {
+        case 3: {
             std::vector<Point> pts = controlPoints();
             return bezier_length(pts[0], pts[1], pts[2], pts[3], tolerance);
         }
-    default:
-        return bezier_length(controlPoints(), tolerance);
+        default:
+            return bezier_length(controlPoints(), tolerance);
     }
 }
 
-std::vector<CurveIntersection>
-BezierCurve::intersect(Curve const &other, Coord eps) const
+std::vector<CurveIntersection> BezierCurve::intersect(Curve const &other, Coord eps) const
 {
     std::vector<CurveIntersection> result;
 
@@ -189,9 +186,9 @@ BezierCurve::intersect(Curve const &other, Coord eps) const
     // here we are sure that this curve is at least a quadratic Bezier
     BezierCurve const *bez = dynamic_cast<BezierCurve const *>(&other);
     if (bez) {
-        std::vector<std::pair<double, double> > xs;
+        std::vector<std::pair<double, double>> xs;
         find_intersections(xs, inner, bez->inner, eps);
-        for (auto & i : xs) {
+        for (auto &i : xs) {
             CurveIntersection x(*this, other, i.first, i.second);
             result.push_back(x);
         }
@@ -206,13 +203,17 @@ BezierCurve::intersect(Curve const &other, Coord eps) const
 
 bool BezierCurve::isNear(Curve const &c, Coord precision) const
 {
-    if (this == &c) return true;
+    if (this == &c)
+        return true;
 
     BezierCurve const *other = dynamic_cast<BezierCurve const *>(&c);
-    if (!other) return false;
+    if (!other)
+        return false;
 
-    if (!are_near(inner.at0(), other->inner.at0(), precision)) return false;
-    if (!are_near(inner.at1(), other->inner.at1(), precision)) return false;
+    if (!are_near(inner.at0(), other->inner.at0(), precision))
+        return false;
+    if (!are_near(inner.at1(), other->inner.at1(), precision))
+        return false;
 
     if (size() == other->size()) {
         for (unsigned i = 1; i < order(); ++i) {
@@ -260,22 +261,23 @@ Curve *BezierCurve::portion(Coord f, Coord t) const
 
 bool BezierCurve::operator==(Curve const &c) const
 {
-    if (this == &c) return true;
+    if (this == &c)
+        return true;
 
     BezierCurve const *other = dynamic_cast<BezierCurve const *>(&c);
-    if (!other) return false;
-    if (size() != other->size()) return false;
+    if (!other)
+        return false;
+    if (size() != other->size())
+        return false;
 
     for (unsigned i = 0; i < size(); ++i) {
-        if (controlPoint(i) != other->controlPoint(i)) return false;
+        if (controlPoint(i) != other->controlPoint(i))
+            return false;
     }
     return true;
 }
 
-Coord BezierCurve::nearestTime(Point const &p, Coord from, Coord to) const
-{
-    return nearest_time(p, inner, from, to);
-}
+Coord BezierCurve::nearestTime(Point const &p, Coord from, Coord to) const { return nearest_time(p, inner, from, to); }
 
 void BezierCurve::feed(PathSink &sink, bool moveto_initial) const
 {
@@ -289,44 +291,44 @@ void BezierCurve::feed(PathSink &sink, bool moveto_initial) const
         sink.moveTo(ip);
     }
     switch (size()) {
-    case 2:
-        sink.lineTo(controlPoint(1));
-        break;
-    case 3:
-        sink.quadTo(controlPoint(1), controlPoint(2));
-        break;
-    case 4:
-        sink.curveTo(controlPoint(1), controlPoint(2), controlPoint(3));
-        break;
-    default:
-        // TODO: add a path sink method that accepts a vector of control points
-        //       and converts to cubic spline by default
-        assert(false);
-        break;
+        case 2:
+            sink.lineTo(controlPoint(1));
+            break;
+        case 3:
+            sink.quadTo(controlPoint(1), controlPoint(2));
+            break;
+        case 4:
+            sink.curveTo(controlPoint(1), controlPoint(2), controlPoint(3));
+            break;
+        default:
+            // TODO: add a path sink method that accepts a vector of control points
+            //       and converts to cubic spline by default
+            assert(false);
+            break;
     }
 }
 
 BezierCurve *BezierCurve::create(std::vector<Point> const &pts)
 {
     switch (pts.size()) {
-    case 0:
-    case 1:
-        THROW_LOGICALERROR("BezierCurve::create: too few points in vector");
-        return NULL;
-    case 2:
-        return new LineSegment(pts[0], pts[1]);
-    case 3:
-        return new QuadraticBezier(pts[0], pts[1], pts[2]);
-    case 4:
-        return new CubicBezier(pts[0], pts[1], pts[2], pts[3]);
-    default:
-        return new BezierCurve(pts);
+        case 0:
+        case 1:
+            THROW_LOGICALERROR("BezierCurve::create: too few points in vector");
+            return NULL;
+        case 2:
+            return new LineSegment(pts[0], pts[1]);
+        case 3:
+            return new QuadraticBezier(pts[0], pts[1], pts[2]);
+        case 4:
+            return new CubicBezier(pts[0], pts[1], pts[2], pts[3]);
+        default:
+            return new BezierCurve(pts);
     }
 }
 
 /**
- * Computes the times where the radius of curvature of the bezier curve equals the given radius. 
-*/
+ * Computes the times where the radius of curvature of the bezier curve equals the given radius.
+ */
 std::vector<Coord> BezierCurve::timesWithRadiusOfCurvature(double radius) const
 {
     /**
@@ -336,7 +338,7 @@ std::vector<Coord> BezierCurve::timesWithRadiusOfCurvature(double radius) const
      * When the left side is positive, taking the square gives
      * ((dx*ddy-ddx*dy)/curvatureValue)**2 - (dx**2+dy**2)**3 = 0
      * This is a polyomial for BezierCurves and can be solved with root finding algos.
-    */
+     */
 
     if (this->size() <= 2) {
         return {};
@@ -366,26 +368,32 @@ std::vector<Coord> BezierCurve::timesWithRadiusOfCurvature(double radius) const
 // optimized specializations for LineSegment
 
 template <>
-Curve *BezierCurveN<1>::derivative() const {
+Curve *BezierCurveN<1>::derivative() const
+{
     double dx = inner[X][1] - inner[X][0], dy = inner[Y][1] - inner[Y][0];
-    return new BezierCurveN<1>(Point(dx,dy),Point(dx,dy));
+    return new BezierCurveN<1>(Point(dx, dy), Point(dx, dy));
 }
 
-template<>
-Coord BezierCurveN<1>::nearestTime(Point const& p, Coord from, Coord to) const
+template <>
+Coord BezierCurveN<1>::nearestTime(Point const &p, Coord from, Coord to) const
 {
     using std::swap;
 
-    if ( from > to ) swap(from, to);
+    if (from > to)
+        swap(from, to);
     Point ip = pointAt(from);
     Point fp = pointAt(to);
     Point v = fp - ip;
     Coord l2v = L2sq(v);
-    if (l2v == 0) return 0;
-    Coord t = dot( p - ip, v ) / l2v;
-    if ( t <= 0 )  		return from;
-    else if ( t >= 1 )  return to;
-    else return from + t*(to-from);
+    if (l2v == 0)
+        return 0;
+    Coord t = dot(p - ip, v) / l2v;
+    if (t <= 0)
+        return from;
+    else if (t >= 1)
+        return to;
+    else
+        return from + t * (to - from);
 }
 
 /* Specialized intersection routine for line segments.
@@ -418,8 +426,7 @@ std::vector<CurveIntersection> BezierCurveN<1>::intersect(Curve const &other, Co
 
     if (segments_are_parallel) {
         // We check if the segments lie on the same line.
-        Coord const distance_between_lines = std::abs(cross(u.normalized(),
-                                                            other.initialPoint() - initialPoint()));
+        Coord const distance_between_lines = std::abs(cross(u.normalized(), other.initialPoint() - initialPoint()));
         if (distance_between_lines > eps) {
             // Segments are parallel but aren't part of the same line => no intersections.
             return {};
@@ -432,8 +439,7 @@ std::vector<CurveIntersection> BezierCurveN<1>::intersect(Curve const &other, Co
             return dot(u.normalized(), point_on_line - initialPoint()) * ulen_inverse;
         };
         // Find the range of times on our segment where we travel through the other segment.
-        auto time_in_other = Interval(time_of_passage(other.initialPoint()),
-                                      time_of_passage(other.finalPoint()));
+        auto time_in_other = Interval(time_of_passage(other.initialPoint()), time_of_passage(other.finalPoint()));
         Coord const eps_utime = eps * ulen_inverse;
         if (time_in_other.min() > 1 + eps_utime || time_in_other.max() < -eps_utime) {
             return {};
@@ -441,7 +447,7 @@ std::vector<CurveIntersection> BezierCurveN<1>::intersect(Curve const &other, Co
 
         // Create two intersections, one at each end of the overlap interval.
         Coord last_time = infinity();
-        for (Coord t : {time_in_other.min(), time_in_other.max()}) {
+        for (Coord t : { time_in_other.min(), time_in_other.max() }) {
             t = std::clamp(t, 0.0, 1.0);
             if (t == last_time) {
                 continue;
@@ -532,7 +538,7 @@ static std::vector<CurveIntersection> bezier_line_intersections(BezierCurveN<deg
             roots = solve_quadratic(c2, 2.0 * c1, c0);
         } else if constexpr (degree == 3) {
             double const c3 = y[3] - y[0] + 3.0 * (y[1] - y[2]);
-            roots = solve_cubic(c3, 3.0 * c2, 3.0 * c1 , c0);
+            roots = solve_cubic(c3, 3.0 * c2, 3.0 * c1, c0);
         }
     }
 
@@ -584,7 +590,8 @@ template <>
 int BezierCurveN<1>::winding(Point const &p) const
 {
     Point ip = inner.at0(), fp = inner.at1();
-    if (p[Y] == std::max(ip[Y], fp[Y])) return 0;
+    if (p[Y] == std::max(ip[Y], fp[Y]))
+        return 0;
 
     Point v = fp - ip;
     assert(v[Y] != 0);
@@ -647,18 +654,14 @@ void BezierCurveN<1>::expandToTransformed(Rect &bbox, Affine const &transform) c
 template <>
 void BezierCurveN<2>::expandToTransformed(Rect &bbox, Affine const &transform) const
 {
-    bezier_expand_to_image(bbox, controlPoint(0) * transform,
-                                 controlPoint(1) * transform,
-                                 controlPoint(2) * transform);
+    bezier_expand_to_image(bbox, controlPoint(0) * transform, controlPoint(1) * transform, controlPoint(2) * transform);
 }
 
 template <>
 void BezierCurveN<3>::expandToTransformed(Rect &bbox, Affine const &transform) const
 {
-    bezier_expand_to_image(bbox, controlPoint(0) * transform,
-                                 controlPoint(1) * transform,
-                                 controlPoint(2) * transform,
-                                 controlPoint(3) * transform);
+    bezier_expand_to_image(bbox, controlPoint(0) * transform, controlPoint(1) * transform, controlPoint(2) * transform,
+                           controlPoint(3) * transform);
 }
 
 static Coord bezier_length_internal(std::vector<Point> &v1, Coord tolerance, int level)
@@ -676,9 +679,9 @@ static Coord bezier_length_internal(std::vector<Point> &v1, Coord tolerance, int
     Coord lower = distance(v1.front(), v1.back());
     Coord upper = 0.0;
     for (size_t i = 0; i < v1.size() - 1; ++i) {
-        upper += distance(v1[i], v1[i+1]);
+        upper += distance(v1[i], v1[i + 1]);
     }
-    if (upper - lower <= 2*tolerance || level >= 8) {
+    if (upper - lower <= 2 * tolerance || level >= 8) {
         return (lower + upper) / 2;
     }
 
@@ -731,7 +734,7 @@ static Coord bezier_length_internal(std::vector<Point> &v1, Coord tolerance, int
 
     for (size_t i = 1; i < v1.size(); ++i) {
         for (size_t j = i; j > 0; --j) {
-            v1[j-1] = 0.5 * (v1[j-1] + v1[j]);
+            v1[j - 1] = 0.5 * (v1[j - 1] + v1[j]);
         }
         v2[i] = v1[0];
     }
@@ -744,7 +747,8 @@ static Coord bezier_length_internal(std::vector<Point> &v1, Coord tolerance, int
  * @relatesalso BezierCurve */
 Coord bezier_length(std::vector<Point> const &points, Coord tolerance)
 {
-    if (points.size() < 2) return 0.0;
+    if (points.size() < 2)
+        return 0.0;
     std::vector<Point> v1 = points;
     return bezier_length_internal(v1, tolerance, 0);
 }
@@ -754,16 +758,16 @@ static Coord bezier_length_internal(Point a0, Point a1, Point a2, Coord toleranc
     Coord lower = distance(a0, a2);
     Coord upper = distance(a0, a1) + distance(a1, a2);
 
-    if (upper - lower <= 2*tolerance || level >= 8) {
+    if (upper - lower <= 2 * tolerance || level >= 8) {
         return (lower + upper) / 2;
     }
 
     Point // Casteljau subdivision
-        // b0 = a0,
-        // c0 = a2,
-        b1 = 0.5*(a0 + a1),
-        c1 = 0.5*(a1 + a2),
-        b2 = 0.5*(b1 + c1); // == c2
+          // b0 = a0,
+          // c0 = a2,
+        b1 = 0.5 * (a0 + a1),
+        c1 = 0.5 * (a1 + a2),
+        b2 = 0.5 * (b1 + c1); // == c2
     return bezier_length_internal(a0, b1, b2, 0.5 * tolerance, level + 1) +
            bezier_length_internal(b2, c1, a2, 0.5 * tolerance, level + 1);
 }
@@ -780,19 +784,16 @@ static Coord bezier_length_internal(Point a0, Point a1, Point a2, Point a3, Coor
     Coord lower = distance(a0, a3);
     Coord upper = distance(a0, a1) + distance(a1, a2) + distance(a2, a3);
 
-    if (upper - lower <= 2*tolerance || level >= 8) {
+    if (upper - lower <= 2 * tolerance || level >= 8) {
         return (lower + upper) / 2;
     }
 
     Point // Casteljau subdivision
-        // b0 = a0,
-        // c0 = a3,
-        b1 = 0.5*(a0 + a1),
-        t0 = 0.5*(a1 + a2),
-        c1 = 0.5*(a2 + a3),
-        b2 = 0.5*(b1 + t0),
-        c2 = 0.5*(t0 + c1),
-        b3 = 0.5*(b2 + c2); // == c3
+          // b0 = a0,
+          // c0 = a3,
+        b1 = 0.5 * (a0 + a1),
+        t0 = 0.5 * (a1 + a2), c1 = 0.5 * (a2 + a3), b2 = 0.5 * (b1 + t0), c2 = 0.5 * (t0 + c1),
+        b3 = 0.5 * (b2 + c2); // == c3
     return bezier_length_internal(a0, b1, b2, b3, 0.5 * tolerance, level + 1) +
            bezier_length_internal(b3, c2, c1, a3, 0.5 * tolerance, level + 1);
 }
@@ -803,6 +804,156 @@ Coord bezier_length(Point a0, Point a1, Point a2, Point a3, Coord tolerance)
 {
     return bezier_length_internal(a0, a1, a2, a3, tolerance, 0);
 }
+
+template <>
+Path BezierCurveN<1>::offsetPointwise(double amount, double tolerance) const
+{
+    Path ret;
+    assert(!isDegenerate());
+
+    // control points difference is used instead of unitTangent,
+    // because isDegenerate just checks for equality and unitTangent checks with small tolerance.
+    Point const tangent = controlPoint(1) - controlPoint(0);
+    Point const normal = rot90(tangent) * amount / tangent.length();
+    ret.append(LineSegment(this->controlPoint(0) + normal, this->controlPoint(1) + normal));
+
+    return { ret };
+}
+
+template <>
+Path BezierCurveN<2>::offsetPointwise(double amount, double tolerance) const
+{
+    return BezierCurve::offsetPointwiseInternal(amount, tolerance);
+}
+
+template <>
+Path BezierCurveN<3>::offsetPointwise(double amount, double tolerance) const
+{
+    return BezierCurve::offsetPointwiseInternal(amount, tolerance);
+}
+
+Path BezierCurve::offsetPointwiseInternal(double amount, double tolerance) const
+{
+    // The offset curve has cusps when the radius of curvature crosses the offset amount.
+    // Therefore, we compute these points in advance and split there first.
+    // Afterwards, we can assume the offset curves of the segments to have smooth derivative.
+    auto splitTimes = timesWithRadiusOfCurvature(amount);
+    splitTimes.push_back(1.);
+    Coord startTime = 0.;
+    Path ret;
+
+    for (Coord time : splitTimes) {
+        // ignore very small steps as it would produce a very small segment only
+        if (time < startTime || are_near(time, startTime, 1e-3)) {
+            continue;
+        }
+
+        // calculate the curvature in the middle
+        // this is required to check if the radius of curvature is smaller or bigger as the width
+        // as it decides in which direction the offset tangent should face.
+        // The middle point is used as the start and end points might have the same radius of curvature
+        // as the offset width which would lead to numerical issues
+        auto const d = pointAndDerivatives(0.5 * (startTime + time), 2);
+        // todo: denominator zero?
+        double const radiusOfCurvature =
+            std::pow<double>(d[1].lengthSq(), 1.5) / (d[1][X] * d[2][Y] - d[2][X] * d[1][Y]);
+        // direction of the tangent on the offset curve wrt the original curve
+        // as it is a precondition for offsetPointwiseSimple that this does not change betwenn start and end,
+        // we just have to compute it once.
+        bool const offset_tangent_reversed =
+            radiusOfCurvature > 0 ? radiusOfCurvature < amount : radiusOfCurvature > amount;
+
+        auto const curve_portion = static_cast<BezierCurve *>(portion(startTime, time));
+        Path curve_offset_path = curve_portion->offsetPointwiseSimple(amount, tolerance, offset_tangent_reversed);
+
+        // the final point of ret is already very close to the first point of curve_offset_path
+        // due to numerical inaccuracies, we manually assure that it is the same point.
+        if (ret.size() > 0) {
+            curve_offset_path.setInitial(ret.finalPoint());
+        }
+        ret.append(curve_offset_path);
+
+        startTime = time;
+    }
+
+    return ret;
+}
+
+Path BezierCurve::offsetPointwiseSimple(double amount, double tolerance, bool offset_tangent_reversed,
+                                        size_t levels) const
+{
+    // The offset curve is approximated by cubic bezier segments.
+    // This is done by sampling points on the offset curve and then fitting a cubic bezier curve to it.
+    // Then, the distance between the offset curve and the approximation is calculated.
+    // If it is too big, the curve is split into smaller segments.
+    size_t const sample_n = 10;
+    Point fit_points[sample_n + 1];
+    Point bezier_points[4];
+    Path ret;
+
+    // sample points
+    for (size_t i = 0; i <= sample_n; i += 1) {
+        Coord time = static_cast<double>(i) / sample_n;
+        Point const point = pointAt(time);
+        Point const tangent = unitTangentAt(time);
+        fit_points[i] = point + rot90(tangent) * amount;
+    }
+
+    // compute the tangents as we are requiring the tangents at the end to have the correct direction.
+    // without that, the result might not be as smooth as the offset curve should be.
+    Point offset_tangent0 = unitTangentAt(0);
+    Point offset_tangent1 = -unitTangentAt(1.);
+    if (offset_tangent_reversed) {
+        offset_tangent0 = -offset_tangent0;
+        offset_tangent1 = -offset_tangent1;
+    }
+    // the error between the points and the generated bezier curve does not matter that much when calling
+    // bezier_fit_cubic. We are gonna check the error between the curves separately.
+    // \todo: optimize fitting as this might construct suboptimal estimations sometimes
+    bezier_fit_cubic_full(bezier_points, NULL, fit_points, sample_n + 1, offset_tangent0, offset_tangent1,
+                          tolerance / 100, 1);
+    CubicBezier bez(bezier_points[0], bezier_points[1], bezier_points[2], bezier_points[3]);
+
+    // the points with the biggest difference between the offset curve and its approximation have collinear normals.
+    // As the offset curve is collinear to the curve itself, we can compute the collinear points between
+    // the approximation and the curve itself. This is sound, but seems to be a little bit numerically illconditioned.
+    std::vector<std::pair<double, double>> error_times;
+    find_collinear_normal(error_times, controlPoints(), bez.controlPoints(), tolerance);
+    double max_error = -1;
+    Coord max_time = -1;
+    for (auto times : error_times) {
+        // todo: optimize split point as the find_collinear_normal is numerically bad condition
+        // because of the offsetting operation
+        Coord const time = times.first;
+        Point const point1 = pointAt(time) + rot90(unitTangentAt(time)) * amount;
+        Point const point2 = bez.pointAt(bez.nearestTime(point1));
+        double const error = (point2 - point1).length();
+        if (error > max_error) {
+            max_error = error;
+            max_time = time;
+        }
+    }
+
+    // in case error is too big, split the approximation curve
+    if (levels > 0 && max_error > tolerance && max_time > 0) {
+        levels -= 1;
+        auto const curve_portion0 = static_cast<BezierCurve *>(portion(0., max_time));
+        auto const curve_offset_path0 =
+            curve_portion0->offsetPointwiseSimple(amount, tolerance, offset_tangent_reversed, levels);
+        ret.append(curve_offset_path0);
+        auto const curve_portion1 = static_cast<BezierCurve *>(portion(max_time, 1.));
+        auto curve_offset_path1 =
+            curve_portion1->offsetPointwiseSimple(amount, tolerance, offset_tangent_reversed, levels);
+        // the final point of curve_offset_path0 is already very close to the first point of curve_offset_path1
+        // due to numerical inaccuracies, we manually assure that it is the same point.
+        curve_offset_path1.setInitial(curve_offset_path0.finalPoint());
+        ret.append(curve_offset_path1);
+    } else {
+        ret.append(bez);
+    }
+
+    return ret;
+};
 
 } // end namespace Geom
 
