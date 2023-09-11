@@ -40,6 +40,7 @@
 
 #include <vector>
 #include <boost/operators.hpp>
+#include <2geom/forward.h>
 #include <2geom/coord.h>
 #include <2geom/point.h>
 #include <2geom/interval.h>
@@ -345,6 +346,9 @@ public:
     /** @brief Feed the curve to a PathSink */
     virtual void feed(PathSink &sink, bool moveto_initial) const;
     /// @}
+
+    /** @brief offsets the curve by width */
+    virtual std::optional<Path> offset(double width) const;
 };
 
 inline

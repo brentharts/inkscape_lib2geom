@@ -221,6 +221,11 @@ void Curve::feed(PathSink &sink, bool moveto_initial) const
     sink.curveTo(pts[0], pts[1], pts[2]);
 }
 
+std::optional<Path> Curve::offset(double width) const
+{
+    THROW_NOTIMPLEMENTED();
+}
+
 } // namespace Geom
 
 /*

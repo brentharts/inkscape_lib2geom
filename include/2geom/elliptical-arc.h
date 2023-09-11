@@ -304,6 +304,7 @@ public:
     bool isNear(Curve const &other, Coord precision) const override;
     void feed(PathSink &sink, bool moveto_initial) const override;
     int winding(Point const &p) const override;
+    std::optional<Path> offset(double width) const override;
 
 private:
     void _updateCenterAndAngles();
