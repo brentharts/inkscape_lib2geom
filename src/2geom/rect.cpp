@@ -143,6 +143,22 @@ Coord distanceSq(Point const &p, Rect const &rect)
     return dx*dx+dy*dy;
 }
 
+Coord maxDistanceSq(Point const &p, Rect const &rect)
+{
+    double dx = 0, dy = 0;
+    if (p[X] > (rect.left() + rect.right()) / 2) {
+        dx = p[X] - rect.left();
+    } else {
+        dx = rect.right() - p[X];
+    }
+    if (p[Y] > (rect.top() + rect.bottom()) / 2) {
+        dy = p[Y] - rect.bottom();
+    } else {
+        dy = rect.top() - p[Y];
+    }
+    return dx*dx+dy*dy;
+}
+
 /** @brief Returns the smallest distance between p and rect.
  * @relates Rect */
 Coord distance(Point const &p, Rect const &rect)
@@ -162,6 +178,25 @@ Coord distance(Point const &p, Rect const &rect)
     return hypot(dx, dy);
 }
 
+/** @brief Returns the furthest distance between p and rect.
+ * @relates Rect */
+Coord maxDistance(Point const &p, Rect const &rect)
+{
+    // copy of furthestDistanceSq, because we need to use hypot()
+    double dx = 0, dy = 0;
+    if ( p[X] > rect.left() ) {
+        dx = p[X] - rect.left();
+    } else if ( p[X] < rect.right() ) {
+        dx = rect.right() - p[X];
+    }
+    if (p[Y] > rect.top() ) {
+        dy = rect.top() - p[Y];
+    } else if (  p[Y] < rect.bottom() ) {
+        dy = p[Y] - rect.bottom();
+    }
+    return hypot(dx, dy);
+}
+
 Coord distanceSq(Point const &p, OptRect const &rect)
 {
     if (!rect) return std::numeric_limits<Coord>::max();
@@ -171,6 +206,17 @@ Coord distance(Point const &p, OptRect const &rect)
 {
     if (!rect) return std::numeric_limits<Coord>::max();
     return distance(p, *rect);
+}
+
+Coord maxDistanceSq(Point const &p, OptRect const &rect)
+{
+    if (!rect) return std::numeric_limits<Coord>::max();
+    return maxDistanceSq(p, *rect);
+}
+Coord maxDistance(Point const &p, OptRect const &rect)
+{
+    if (!rect) return std::numeric_limits<Coord>::max();
+    return maxDistance(p, *rect);
 }
 
 } // namespace Geom

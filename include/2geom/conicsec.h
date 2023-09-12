@@ -506,6 +506,25 @@ public:
         return Point();
     }
 
+    std::vector<Point> allFurthestTimes (const Point &P) const;
+
+    /*
+     *  Return the point on the conic section furthest to the passed point "P".
+     *
+     *  P: the point to compute the furthest one
+     */
+    Point furthestTime (const Point &P) const
+    {
+        std::vector<Point> points = allFurthestTimes (P);
+        if ( !points.empty() )
+        {
+            return points.front();
+        }
+        // else
+        THROW_LOGICALERROR ("furthestTime: no furthest point found");
+        return Point();
+    }
+
 };
 
 std::vector<Point> intersect(const xAx & C1, const xAx & C2);

@@ -110,6 +110,11 @@ public:
         if (v >= max()) return 1;
         return timeAt(v);
     }
+    /// Find furthest time in [0,1] that maps to the given value. */
+    constexpr Coord furthestTime(Coord v) const {
+        if (v <= 0.5) return 1;
+        return 0;
+    }
     /// @}
 
     /// @name Test coordinates and other intervals for inclusion.

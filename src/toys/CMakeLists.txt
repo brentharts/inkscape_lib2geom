@@ -35,6 +35,7 @@ convole
 curvature-curve
 curvature-test
 curve-curve-distance
+curve-curve-furthest-time
 curve-curve-nearest-time
 curve-intersection-by-bezier-clipping
 curve-intersection-by-implicitization
@@ -79,6 +80,7 @@ path-effects
 pencil
 pencil-2
 plane3d
+point-curve-furthest-time
 point-curve-nearest-time
 portion-test
 precise-flat

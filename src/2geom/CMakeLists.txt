@@ -59,6 +59,7 @@ add_library(2geom ${LIB_TYPE}
     line.cpp
 
     nearest-time.cpp
+    furthest-time.cpp
 
     numeric/matrix.cpp
 
@@ -142,7 +143,7 @@ add_library(2geom ${LIB_TYPE}
     ${2GEOM_INCLUDE_DIR}/2geom/math-utils.h
 
     ${2GEOM_INCLUDE_DIR}/2geom/nearest-time.h
-
+    ${2GEOM_INCLUDE_DIR}/2geom/furthest-time.h
     ${2GEOM_INCLUDE_DIR}/2geom/ord.h
 
     ${2GEOM_INCLUDE_DIR}/2geom/parallelogram.h

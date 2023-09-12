@@ -36,6 +36,8 @@
 
 #ifndef LIB2GEOM_SEEN_ELLIPTICAL_ARC_H
 #define LIB2GEOM_SEEN_ELLIPTICAL_ARC_H
+//# GSL bug: uncoment to test with GSL in some sites, add to the file you want to test
+//#define HAVE_GSL
 
 #include <algorithm>
 #include <2geom/affine.h>
@@ -43,6 +45,7 @@
 #include <2geom/bezier-curve.h>
 #include <2geom/curve.h>
 #include <2geom/ellipse.h>
+#include <2geom/polynomial.h>
 #include <2geom/sbasis-curve.h>  // for non-native methods
 #include <2geom/utils.h>
 
@@ -283,6 +286,10 @@ public:
             return from;
         }
         return allNearestTimes(p, from, to).front();
+    }
+    std::vector<double> allFurthestTimes( Point const& p, double from = 0, double to = 1 ) const override;
+    double furthestTime( Point const& p, double from = 0, double to = 1 ) const override {
+        return allFurthestTimes(p, from, to).front();
     }
 #endif
     std::vector<CurveIntersection> intersect(Curve const &other, Coord eps=EPSILON) const override;

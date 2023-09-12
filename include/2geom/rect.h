@@ -214,6 +214,13 @@ Coord distanceSq(Point const &p, OptRect const &rect);
 /// Minimum distance to rectangle, or infinity if empty.
 Coord distance(Point const &p, OptRect const &rect);
 
+Coord maxDistanceSq(Point const &p, Rect const &rect);
+Coord maxDistance(Point const &p, Rect const &rect);
+/// Maximiun square of distance to rectangle, or infinity if empty.
+Coord maxDistanceSq(Point const &p, OptRect const &rect);
+/// Maximiun distance to rectangle, or infinity if empty.
+Coord maxDistance(Point const &p, OptRect const &rect);
+
 inline bool Rect::interiorContains(OptRect const &r) const {
     return !r || interiorContains(static_cast<Rect const &>(*r));
 }

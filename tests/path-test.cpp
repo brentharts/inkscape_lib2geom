@@ -244,6 +244,44 @@ TEST_F(PathTest, NearestPoint) {
 
 }
 
+#ifdef HAVE_GSL
+TEST_F(PathTest, ALLNearestPoint) {
+    EXPECT_EQ(1, line.allNearestTimes(Point(0.5,0)).size());
+    EXPECT_EQ(4, square.allNearestTimes(Point(0.5,0.5)).size());
+    EXPECT_EQ(1, square.allNearestTimes(Point(100,20)).size()); 
+}
+
+TEST_F(PathTest, ALLFurtestPoint) {
+    EXPECT_EQ(2, line.allFurthestTimes(Point(0.5,0)).size());
+    EXPECT_EQ(1, line.allFurthestTimes(Point(20.0,8)).size());
+    EXPECT_EQ(2, line.allFurthestTimes(Point(0.5,300)).size());
+    EXPECT_EQ(5, square.allFurthestTimes(Point(0.5,0.5)).size());
+    EXPECT_EQ(1, square.allFurthestTimes(Point(100,20)).size());
+}
+
+TEST_F(PathTest, FurthestPoint) {
+    EXPECT_EQ(1, line.furthestTime(Point(0,0)).asFlatTime());
+    EXPECT_EQ(0, line.furthestTime(Point(0.5,0)).asFlatTime());
+    EXPECT_EQ(0, line.furthestTime(Point(0.5,1)).asFlatTime());
+    EXPECT_EQ(0, line.furthestTime(Point(100,0)).asFlatTime());
+    EXPECT_EQ(1, line.furthestTime(Point(-100,1000)).asFlatTime());
+
+    EXPECT_EQ(2, square.furthestTime(Point(0,0)).asFlatTime());
+    EXPECT_EQ(3, square.furthestTime(Point(1,0)).asFlatTime());
+    EXPECT_EQ(1, square.furthestTime(Point(0,1)).asFlatTime());
+
+    //cout << diederik.furthestTime(Point(247.32293,-43.339507)) << endl;
+    
+    Point p(511.75,40.85);
+    EXPECT_FLOAT_EQ(0.72768039, diederik.furthestTime(p).asFlatTime());
+    /*cout << diederik.pointAt(diederik.furthestTime(p)) << endl
+         << diederik.pointAt(0.72768039) << endl
+         << distance(diederik.pointAt(diederik.furthestTime(p)), p) << "  "
+         << distance(diederik.pointAt(0.72768039), p) << endl;*/
+
+}
+#endif
+
 TEST_F(PathTest, Winding) {
     // test points in special positions
     EXPECT_EQ(line.winding(Point(-1, 0)), 0);

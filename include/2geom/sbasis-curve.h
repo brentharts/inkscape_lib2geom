@@ -39,6 +39,7 @@
 #include <2geom/curve.h>
 #include <2geom/exception.h>
 #include <2geom/nearest-time.h>
+#include <2geom/furthest-time.h>
 #include <2geom/sbasis-geometric.h>
 #include <2geom/transforms.h>
 
@@ -113,10 +114,18 @@ public:
     Coord nearestTime( Point const& p, Coord from = 0, Coord to = 1 ) const override {
         return nearest_time(p, inner, from, to);
     }
+    Coord furthestTime( Point const& p, Coord from = 0, Coord to = 1 ) const override {
+        return furthest_time(p, inner, from, to);
+    }
     std::vector<Coord> allNearestTimes( Point const& p, Coord from = 0,
         Coord to = 1 ) const override
     {
         return all_nearest_times(p, inner, from, to);
+    }
+    std::vector<Coord> allFurthestTimes( Point const& p, Coord from = 0,
+        Coord to = 1 ) const override
+    {
+        return all_furthest_times(p, inner, from, to);
     }
     Coord length(Coord tolerance) const override { return ::Geom::length(inner, tolerance); }
     Curve *portion(Coord f, Coord t) const override {

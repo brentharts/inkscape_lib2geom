@@ -159,6 +159,8 @@ public:
         return (inner[d] - v).roots();
     }
     Coord nearestTime(Point const &p, Coord from = 0, Coord to = 1) const override;
+    Coord furthestTime(Point const &p, Coord from = 0, Coord to = 1) const override;
+    std::vector<Coord> allFurthestTimes( Point const& p, Coord from = 0, Coord to = 1) const override;
     Coord length(Coord tolerance) const override;
     std::vector<CurveIntersection> intersect(Curve const &other, Coord eps = EPSILON) const override;
     Point pointAt(Coord t) const override { return inner.pointAt(t); }
@@ -280,6 +282,15 @@ public:
     Coord nearestTime(Point const &p, Coord from = 0, Coord to = 1) const override {
         return BezierCurve::nearestTime(p, from, to);
     }
+
+    Coord furthestTime(Point const &p, Coord from = 0, Coord to = 1) const override {
+        return BezierCurve::furthestTime(p, from, to);
+    }
+
+    std::vector<Coord> allFurthestTimes( Point const& p, Coord from = 0, Coord to = 1)  const override {
+        return BezierCurve::allFurthestTimes(p, from, to);
+    }
+
     std::vector<CurveIntersection> intersect(Curve const &other, Coord eps = EPSILON) const override {
         // call super. this is implemented only to allow specializations
         return BezierCurve::intersect(other, eps);
@@ -327,6 +338,8 @@ template <> inline bool BezierCurveN<1>::isDegenerate() const {
 template <> inline bool BezierCurveN<1>::isLineSegment() const { return true; }
 template <> Curve *BezierCurveN<1>::derivative() const;
 template <> Coord BezierCurveN<1>::nearestTime(Point const &, Coord, Coord) const;
+template <> Coord BezierCurveN<1>::furthestTime(Point const&, Coord, Coord) const;
+template <> std::vector<Coord> BezierCurveN<1>::allFurthestTimes(Point const&, Coord, Coord) const;
 template <> std::vector<CurveIntersection> BezierCurveN<1>::intersect(Curve const &, Coord) const;
 template <> std::vector<CurveIntersection> BezierCurveN<2>::intersect(Curve const &, Coord) const;
 template <> std::vector<CurveIntersection> BezierCurveN<3>::intersect(Curve const &, Coord) const;

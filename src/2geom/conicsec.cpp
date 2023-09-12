@@ -1614,6 +1614,58 @@ std::vector<Point> xAx::allNearestTimes (const Point &P) const
     return points;
 }
 
+/*
+ *  Return all points on the conic section furtest to the passed point "P".
+ *
+ *  P: the point to compute the furtest one
+ */
+std::vector<Point> xAx::allFurthestTimes (const Point &P) const
+{
+    // TODO: manage the circle - centre case
+    std::vector<Point> points;
+
+    // named C the conic we look for points (x,y) on C such that
+    // dot (grad (C(x,y)), rot90 (P -(x,y))) == 0; the set of points satisfying
+    // this equation is still a conic G, so the wanted points can be found by
+    // intersecting C with G
+    xAx G (-coeff(1),
+           2 * (coeff(0) - coeff(2)),
+           coeff(1),
+           -coeff(4) + coeff(1) * P[X] - 2 * coeff(0) * P[Y],
+           coeff(3) - coeff(1) * P[Y] + 2 * coeff(2) * P[X],
+           -coeff(3) * P[Y] + coeff(4) * P[X]);
+
+    std::vector<Point> crs = intersect (*this, G);
+
+    //std::cout << "NEAREST POINT: crs.size = " << crs.size() << std::endl;
+    if (crs.empty())  return points;
+
+    size_t idx = 0;
+    double maxdist = distanceSq (crs[0], P);
+    std::vector<double> dist;
+    dist.push_back (maxdist);
+
+    for (size_t i = 1; i < crs.size(); ++i)
+    {
+        dist.push_back (distanceSq (crs[i], P));
+        if (maxdist < dist.back())
+        {
+            idx = i;
+            maxdist = dist.back();
+        }
+    }
+
+    points.push_back (crs[idx]);
+    for (size_t i = 0; i < crs.size(); ++i)
+    {
+        if (i == idx) continue;
+        if (dist[i] == maxdist)
+            points.push_back (crs[i]);
+    }
+
+    return points;
+}
+
 
 
 bool clip (std::vector<RatQuad> & rq, const xAx & cs, const Rect & R)
