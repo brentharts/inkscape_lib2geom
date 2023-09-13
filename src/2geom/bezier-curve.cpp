@@ -324,6 +324,45 @@ BezierCurve *BezierCurve::create(std::vector<Point> const &pts)
     }
 }
 
+/**
+ * Computes the times where the radius of curvature of the bezier curve equals the given radius. 
+*/
+std::vector<Coord> BezierCurve::timesWithRadiusOfCurvature(double radius) const
+{
+    /**
+     * The algorithm works as follows:
+     * Find the solutions of curvature of curve at t = curvatureValue
+     * This is equivalent to (dx*ddy-ddx*dy)/curvatureValue = (dx**2+dy**2)**(3/2)
+     * When the left side is positive, taking the square gives
+     * ((dx*ddy-ddx*dy)/curvatureValue)**2 - (dx**2+dy**2)**3 = 0
+     * This is a polyomial for BezierCurves and can be solved with root finding algos.
+    */
+
+    if (this->size() <= 2) {
+        return {};
+    }
+
+    std::vector<Coord> res;
+
+    auto const dx = Geom::derivative(inner[X]);
+    auto const dy = Geom::derivative(inner[Y]);
+    auto const ddx = Geom::derivative(dx);
+    auto const ddy = Geom::derivative(dy);
+    auto const c0 = (dx * ddy - ddx * dy) * radius;
+    auto const c1 = dx * dx + dy * dy;
+    auto const p = c0 * c0 - c1 * c1 * c1;
+    auto const candidates = p.roots();
+    // check which candidates have positive nominator
+    // as squaring also give negative (spurious) results
+    for (Coord const candidate : candidates) {
+        if (c0.valueAt(candidate) > 0) {
+            res.push_back(candidate);
+        }
+    }
+
+    return res;
+}
+
 // optimized specializations for LineSegment
 
 template <>

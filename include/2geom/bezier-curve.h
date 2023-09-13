@@ -170,6 +170,7 @@ public:
     bool isNear(Curve const &c, Coord precision) const override;
     bool operator==(Curve const &c) const override;
     void feed(PathSink &sink, bool) const override;
+    std::vector<Coord> timesWithRadiusOfCurvature(double radius) const;
 };
 
 template <unsigned degree>

@@ -661,6 +661,27 @@ TEST_F(BezierTest, ExpandToTransformedTest)
     test_curve(CubicBezier(Point(-1, 0), Point(1, 1), Point(2, -2), Point(3, 0)));
 }
 
+TEST_F(BezierTest, TimesWithRadiusOfCurvature)
+{
+    auto test_curve = [](BezierCurve const &curve, double radius, std::vector<Coord> times_expected) {
+        auto const times_actual = curve.timesWithRadiusOfCurvature(radius);
+        EXPECT_vector_near(times_actual, times_expected, 1e-8);
+    };
+
+    test_curve(LineSegment(Point(-1, 0), Point(1, 2)), 1.7, {});
+    test_curve(LineSegment(Point(-1, 0), Point(1, 2)), -1.7, {});
+    test_curve(QuadraticBezier(Point(-1, 0), Point(0, 1), Point(1, 0)), 1.7, {});
+    test_curve(QuadraticBezier(Point(-1, 0), Point(0, 1), Point(1, 0)), -1.7, {0.17426923333331537, 1-0.17426923333331537});
+    test_curve(CubicBezier(Point(-1, 0), Point(1, -1), Point(-1, 1), Point(1, 0)), 1.7, {0.122157669319538, 0.473131422069614});
+    test_curve(CubicBezier(Point(-1, 0), Point(1, -1), Point(-1, 1), Point(1, 0)), -1.7, {1 - 0.473131422069614, 1 - 0.122157669319538});
+    test_curve(CubicBezier(Point(-1, 0), Point(1, -2), Point(-2, -1), Point(1, 0)), 1.7, {});
+    test_curve(CubicBezier(Point(-1, 0), Point(1, -2), Point(-2, -1), Point(1, 0)), -1.7, {0.16316709499671345, 0.82043191574008589});
+    // degenerate cases, cubic representation of a point / line
+    test_curve(CubicBezier(Point(1, 0), Point(1, 0), Point(1, 0), Point(1, 0)), 1.7, {});
+    test_curve(CubicBezier(Point(1, 1), Point(2, 2), Point(1, 1), Point(2, 2)), -1.7, {});
+    test_curve(CubicBezier(Point(1, 0), Point(1, 0), Point(1, 0), Point(2, 0)), 1.7, {});
+}
+
 TEST_F(BezierTest, ForwardDifferenceTest)
 {
     auto b = Bezier(3, 4, 2, -5, 7);
