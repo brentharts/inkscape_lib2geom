@@ -356,7 +356,7 @@ std::vector<Coord> BezierCurve::timesWithRadiusOfCurvature(double radius) const
     // check which candidates have positive nominator
     // as squaring also give negative (spurious) results
     for (Coord const candidate : candidates) {
-        if (c0.valueAt(candidate) > 0) {
+        if (candidate >= 0 && candidate <= 1 && c0.valueAt(candidate) > 0) {
             res.push_back(candidate);
         }
     }
@@ -847,32 +847,38 @@ template <> std::optional<Path> BezierCurveN<3>::offset(double width, bool no_cr
         if (are_near(time, startTime)) {
             continue;
         }
-
         ret.append(partial_offset_simple(width, startTime, time, tolerance));
         startTime = time;
     }
 
-    return ret;
+    if (!are_near(startTime, 1.)) {
+        ret.append(partial_offset_simple(width, startTime, 1., tolerance));
+    }
+
+    return { ret };
 }
 
 Path BezierCurve::partial_offset_simple(double width, Coord startTime, Coord endTime, double tolerance) const {
-    Point fit_points[5];
+    Point fit_points[6];
     Point bezier_points[4];
     Path ret;
 
-    for (size_t i = 0; i < 5; i += 1) {
-        Coord time = static_cast<double>(i*2+1) / 10;
-        fit_points[i] = pointAt(time);
+    for (size_t i = 0; i <= 5; i += 1) {
+        Coord time = (static_cast<double>(i) / 5)*(endTime - startTime) + startTime;
+        Point const point = pointAt(time);
+        Point const tangent = unitTangentAt(time);
+        fit_points[i] = point + rot90(tangent) * width;
     }
 
     // the error does not matter when calling bezier_fit_cubic.
     // We are gonna check the error between the curves separately.
-    bezier_fit_cubic(bezier_points, fit_points, 5, 1.);
+    bezier_fit_cubic(bezier_points, fit_points, 6, tolerance);
 
     // todo check error and split curve if required
 
     CubicBezier bez(bezier_points[0], bezier_points[1], bezier_points[2], bezier_points[3]);
     ret.append(bez);
+
     return ret;
 };
 
