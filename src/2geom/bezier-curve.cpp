@@ -782,7 +782,7 @@ template <> std::optional<Path> BezierCurveN<1>::offset(double width, bool no_cr
         return std::nullopt;
     }
     
-    Point const normal = tangent.ccw() * width;
+    Point const normal = rot90(tangent) * width;
     ret.append(LineSegment(
         this->controlPoint(0)+normal,
         this->controlPoint(1)+normal
