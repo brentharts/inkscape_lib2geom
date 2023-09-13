@@ -296,7 +296,7 @@ public:
         BezierCurve::expandToTransformed(bbox, transform);
     }
 
-    std::optional<Path> offset(double width) const override;
+    std::optional<Path> offset(double width, bool no_crossing = false, double tolerance = 1e-4) const override;
 };
 
 // BezierCurveN<0> is meaningless; specialize it out
@@ -339,9 +339,9 @@ template <> void BezierCurveN<3>::feed(PathSink &sink, bool moveto_initial) cons
 template <> void BezierCurveN<1>::expandToTransformed(Rect &bbox, Affine const &transform) const;
 template <> void BezierCurveN<2>::expandToTransformed(Rect &bbox, Affine const &transform) const;
 template <> void BezierCurveN<3>::expandToTransformed(Rect &bbox, Affine const &transform) const;
-template <> std::optional<Path> BezierCurveN<1>::offset(double width) const;
-template <> std::optional<Path> BezierCurveN<2>::offset(double width) const;
-template <> std::optional<Path> BezierCurveN<3>::offset(double width) const;
+template <> std::optional<Path> BezierCurveN<1>::offset(double width, bool no_crossing, double tolerance) const;
+template <> std::optional<Path> BezierCurveN<2>::offset(double width, bool no_crossing, double tolerance) const;
+template <> std::optional<Path> BezierCurveN<3>::offset(double width, bool no_crossing, double tolerance) const;
 
 inline Point middle_point(LineSegment const& _segment) {
     return ( _segment.initialPoint() + _segment.finalPoint() ) / 2;

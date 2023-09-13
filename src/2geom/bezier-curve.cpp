@@ -765,12 +765,12 @@ Coord bezier_length(Point a0, Point a1, Point a2, Point a3, Coord tolerance)
     return bezier_length_internal(a0, a1, a2, a3, tolerance, 0);
 }
 
-template <> std::optional<Path> BezierCurveN<1>::offset(double width) const
+template <> std::optional<Path> BezierCurveN<1>::offset(double width, bool no_crossing, double tolerance) const
 {
     Path ret;
 
     // without offset return the curve itself
-    if (are_near(width, 0)) {
+    if (are_near(width, 0, tolerance)) {
         ret.append(*this);
         return { ret };
     }
@@ -778,7 +778,7 @@ template <> std::optional<Path> BezierCurveN<1>::offset(double width) const
     Point const tangent = this->unitTangentAt(0);
     // if the tangent is 0 it is a degenerated curve
     // no offset possible for a point
-    if (are_near(Point(0, 0), tangent)) {
+    if (are_near(Point(0, 0), tangent, tolerance)) {
         return std::nullopt;
     }
     
@@ -791,12 +791,12 @@ template <> std::optional<Path> BezierCurveN<1>::offset(double width) const
     return { ret };
 }
 
-template <> std::optional<Path> BezierCurveN<2>::offset(double width) const
+template <> std::optional<Path> BezierCurveN<2>::offset(double width, bool no_crossing, double tolerance) const
 {
     THROW_NOTIMPLEMENTED();
 }
 
-template <> std::optional<Path> BezierCurveN<3>::offset(double width) const
+template <> std::optional<Path> BezierCurveN<3>::offset(double width, bool no_crossing, double tolerance) const
 {
     THROW_NOTIMPLEMENTED();
 }

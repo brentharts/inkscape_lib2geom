@@ -221,7 +221,7 @@ void Curve::feed(PathSink &sink, bool moveto_initial) const
     sink.curveTo(pts[0], pts[1], pts[2]);
 }
 
-std::optional<Path> Curve::offset(double width) const
+std::optional<Path> Curve::offset(double width, bool no_crossing, double tolerance) const
 {
     THROW_NOTIMPLEMENTED();
 }
