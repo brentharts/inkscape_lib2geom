@@ -32,6 +32,7 @@
  */
 
 #include <2geom/bezier-curve.h>
+#include <2geom/bezier-utils.h>
 #include <2geom/path-sink.h>
 #include <2geom/basic-intersection.h>
 #include <2geom/nearest-time.h>
@@ -837,8 +838,43 @@ template <> std::optional<Path> BezierCurveN<2>::offset(double width, bool no_cr
 
 template <> std::optional<Path> BezierCurveN<3>::offset(double width, bool no_crossing, double tolerance) const
 {
-    THROW_NOTIMPLEMENTED();
+    auto const splitTimes = timesWithRadiusOfCurvature(width);
+    Path ret;
+
+    Coord startTime = 0.;
+    for (Coord time : splitTimes) {
+        // ignore very small steps as it would produce a very small segment only
+        if (are_near(time, startTime)) {
+            continue;
+        }
+
+        ret.append(partial_offset_simple(width, startTime, time, tolerance));
+        startTime = time;
+    }
+
+    return ret;
 }
+
+Path BezierCurve::partial_offset_simple(double width, Coord startTime, Coord endTime, double tolerance) const {
+    Point fit_points[5];
+    Point bezier_points[4];
+    Path ret;
+
+    for (size_t i = 0; i < 5; i += 1) {
+        Coord time = static_cast<double>(i*2+1) / 10;
+        fit_points[i] = pointAt(time);
+    }
+
+    // the error does not matter when calling bezier_fit_cubic.
+    // We are gonna check the error between the curves separately.
+    bezier_fit_cubic(bezier_points, fit_points, 5, 1.);
+
+    // todo check error and split curve if required
+
+    CubicBezier bez(bezier_points[0], bezier_points[1], bezier_points[2], bezier_points[3]);
+    ret.append(bez);
+    return ret;
+};
 
 } // end namespace Geom
 
