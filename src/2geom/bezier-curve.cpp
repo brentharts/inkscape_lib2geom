@@ -831,53 +831,100 @@ template <> std::optional<Path> BezierCurveN<1>::offset(double width, bool no_cr
     return { ret };
 }
 
+// todo:
+// * lpe offset crashes for linear segments
+// * check drag tolerance, why always 3
 template <> std::optional<Path> BezierCurveN<2>::offset(double width, bool no_crossing, double tolerance) const
 {
-    THROW_NOTIMPLEMENTED();
+    return BezierCurve::offset_internal(width, no_crossing, tolerance);
 }
 
 template <> std::optional<Path> BezierCurveN<3>::offset(double width, bool no_crossing, double tolerance) const
 {
-    auto const splitTimes = timesWithRadiusOfCurvature(width);
+    return BezierCurve::offset_internal(width, no_crossing, tolerance);
+}
+
+std::optional<Path> BezierCurve::offset_internal(double width, bool no_crossing, double tolerance) const
+{
+    auto splitTimes = timesWithRadiusOfCurvature(width);
+    splitTimes.push_back(1.);
     Path ret;
+    ret.setStitching(true);
 
     Coord startTime = 0.;
     for (Coord time : splitTimes) {
         // ignore very small steps as it would produce a very small segment only
-        if (are_near(time, startTime)) {
+        if (are_near(time, startTime, 1e-3)) {
             continue;
         }
-        ret.append(partial_offset_simple(width, startTime, time, tolerance));
-        startTime = time;
-    }
 
-    if (!are_near(startTime, 1.)) {
-        ret.append(partial_offset_simple(width, startTime, 1., tolerance));
+        auto const curve_portion = static_cast<BezierCurve *>(portion(startTime, time));
+        ret.append(curve_portion->offset_simple(width, tolerance));
+        startTime = time;
     }
 
     return { ret };
 }
 
-Path BezierCurve::partial_offset_simple(double width, Coord startTime, Coord endTime, double tolerance) const {
+// \todo: maybe add more values which are already calculated to the optional parameter list
+Path BezierCurve::offset_simple(double width, double tolerance, double offset_tangent_reversed) const {
     Point fit_points[6];
     Point bezier_points[4];
     Path ret;
+    ret.setStitching(true);
+
+    if (offset_tangent_reversed == 0.) {
+        // calculate the curvature in the middle
+        // this is required to check if the radius of curvature is smaller or bigger as the width
+        // as it decides in which direction the offset tangent should face.
+        // The middle point is used as the start and end points might have the same radius of curvature
+        // as the offset width which would lead to numerical issues
+        auto const d = pointAndDerivatives(0.5, 2);
+        // todo: denominator zero?
+        double const radiusOfCurvature = std::pow<double>(d[1].lengthSq(), 1.5) / (d[1][X] * d[2][Y] - d[2][X] * d[1][Y]);
+        // direction of the tangent on the offset curve wrt the original curve
+        // as it is a precondition that this does not change betwenn start and end,
+        // we just have to compute it once.
+        offset_tangent_reversed = radiusOfCurvature > 0 ? sgn(radiusOfCurvature - width) : sgn(width - radiusOfCurvature);
+    }
 
     for (size_t i = 0; i <= 5; i += 1) {
-        Coord time = (static_cast<double>(i) / 5)*(endTime - startTime) + startTime;
+        Coord time = static_cast<double>(i) / 5;
         Point const point = pointAt(time);
         Point const tangent = unitTangentAt(time);
         fit_points[i] = point + rot90(tangent) * width;
     }
 
+    Point offset_tangent0 = unitTangentAt(0) * offset_tangent_reversed;
+    Point offset_tangent1 = -unitTangentAt(1.) * offset_tangent_reversed;
     // the error does not matter when calling bezier_fit_cubic.
     // We are gonna check the error between the curves separately.
-    bezier_fit_cubic(bezier_points, fit_points, 6, tolerance);
-
-    // todo check error and split curve if required
-
+    bezier_fit_cubic_full(bezier_points, NULL, fit_points, 6, offset_tangent0, offset_tangent1, tolerance, 1);
     CubicBezier bez(bezier_points[0], bezier_points[1], bezier_points[2], bezier_points[3]);
-    ret.append(bez);
+
+    std::vector< std::pair<double, double> > error_times;
+    find_collinear_normal(error_times, controlPoints(), bez.controlPoints(), tolerance);
+    double max_error = -1;
+    Coord max_time = -1;
+    for (auto times : error_times) {
+        Coord const time = times.first;
+        Point const point1 = pointAt(time) + rot90(unitTangentAt(time)) * width;
+        Point const point2 = bez.pointAt(bez.nearestTime(point1));
+        double const error = (point2 - point1).length();
+        if (error > max_error) {
+            max_error = error;
+            max_time = time;
+        }
+    }
+
+    if (max_error > tolerance && max_time > 0) {
+        auto const curve_portion0 = static_cast<BezierCurve *>(portion(0., max_time));
+        ret.append(curve_portion0->offset_simple(width, tolerance, offset_tangent_reversed));
+        auto const curve_portion1 = static_cast<BezierCurve *>(portion(max_time, 1.));
+        ret.append(curve_portion1->offset_simple(width, tolerance, offset_tangent_reversed));
+    } else {
+        ret.append(bez);
+    }
 
     return ret;
 };

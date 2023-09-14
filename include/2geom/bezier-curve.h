@@ -172,14 +172,16 @@ public:
     void feed(PathSink &sink, bool) const override;
     std::vector<Coord> timesWithRadiusOfCurvature(double radius) const;
 
-protected:
     /**
      * @brief offset the curve expecting some constraints
      * 
      * This method expects that the time was split already according to timesWithRadiusOfCurvature.
-     * Hence, it is expecteded there are no cusps within the time-interval (startTime, endTime).
+     * Hence, it is expected there are no cusps within the time-interval.
     */
-    Path partial_offset_simple(double width, Coord startTime, Coord endTime, double tolerance) const;
+    Path offset_simple(double width, double tolerance, double offset_tangent_reversed = 0.) const;
+    
+protected:
+    std::optional<Path> offset_internal(double width, bool no_crossing = false, double tolerance = 1e-4) const;
 };
 
 template <unsigned degree>
