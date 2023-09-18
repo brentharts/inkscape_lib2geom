@@ -347,11 +347,13 @@ public:
     virtual void feed(PathSink &sink, bool moveto_initial) const;
     /// @}
 
-    /** @brief offsets the curve by width
+    /** offsets the curve by width
      * 
      * @param width the offset width
-     * @param no_crossing specifies the type of offsetting, see below
      * @param tolerance the tolerance used during the offsetting algorithm
+     * @param no_crossing specifies the type of offsetting, see below
+     * 
+     * @pre the curve contains more than one point. E.g. isDegenerate() is false.
      * 
      * If no_crossing is set to false, the output is a curve containing an offset point for every
      * point of the curve. The offset path may have self intersections.
@@ -364,7 +366,7 @@ public:
      * than the offset width. This behaviour is intended and helps with combining
      * offsetted curve segments.
      */
-    virtual std::optional<Path> offset(double width, bool no_crossing = false, double tolerance = 1e-4) const;
+    virtual Path offsetted(double width, double tolerance = 1e-4, bool no_crossing = false) const;
 };
 
 inline

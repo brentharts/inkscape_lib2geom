@@ -173,15 +173,17 @@ public:
     std::vector<Coord> timesWithRadiusOfCurvature(double radius) const;
 
     /**
-     * @brief offset the curve expecting some constraints
+     * @brief returns the offset path of the curve, but expects some constraints
      * 
      * This method expects that the time was split already according to timesWithRadiusOfCurvature.
      * Hence, it is expected there are no cusps within the time-interval.
+     * 
+     * The levels parameter defines a recursion limit for backup. Should only be required in numeric issues cases.
     */
-    Path offset_simple(double width, double tolerance, double offset_tangent_reversed = 0.) const;
+    Path offsettedSimple(double width, double tolerance, bool offset_tangent_reversed, size_t levels = 16) const;
     
 protected:
-    std::optional<Path> offset_internal(double width, bool no_crossing = false, double tolerance = 1e-4) const;
+    Path offsettedInternal(double width, double tolerance = 1e-4, bool no_crossing = false) const;
 };
 
 template <unsigned degree>
@@ -308,7 +310,7 @@ public:
         BezierCurve::expandToTransformed(bbox, transform);
     }
 
-    std::optional<Path> offset(double width, bool no_crossing = false, double tolerance = 1e-4) const override;
+    Path offsetted(double width, double tolerance = 1e-4, bool no_crossing = false) const override;
 };
 
 // BezierCurveN<0> is meaningless; specialize it out
@@ -351,9 +353,9 @@ template <> void BezierCurveN<3>::feed(PathSink &sink, bool moveto_initial) cons
 template <> void BezierCurveN<1>::expandToTransformed(Rect &bbox, Affine const &transform) const;
 template <> void BezierCurveN<2>::expandToTransformed(Rect &bbox, Affine const &transform) const;
 template <> void BezierCurveN<3>::expandToTransformed(Rect &bbox, Affine const &transform) const;
-template <> std::optional<Path> BezierCurveN<1>::offset(double width, bool no_crossing, double tolerance) const;
-template <> std::optional<Path> BezierCurveN<2>::offset(double width, bool no_crossing, double tolerance) const;
-template <> std::optional<Path> BezierCurveN<3>::offset(double width, bool no_crossing, double tolerance) const;
+template <> Path BezierCurveN<1>::offsetted(double width, double tolerance, bool no_crossing) const;
+template <> Path BezierCurveN<2>::offsetted(double width, double tolerance, bool no_crossing) const;
+template <> Path BezierCurveN<3>::offsetted(double width, double tolerance, bool no_crossing) const;
 
 inline Point middle_point(LineSegment const& _segment) {
     return ( _segment.initialPoint() + _segment.finalPoint() ) / 2;

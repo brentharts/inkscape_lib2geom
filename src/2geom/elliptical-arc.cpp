@@ -1019,10 +1019,6 @@ int EllipticalArc::winding(Point const &p) const
     return sweep() ? winding_assuming_increasing_angles : -winding_assuming_increasing_angles;
 }
 
-std::optional<Path> EllipticalArc::offset(double width, bool no_crossing, double tolerance) const {
-    THROW_NOTIMPLEMENTED();
-}
-
 std::ostream &operator<<(std::ostream &out, EllipticalArc const &ea)
 {
     out << "EllipticalArc("
