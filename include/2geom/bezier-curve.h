@@ -171,6 +171,22 @@ public:
     bool operator==(Curve const &c) const override;
     void feed(PathSink &sink, bool) const override;
     std::vector<Coord> timesWithRadiusOfCurvature(double radius) const;
+
+    /**
+     * @brief returns the (pointwise) offset path of the curve, but expects some constraints.
+     * 
+     * Expects that isDegenerate is false.
+     * 
+     * This method expects that the time was split already according to timesWithRadiusOfCurvature.
+     * Hence, it is expected there are no cusps within the time-interval.
+     *
+     * 
+     * The levels parameter defines a recursion limit for backup. Should only be required in numeric issues cases.
+    */
+    Path offsetPointwiseSimple(double amount, double tolerance, bool offset_tangent_reversed, size_t levels = 16) const;
+    
+protected:
+    Path offsetPointwiseInternal(double amount, double tolerance = 1e-4) const;
 };
 
 template <unsigned degree>
@@ -296,6 +312,8 @@ public:
         // call super. this is implemented only to allow specializations
         BezierCurve::expandToTransformed(bbox, transform);
     }
+
+    Path offsetPointwise(double amount, double tolerance = 1e-4) const override;
 };
 
 // BezierCurveN<0> is meaningless; specialize it out
@@ -338,6 +356,9 @@ template <> void BezierCurveN<3>::feed(PathSink &sink, bool moveto_initial) cons
 template <> void BezierCurveN<1>::expandToTransformed(Rect &bbox, Affine const &transform) const;
 template <> void BezierCurveN<2>::expandToTransformed(Rect &bbox, Affine const &transform) const;
 template <> void BezierCurveN<3>::expandToTransformed(Rect &bbox, Affine const &transform) const;
+template <> Path BezierCurveN<1>::offsetPointwise(double amount, double tolerance) const;
+template <> Path BezierCurveN<2>::offsetPointwise(double amount, double tolerance) const;
+template <> Path BezierCurveN<3>::offsetPointwise(double amount, double tolerance) const;
 
 inline Point middle_point(LineSegment const& _segment) {
     return ( _segment.initialPoint() + _segment.finalPoint() ) / 2;

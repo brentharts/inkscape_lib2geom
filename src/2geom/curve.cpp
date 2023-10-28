@@ -221,6 +221,12 @@ void Curve::feed(PathSink &sink, bool moveto_initial) const
     sink.curveTo(pts[0], pts[1], pts[2]);
 }
 
+Path Curve::offsetPointwise(double amount, double tolerance) const
+{
+    assert(!isDegenerate());
+    THROW_NOTIMPLEMENTED();
+}
+
 } // namespace Geom
 
 /*

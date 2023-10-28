@@ -40,6 +40,7 @@
 
 #include <vector>
 #include <boost/operators.hpp>
+#include <2geom/forward.h>
 #include <2geom/coord.h>
 #include <2geom/point.h>
 #include <2geom/interval.h>
@@ -345,6 +346,17 @@ public:
     /** @brief Feed the curve to a PathSink */
     virtual void feed(PathSink &sink, bool moveto_initial) const;
     /// @}
+
+    /** offsets (pointwise) the curve by the given amount
+     * 
+     * @param amount the offset amount. The sign tells on which side the offset is applied.
+     * @param tolerance the tolerance used during the offsetting algorithm
+     * 
+     * @pre the curve contains more than one point. E.g. isDegenerate() is false.
+     * 
+     * Note that the offset path might have self-intersections and cusps even when the curve has no self-intersection and its derivative is smooth.
+     */
+    virtual Path offsetPointwise(double amount, double tolerance = 1e-4) const;
 };
 
 inline

@@ -16,6 +16,7 @@ SET(2GEOM_GTESTS_SRC
 affine-test
 angle-test
 bezier-test
+bezier-curve-offset-test
 choose-test
 circle-test
 convex-hull-test
