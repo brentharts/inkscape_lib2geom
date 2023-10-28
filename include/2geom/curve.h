@@ -40,6 +40,7 @@
 
 #include <vector>
 #include <boost/operators.hpp>
+#include <2geom/forward.h>
 #include <2geom/coord.h>
 #include <2geom/point.h>
 #include <2geom/interval.h>
@@ -345,6 +346,27 @@ public:
     /** @brief Feed the curve to a PathSink */
     virtual void feed(PathSink &sink, bool moveto_initial) const;
     /// @}
+
+    /** offsets the curve by width
+     * 
+     * @param width the offset width
+     * @param tolerance the tolerance used during the offsetting algorithm
+     * @param no_crossing specifies the type of offsetting, see below
+     * 
+     * @pre the curve contains more than one point. E.g. isDegenerate() is false.
+     * 
+     * If no_crossing is set to false, the output is a curve containing an offset point for every
+     * point of the curve. The offset path may have self intersections.
+     *
+     * If no_crossing is set to true, self crossings are removed. The operation can be seen as
+     * rolling a circle on one side of the curve, which must not intersect with the curve itself.
+     * Therefore, the output is only a fraction of what would be returned for setting
+     * no_crossings to false.
+     * Note that also the endpoints may change when the radius of curvature is smaller
+     * than the offset width. This behaviour is intended and helps with combining
+     * offsetted curve segments.
+     */
+    virtual Path offsetted(double width, double tolerance = 1e-4, bool no_crossing = false) const;
 };
 
 inline
