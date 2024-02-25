@@ -80,6 +80,9 @@ void find_self_intersections(std::vector<std::pair<double, double> > &xs,
  *  output: xs        - set of pairs of parameter values
  *                      at which crossing happens
  *
+ *  If A and B are identical, or identical up to reversal,
+ *  then no intersections are returned.
+ *
  *  This routine is based on the Bezier Clipping Algorithm,
  *  see: Sederberg, Nishita, 1990 - Curve intersection using Bezier clipping
  */

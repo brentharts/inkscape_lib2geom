@@ -1130,8 +1130,7 @@ void find_collinear_normal (std::vector< std::pair<double, double> >& xs,
                             std::vector<Point> const& B,
                             double precision)
 {
-    using detail::bezier_clipping::get_solutions;
-    using detail::bezier_clipping::collinear_normal_tag;
+    using namespace detail::bezier_clipping;
     get_solutions<collinear_normal_tag>(xs, A, B, precision);
 }
 
@@ -1147,20 +1146,21 @@ void find_collinear_normal (std::vector< std::pair<double, double> >& xs,
  *  This routine is based on the Bezier Clipping Algorithm,
  *  see: Sederberg, Nishita, 1990 - Curve intersection using Bezier clipping
  */
-void find_intersections_bezier_clipping (std::vector< std::pair<double, double> >& xs,
-                         std::vector<Point> const& A,
-                         std::vector<Point> const& B,
-                         double precision)
+void find_intersections_bezier_clipping(std::vector<std::pair<double, double>> &xs,
+                                        std::vector<Point> const &A,
+                                        std::vector<Point> const &B,
+                                        double precision)
 {
-    using detail::bezier_clipping::get_solutions;
-    using detail::bezier_clipping::intersection_point_tag;
+    // Handle beziers with identical control points (up to reversal).
+    if (A.size() == B.size() && (A == B || std::equal(A.begin(), A.end(), B.rbegin()))) {
+        return;
+    }
+
+    using namespace detail::bezier_clipping;
     get_solutions<intersection_point_tag>(xs, A, B, precision);
 }
 
-}  // end namespace Geom
-
-
-
+} // namespace Geom
 
 /*
   Local Variables:

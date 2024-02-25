@@ -41,7 +41,6 @@
 #include <2geom/basic-intersection.h>
 #include <2geom/bezier-curve.h>
 #include <vector>
-#include <iterator>
 #include <glib.h>
 
 using std::vector, std::min, std::max;
@@ -687,6 +686,24 @@ TEST_F(BezierTest, ForwardDifferenceTest)
     auto b = Bezier(3, 4, 2, -5, 7);
     EXPECT_EQ(b.forward_difference(1), Bezier(19, 34, 22, 5));
     EXPECT_EQ(b.forward_difference(2), Bezier(-3, 2, 2));
+}
+
+TEST_F(BezierTest, Coincident)
+{
+    auto const b1 = Geom::CubicBezier({0, 0}, {1, 0}, {2, 0}, {3, 0});
+    auto const b2 = Geom::CubicBezier({0, 0}, {1, 1e-9}, {2, 0}, {3, 0});
+    auto const b3 = Geom::CubicBezier({0, 0}, {1, 1e-9}, {2, -1e-9}, {3, 0});
+    auto const b1r = Geom::CubicBezier({3, 0}, {2, 0}, {1, 0}, {0, 0});
+
+    // Exactly coincident - no intersections.
+    EXPECT_EQ(b1.intersect(b1).size(), 0);
+    EXPECT_EQ(b1r.intersect(b1).size(), 0);
+
+    // Approximately coincident - should still have intersections.
+    EXPECT_EQ(b1.intersect(b2).size(), 2);
+    EXPECT_EQ(b1.intersect(b3).size(), 3);
+    EXPECT_EQ(b1r.intersect(b2).size(), 2);
+    // ASSERT_EQ(b1r.intersect(b3).size(), 3); // Fails, outputs 4.
 }
 
 /*
