@@ -706,6 +706,12 @@ TEST_F(BezierTest, Coincident)
     // ASSERT_EQ(b1r.intersect(b3).size(), 3); // Fails, outputs 4.
 }
 
+TEST_F(BezierTest, InfiniteRecursion)
+{
+    auto const b = Geom::Bezier{-0.0030759119071035457, -0.0030759119071035457, 0.32441359420920435, -9.612067618408332};
+    EXPECT_EQ(b.roots().size(), 0);
+}
+
 /*
   Local Variables:
   mode:c++
