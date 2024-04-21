@@ -843,7 +843,7 @@ private:
     void _unshare() {
         // Called before every mutation.
         // Ensure we have our own copy of curve data and reset cached values
-        if (!_data.unique()) {
+        if (_data.use_count() != 1) {
             _data.reset(new PathData(*_data));
             _closing_seg = static_cast<ClosingSegment*>(&_data->curves.back());
         }
