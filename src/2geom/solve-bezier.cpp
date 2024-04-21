@@ -138,6 +138,10 @@ void Bernsteins::find_bernstein_roots(Bezier const &bz,
         double dsplit_t = 0.5;
         if(!dsolutions.empty()) {
             dsplit_t = dsolutions[0];
+            if (dsplit_t < EPSILON || dsplit_t > 1 - EPSILON) {
+                // Avoid infinite recursion if making no progress.
+                dsplit_t = 0.5;
+            }
             split_t = left_t + (right_t - left_t)*dsplit_t;
             debug(std::cout << "split_value = " << bz(split_t) << std::endl);
             debug(std::cout << "splitting around " << dsplit_t << " = " 
