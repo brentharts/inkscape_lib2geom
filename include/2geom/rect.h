@@ -149,6 +149,29 @@ public:
     }
     /// @}
 
+    /// @name Return an expanded or shrunk copy of the rectangle.
+    /// @{
+    /** Return a new rectangle which results from expanding this one by the same
+     * amount along both axes.
+     */
+    Rect expandedBy(Coord amount) const;
+
+    /** Return a new rectangle which results from expanding this one by
+     * possibly different amounts along both axes.
+     */
+    Rect expandedBy(Coord x, Coord y) const;
+
+    /** Return a new rectangle which results from shrinking this one by the same
+     * amount along both axes.
+     */
+    Rect shrunkBy(Coord amount) const;
+
+    /** Return a new rectangle which results from shrinking this one by
+     * possibly different amounts along both axes.
+     */
+    Rect shrunkBy(Coord x, Coord y) const;
+    /// @}
+
     /// @name SVG viewbox functionality.
     /// @{
     /** @brief Transform contents to viewport.

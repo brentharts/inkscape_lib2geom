@@ -73,6 +73,38 @@ TEST(RectTest, Rounding) {
     EXPECT_EQ(r_small.roundInwards(), OptIntRect());
 }
 
+TEST(RectTest, ExpansionInPlace)
+{
+    Rect r{1, 2, 3, 4};
+    r.expandBy(3);
+    EXPECT_EQ(r, Rect(1 - 3, 2 - 3, 3 + 3, 4 + 3));
+
+    Rect u{1, 2, 3, 4};
+    u.expandBy(5, 7);
+    EXPECT_EQ(u, Rect(1 - 5, 2 - 7, 3 + 5, 4 + 7));
+}
+
+TEST(RectTest, Expanded)
+{
+    EXPECT_EQ(Rect(1, 2, 3, 4).expandedBy(4), Rect(1 - 4, 2 - 4, 3 + 4, 4 + 4));
+}
+
+TEST(RectTest, ShrinkingInPlace)
+{
+    Rect r{5, 10, 15, 20};
+    r.shrinkBy(2);
+    EXPECT_EQ(r, Rect(5 + 2, 10 + 2, 15 - 2, 20 - 2));
+
+    Rect u{5, 10, 15, 20};
+    u.shrinkBy(1, 2);
+    EXPECT_EQ(u, Rect(5 + 1, 10 + 2, 15 - 1, 20 - 2));
+}
+
+TEST(RectTest, Shrunk)
+{
+    EXPECT_EQ(Rect(5, 10, 15, 20).shrunkBy(4), Rect(5 + 4, 10 + 4, 15 - 4, 20 - 4));
+}
+
 template <typename C>
 class GenericRectTest : public ::testing::Test {
 public:

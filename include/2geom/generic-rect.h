@@ -276,6 +276,13 @@ public:
     void expandBy(C amount) {
         expandBy(amount, amount);
     }
+
+    /** @brief Shrink the rectangle in both directions by the specified amount.
+     * If the amount of shrinkage exceeds a half of the smaller dimension, the
+     * rectangle will be shrunk to a line segment.
+    */
+    void shrinkBy(C amount) { expandBy(-amount); }
+
     /** @brief Expand the rectangle in both directions.
      * Note that this is different from scaling. Negative values will shrink the
      * rectangle. If <code>-x</code> is larger than
@@ -285,6 +292,13 @@ public:
         f[X].expandBy(x);
         f[Y].expandBy(y);
     }
+
+    /** @brief Shrink the rectangle in both directions by possibly different amounts.
+     * If the amount of shrinkage exceeds a half of the corresponding dimension, the
+     * rectangle will be shrunk to a line segment.
+    */
+    void shrinkBy(C x, C y) { expandBy(-x, -y); }
+
     /** @brief Expand the rectangle by the coordinates of the given point.
      * This will expand the width by the X coordinate of the point in both directions
      * and the height by Y coordinate of the point. Negative coordinate values will
