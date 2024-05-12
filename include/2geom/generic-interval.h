@@ -31,6 +31,7 @@
 #ifndef LIB2GEOM_SEEN_GENERIC_INTERVAL_H
 #define LIB2GEOM_SEEN_GENERIC_INTERVAL_H
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <optional>
