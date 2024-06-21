@@ -73,38 +73,6 @@ TEST(RectTest, Rounding) {
     EXPECT_EQ(r_small.roundInwards(), OptIntRect());
 }
 
-TEST(RectTest, ExpansionInPlace)
-{
-    Rect r{1, 2, 3, 4};
-    r.expandBy(3);
-    EXPECT_EQ(r, Rect(1 - 3, 2 - 3, 3 + 3, 4 + 3));
-
-    Rect u{1, 2, 3, 4};
-    u.expandBy(5, 7);
-    EXPECT_EQ(u, Rect(1 - 5, 2 - 7, 3 + 5, 4 + 7));
-}
-
-TEST(RectTest, Expanded)
-{
-    EXPECT_EQ(Rect(1, 2, 3, 4).expandedBy(4), Rect(1 - 4, 2 - 4, 3 + 4, 4 + 4));
-}
-
-TEST(RectTest, ShrinkingInPlace)
-{
-    Rect r{5, 10, 15, 20};
-    r.shrinkBy(2);
-    EXPECT_EQ(r, Rect(5 + 2, 10 + 2, 15 - 2, 20 - 2));
-
-    Rect u{5, 10, 15, 20};
-    u.shrinkBy(1, 2);
-    EXPECT_EQ(u, Rect(5 + 1, 10 + 2, 15 - 1, 20 - 2));
-}
-
-TEST(RectTest, Shrunk)
-{
-    EXPECT_EQ(Rect(5, 10, 15, 20).shrunkBy(4), Rect(5 + 4, 10 + 4, 15 - 4, 20 - 4));
-}
-
 template <typename C>
 class GenericRectTest : public ::testing::Test {
 public:
@@ -386,7 +354,63 @@ TYPED_TEST(GenericRectTest, NearestEdgePoint) {
     EXPECT_EQ(a.nearestEdgePoint(p4), r4);
 }
 
-} // end namespace Geom
+TYPED_TEST(GenericRectTest, ExpansionInPlace)
+{
+    using CRect = TestFixture::CRect;
+    using CPoint = TestFixture::CPoint;
+
+    CRect r{1, 2, 3, 4};
+    r.expandBy(3);
+    EXPECT_EQ(r, CRect(1 - 3, 2 - 3, 3 + 3, 4 + 3));
+
+    CRect u{1, 2, 3, 4};
+    u.expandBy(5, 7);
+    EXPECT_EQ(u, CRect(1 - 5, 2 - 7, 3 + 5, 4 + 7));
+
+    CRect v{1, 2, 3, 4};
+    v.expandBy(CPoint{5, 7});
+    EXPECT_EQ(v, CRect(1 - 5, 2 - 7, 3 + 5, 4 + 7));
+}
+
+TYPED_TEST(GenericRectTest, Expanded)
+{
+    using CRect = TestFixture::CRect;
+    using CPoint = TestFixture::CPoint;
+
+    EXPECT_EQ(CRect(1, 2, 3, 4).expandedBy(4), CRect(1 - 4, 2 - 4, 3 + 4, 4 + 4));
+    EXPECT_EQ(CRect(1, 2, 3, 4).expandedBy(4, 3), CRect(1 - 4, 2 - 3, 3 + 4, 4 + 3));
+    EXPECT_EQ(CRect(1, 2, 3, 4).expandedBy(CPoint{4, 3}), CRect(1 - 4, 2 - 3, 3 + 4, 4 + 3));
+}
+
+TYPED_TEST(GenericRectTest, ShrinkingInPlace)
+{
+    using CRect = TestFixture::CRect;
+    using CPoint = TestFixture::CPoint;
+
+    CRect r{5, 10, 15, 20};
+    r.shrinkBy(2);
+    EXPECT_EQ(r, CRect(5 + 2, 10 + 2, 15 - 2, 20 - 2));
+
+    CRect u{5, 10, 15, 20};
+    u.shrinkBy(1, 2);
+    EXPECT_EQ(u, CRect(5 + 1, 10 + 2, 15 - 1, 20 - 2));
+
+    CRect v{5, 10, 15, 20};
+    v.shrinkBy(CPoint{1, 2});
+    EXPECT_EQ(v, CRect(5 + 1, 10 + 2, 15 - 1, 20 - 2));
+}
+
+TYPED_TEST(GenericRectTest, Shrunk)
+{
+    using CRect = TestFixture::CRect;
+    using CPoint = TestFixture::CPoint;
+
+    EXPECT_EQ(CRect(5, 10, 15, 20).shrunkBy(4), CRect(5 + 4, 10 + 4, 15 - 4, 20 - 4));
+    EXPECT_EQ(CRect(5, 10, 15, 20).shrunkBy(4, 3), CRect(5 + 4, 10 + 3, 15 - 4, 20 - 3));
+    EXPECT_EQ(CRect(5, 10, 15, 20).shrunkBy(CPoint{4, 3}), CRect(5 + 4, 10 + 3, 15 - 4, 20 - 3));
+}
+
+} // namespace Geom
 
 /*
   Local Variables:

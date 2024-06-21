@@ -308,6 +308,71 @@ public:
     void expandBy(CPoint const &p) {
         expandBy(p[X], p[Y]);
     }
+
+    /** @brief Shrink the rectangle by the coordinates of the given point.
+     * If the amount of shrinkage exceeds a half of the corresponding dimension, the
+     * rectangle will be shrunk to a line segment.
+     */
+    void shrinkBy(CPoint const &p) {
+        shrinkBy(p[X], p[Y]);
+    }
+    /// @}
+
+    /// @name Return an expanded or shrunk copy of the rectangle.
+    /// @{
+    /** Return a new rectangle which results from expanding this one by the same
+     * amount along both axes.
+     */
+    CRect expandedBy(Coord amount) const {
+        auto copy{*this};
+        copy.expandBy(amount);
+        return copy;
+    }
+
+    /** Return a new rectangle which results from expanding this one by
+     * possibly different amounts along both axes.
+     */
+    CRect expandedBy(Coord x, Coord y) const {
+        auto copy{*this};
+        copy.expandBy(x, y);
+        return copy;
+    }
+
+    /** Return a new rectangle which results from expanding this one by
+     * possibly different amounts along both axes.
+     */
+    CRect expandedBy(CPoint const &p) const {
+        auto copy{*this};
+        copy.expandBy(p);
+        return copy;
+    }
+
+    /** Return a new rectangle which results from shrinking this one by the same
+     * amount along both axes.
+     */
+    CRect shrunkBy(Coord amount) const {
+        auto copy{*this};
+        copy.shrinkBy(amount);
+        return copy;
+    }
+
+    /** Return a new rectangle which results from shrinking this one by
+     * possibly different amounts along both axes.
+     */
+    CRect shrunkBy(Coord x, Coord y) const {
+        auto copy{*this};
+        copy.shrinkBy(x, y);
+        return copy;
+    }
+
+    /** Return a new rectangle which results from shrinking this one by
+     * possibly different amounts along both axes.
+     */
+    CRect shrunkBy(CPoint const &p) const {
+        auto copy{*this};
+        copy.shrinkBy(p);
+        return copy;
+    }
     /// @}
 
     /// @name Operators

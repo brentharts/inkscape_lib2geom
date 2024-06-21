@@ -127,34 +127,6 @@ Affine Rect::transformTo(Rect const &viewport, Aspect const &aspect) const
     return total;
 }
 
-Rect Rect::expandedBy(Coord amount) const
-{
-    auto copy{*this};
-    copy.expandBy(amount);
-    return copy;
-}
-
-Rect Rect::expandedBy(Coord x, Coord y) const
-{
-    auto copy{*this};
-    copy.expandBy(x, y);
-    return copy;
-}
-
-Rect Rect::shrunkBy(Coord amount) const
-{
-    auto copy{*this};
-    copy.shrinkBy(amount);
-    return copy;
-}
-
-Rect Rect::shrunkBy(Coord x, Coord y) const
-{
-    auto copy{*this};
-    copy.shrinkBy(x, y);
-    return copy;
-}
-
 Coord distanceSq(Point const &p, Rect const &rect)
 {
     double dx = 0, dy = 0;
