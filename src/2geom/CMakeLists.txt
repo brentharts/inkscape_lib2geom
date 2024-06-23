@@ -84,6 +84,8 @@ add_library(2geom ${LIB_TYPE}
     sbasis-to-bezier.cpp
     sbasis.cpp
     self-intersect.cpp
+    shape.cpp
+    shape-flatten.cpp
     solve-bezier.cpp
     solve-bezier-one-d.cpp
     solve-bezier-parametric.cpp
@@ -164,6 +166,7 @@ add_library(2geom ${LIB_TYPE}
     ${2GEOM_INCLUDE_DIR}/2geom/sbasis-poly.h
     ${2GEOM_INCLUDE_DIR}/2geom/sbasis-to-bezier.h
     ${2GEOM_INCLUDE_DIR}/2geom/sbasis.h
+    ${2GEOM_INCLUDE_DIR}/2geom/shape.h
     ${2GEOM_INCLUDE_DIR}/2geom/solver.h
     ${2GEOM_INCLUDE_DIR}/2geom/svg-path-parser.h
     ${2GEOM_INCLUDE_DIR}/2geom/svg-path-writer.h

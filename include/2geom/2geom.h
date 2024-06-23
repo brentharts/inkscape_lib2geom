@@ -58,6 +58,9 @@
 #include <2geom/bezier.h>
 #include <2geom/sbasis.h>
 
+// shapes and boolean operations (future)
+#include <2geom/shape.h>
+
 // others
 #include <2geom/math-utils.h>
 #include <2geom/utils.h>

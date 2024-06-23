@@ -64,7 +64,7 @@ private:
  *
  * This class encapsulates an algorithm that sorts the objects according
  * to their bounds, then moves an imaginary line (sweepline) over those
- * bounds from left to right. Objects are added to the active list when
+ * bounds from right to left. Objects are added to the active list when
  * the line starts intersecting their bounds, and removed when it completely
  * passes over them.
  *

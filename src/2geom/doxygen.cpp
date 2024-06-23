@@ -3,7 +3,7 @@
  *
  * Authors:
  *    Krzysztof Kosiński <tweenk.pl@gmail.com>
- * 
+ *
  * Copyright 2009-2011 Authors
  *
  * This library is free software; you can redistribute it and/or
@@ -53,7 +53,7 @@
  * - @ref Curves "Curves" - functions mapping the unit interval to points on a plane.
  * - @ref Shapes "Shapes" - circles, ellipses, polygons and the like.
  * - @ref Paths "Paths" - sequences of contiguous curves, aka splines, and their processing.
- * - @ref ShapeOps "Shape operations" - boolean algebra, offsets and other advanced operations.
+ * - @ref ShapeOps "Shape operations" - Arbitrary two-dimensional shapes, boolean algebra, offsets and more.
  * - @ref Containers "Geometric containers" - efficient ways to store and retrieve
  *   geometric information.
  * - @ref Utilities "Utilities" - other useful code that does not fit under the above categories.
@@ -135,7 +135,7 @@
  * @section Indenting
  *
  * All files should use 4 spaces as indentation.
- * 
+ *
  * @section Namespaces
  *
  * All classes intended for direct use by the end users should be in the Geom namespace.
@@ -144,7 +144,7 @@
  * @code
  namespace Geom {
  namespace FooInternal {
- 
+
  unsigned some_function()
  {
  // ...code...
@@ -153,7 +153,7 @@
  } // namespace FooInternal
  } // namespace Geom
  @endcode
- * 
+ *
  * @section Classes
  *
  * @code
@@ -282,6 +282,17 @@
 /**
  * @defgroup Paths Paths and path sequences
  * @brief Sequences of contiguous curves, aka splines, and their processing
+ */
+
+/**
+ * @defgroup ShapeOps Arbitrary two-dimensional shapes and operations on them
+ * @brief Arbitrary shapes, boolean algebra, offsets and other advanced operations.
+ *
+ * This group includes the Geom::Shape class which can represent a bounded piece of the plane
+ * whose contour consists of arbitrary closed paths.
+ *
+ * In the future, boolean operations (union, intersection, difference, symmetric difference) will
+ * be implemented on Geom::Shape objects.
  */
 
 /**

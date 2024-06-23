@@ -8,8 +8,8 @@
  * This way, the 'user' can distinguish between groups of exceptions
  * ('user' is the coder that uses lib2geom)
  *
- * Several macro's are defined for easily throwing exceptions 
- * (e.g. THROW_CONTINUITYERROR). 
+ * Several macros are defined for easily throwing exceptions
+ * (e.g., THROW_CONTINUITYERROR).
  */
 /* Copyright 2007 Johan Engelen <goejendaagh@zonnet.nl>
  *
@@ -139,6 +139,18 @@ struct SVGPathParseError : public std::exception {
     char const *what() const noexcept override { return "parse error"; }
 };
 
+class UnboundedRegion : public RangeError
+{
+private:
+    char const *const _message;
+public:
+    UnboundedRegion(const char *file, const int line, char const *const message)
+        : RangeError("Unbounded region", file, line)
+        , _message{message}
+        {}
+    char const *what() const noexcept override { return _message; }
+};
+#define THROW_UNBOUNDEDREGION(msg) throw(UnboundedRegion(__FILE__, __LINE__, msg))
 
 } // namespace Geom
 

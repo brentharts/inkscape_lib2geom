@@ -65,6 +65,15 @@ class Parallelogram {
 
     /// True if this parallelogram does not have right angles
     bool isSheared(Coord eps = EPSILON) const;
+
+    /** @brief Returns the transform that maps the unit square to this parallelogram.
+     *
+     * Every parallelogram can be interpreted as the image of the unit square under an
+     * affine transformation (including translation, rotation, shearing and non-uniform scale).
+     *
+     * @return The transform that maps the unit square to this parallelogram.
+     */
+    auto unitSquareTransform() const { return m_affine; }
 };
 
 } // namespace Geom
