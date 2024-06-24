@@ -58,6 +58,9 @@ if(HAVE_SINCOS)
     add_definitions(-DHAVE_SINCOS)
 endif()
 if(GSL_FOUND)
+    # TODO: Fix not works in all systems, with GSL enabled cmake HAVE_GSL return false
+    # comenting here and addind into headers works
+    # GSL bug: coment to test with GSL in some sites, add to the file you want to test
     add_definitions(-DHAVE_GSL)
 endif()
 if(CAIRO_FOUND)

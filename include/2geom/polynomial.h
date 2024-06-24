@@ -35,6 +35,8 @@
 
 #ifndef LIB2GEOM_SEEN_POLY_H
 #define LIB2GEOM_SEEN_POLY_H
+//# GSL bug: uncoment to test with GSL in some sites, add to the file you want to test
+//#define HAVE_GSL
 #include <assert.h>
 #include <vector>
 #include <iostream>

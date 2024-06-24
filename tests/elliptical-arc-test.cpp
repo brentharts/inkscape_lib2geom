@@ -277,3 +277,80 @@ TEST(EllipticalArcTest, ExpandToTransformedTest)
         test_curve(EllipticalArc(Point(1, 0), 0.0, 0.0, 0.0, false, false, Point(1, 0)), b);
     }
 }
+
+#ifdef HAVE_GSL
+TEST(EllipticalArcTest, NearestTimeTest) 
+{
+    auto arc = EllipticalArc(Point(300, 0), 300.0, 30.0, Angle::from_degrees(300.0), true, false, Point(300,300));
+    auto p = Geom::Point(260,320); //inside the arc
+    double nearest = arc.nearestTime(p);
+    EXPECT_NEAR(0.9838537, nearest, 0.000001);
+    p = Geom::Point(130,930); //outside the arc
+    nearest = arc.nearestTime(p);
+    EXPECT_NEAR(0.6756072, nearest, 0.000001);
+    p = Geom::Point(1300,320); //outside the arc
+    nearest = arc.nearestTime(p);
+    EXPECT_NEAR(1, nearest, 0.000001);
+    //std::cout << "M 300 0 A 300.0 30.0, 300.0, 1 0,300 300" << std::endl;
+    //std::cout << p << std::endl;
+    //std::cout << nearest << std::endl;
+    //std::cout << arc.pointAt(nearest) << std::endl;
+}
+
+TEST(EllipticalArcTest, AllNearestTimeTest) 
+{
+    auto arc = EllipticalArc(Point(300, 300), 10.0, 90.0, Angle::from_degrees(0.0), false, true, Point(250,300));
+    auto p = Geom::Point(275,400);
+    auto allnearest = arc.allNearestTimes(p);
+    if (allnearest.size() > 1) {
+        double dist = Geom::distance(p, arc.pointAt(allnearest[0]));
+        for (auto nearest : allnearest) {
+            double ndist = Geom::distance(p, arc.pointAt(nearest));
+            EXPECT_NEAR(dist, ndist, 0.000001);
+            dist = ndist;
+        }
+    } /* else if (!allnearest.empty()) {
+        EXPECT_NEAR(0.5000000, allnearest[0], 0.000001);
+        //std::cout << allnearest[0] << std::endl;
+        //std::cout << arc.pointAt(allnearest[0]) << std::endl;
+    } */
+}
+
+TEST(EllipticalArcTest, FurthestTimeTest) 
+{
+    auto arc = EllipticalArc(Point(300, 0), 300.0, 30.0, Angle::from_degrees(300.0), true, false, Point(300,300));
+    auto p = Geom::Point(260,320); //inside the arc
+    double furthest = arc.furthestTime(p);
+    EXPECT_NEAR(0.5518574, furthest, 0.000001);
+    p = Geom::Point(130,930); //outside the arc
+    furthest = arc.furthestTime(p);
+    EXPECT_NEAR(0, furthest, 0.000001);
+    p = Geom::Point(1300,320); //outside the arc
+    furthest = arc.furthestTime(p);
+    EXPECT_NEAR(0.5272273, furthest, 0.000001);
+    //std::cout << "M 300 0 A 300.0 30.0, 300.0, 1 0,300 300" << std::endl;
+    //std::cout << p << std::endl;
+    //std::cout << furthest << std::endl;
+    //std::cout << arc.pointAt(furthest) << std::endl;
+}
+
+
+TEST(EllipticalArcTest, AllFurthestTimeTest) 
+{
+    auto arc = EllipticalArc(Point(300, 300), 10.0, 10.0, Angle::from_degrees(150.0), true, true, Point(250,300));
+    auto p = Geom::Point(275,310);
+    auto allfurthest = arc.allFurthestTimes(p);
+    if (allfurthest.size() > 1) {
+        double dist = Geom::distance(p, arc.pointAt(allfurthest[0]));
+        for (auto furthest : allfurthest) {
+            double fdist = Geom::distance(p, arc.pointAt(furthest));
+            EXPECT_NEAR(dist, fdist, 0.000001);
+            dist = fdist;
+        }
+    } /* else if (!allnearest.empty()) {
+        EXPECT_NEAR(0.5000000, allnearest[0], 0.000001);
+        std::cout << allfurthest[0] << std::endl;
+        std::cout << arc.pointAt(allfurthest[0]) << std::endl;
+    } */
+}
+#endif

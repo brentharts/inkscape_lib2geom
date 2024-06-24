@@ -253,6 +253,36 @@ public:
         return timeAtProjection(p);
     }
 
+    /** @brief Find a point on the line far away to the query point.
+    */
+    Coord furthestTime(Point const &p) const {
+        if (timeAtProjection(p) < 0.5) {
+            return 1;
+        };
+        return 0;
+    }
+    /** @brief Compute time values at which the line comes furtest to a specified point.
+    */
+    virtual std::vector<Coord> allFurthestTimes( Point const& p, Coord from = 0,
+        Coord to = 1 ) const {
+        using std::swap;
+        if (from > to) std::swap(from,to);
+        Coord t = timeAtProjection(p);
+
+        Coord center = (to-from)/2.0;
+        if (Geom::are_near(t, center)) {
+            return {from,to};
+        } else if (t > center) {
+            return {from};
+        }
+        return {to};
+    }
+
+    /** @brief A version full line. */
+    std::vector<Coord> allFurthestTimes(Point const &p) {
+        return allFurthestTimes(p, 0, 1);
+    }
+
     std::vector<Coord> roots(Coord v, Dim2 d) const;
     Coord root(Coord v, Dim2 d) const;
     /// @}

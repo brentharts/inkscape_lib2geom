@@ -35,6 +35,7 @@
 #include <2geom/curve.h>
 #include <2geom/exception.h>
 #include <2geom/nearest-time.h>
+#include <2geom/furthest-time.h>
 #include <2geom/sbasis-geometric.h>
 #include <2geom/sbasis-to-bezier.h>
 #include <2geom/ord.h>
@@ -48,9 +49,19 @@ Coord Curve::nearestTime(Point const& p, Coord a, Coord b) const
     return nearest_time(p, toSBasis(), a, b);
 }
 
+Coord Curve::furthestTime(Point const& p, Coord a, Coord b) const
+{
+    return furthest_time(p, toSBasis(), a, b);
+}
+
 std::vector<Coord> Curve::allNearestTimes(Point const& p, Coord from, Coord to) const
 {
     return all_nearest_times(p, toSBasis(), from, to);
+}
+
+std::vector<Coord> Curve::allFurthestTimes(Point const& p, Coord from, Coord to) const
+{
+    return all_furthest_times(p, toSBasis(), from, to);
 }
 
 Coord Curve::length(Coord tolerance) const

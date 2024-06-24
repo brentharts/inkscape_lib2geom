@@ -35,6 +35,7 @@
 #include <2geom/path-sink.h>
 #include <2geom/basic-intersection.h>
 #include <2geom/nearest-time.h>
+#include <2geom/furthest-time.h>
 #include <2geom/polynomial.h>
 
 namespace Geom
@@ -278,6 +279,16 @@ Coord BezierCurve::nearestTime(Point const &p, Coord from, Coord to) const
     return nearest_time(p, inner, from, to);
 }
 
+Coord BezierCurve::furthestTime(Point const &p, Coord from, Coord to) const
+{
+    return furthest_time(p, inner, from, to);
+}
+
+std::vector<Coord> BezierCurve::allFurthestTimes( Point const& p, Coord from, Coord to) const
+{
+    return all_furthest_times(p, inner.toSBasis(), from, to);
+};
+
 void BezierCurve::feed(PathSink &sink, bool moveto_initial) const
 {
     if (size() > 4) {
@@ -387,6 +398,45 @@ Coord BezierCurveN<1>::nearestTime(Point const& p, Coord from, Coord to) const
     if ( t <= 0 )  		return from;
     else if ( t >= 1 )  return to;
     else return from + t*(to-from);
+}
+
+template<>
+Coord BezierCurveN<1>::furthestTime(Point const& p, Coord from, Coord to) const
+{
+    using std::swap;
+
+    if ( from > to ) swap(from, to);
+    Point ip = pointAt(from);
+    Point fp = pointAt(to);
+    Coord center = (from + to) / 2.0;
+    Point v = fp - ip;
+    Coord l2v = L2sq(v);
+    if (l2v == 0) return 1;
+    Coord t = dot( p - ip, v ) / l2v;
+    if ( t <= 0 )  		return to;
+    else if ( t >= 1 )  return from;
+    else if (t < center) return {to};
+    return {from};
+}
+
+template<>
+std::vector<Coord> BezierCurveN<1>::allFurthestTimes(Point const& p, Coord from, Coord to) const
+{
+    using std::swap;
+
+    if ( from > to ) swap(from, to);
+    Point ip = pointAt(from);
+    Point fp = pointAt(to);
+    Coord center = (from + to) / 2.0;;
+    Point v = fp - ip;
+    Coord l2v = L2sq(v);
+    if (l2v == 0) return {1};
+    Coord t = dot( p - ip, v ) / l2v;
+    if ( t <= 0 )  		return {to};
+    else if ( t >= 1 )  return {from};
+    else if ( Geom::are_near(t,center) )  return {from,to};
+    else if (t < center) return {to};
+    return {from};
 }
 
 /* Specialized intersection routine for line segments.
