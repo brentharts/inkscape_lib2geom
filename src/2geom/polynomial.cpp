@@ -49,9 +49,9 @@ namespace Geom {
 #endif
 
 Poly Poly::operator*(const Poly& p) const {
-    Poly result; 
+    Poly result;
     result.resize(degree() +  p.degree()+1);
-    
+
     for(unsigned i = 0; i < size(); i++) {
         for(unsigned j = 0; j < p.size(); j++) {
             result[i+j] += (*this)[i] * p[j];
@@ -60,10 +60,6 @@ Poly Poly::operator*(const Poly& p) const {
     return result;
 }
 
-/*double Poly::eval(double x) const {
-    return gsl_poly_eval(&coeff[0], size(), x);
-    }*/
-
 void Poly::normalize() {
     while(back() == 0)
         pop_back();
@@ -71,9 +67,9 @@ void Poly::normalize() {
 
 void Poly::monicify() {
     normalize();
-    
+
     double scale = 1./back(); // unitize
-    
+
     for(unsigned i = 0; i < size(); i++) {
         (*this)[i] *= scale;
     }
@@ -84,25 +80,23 @@ void Poly::monicify() {
 std::vector<std::complex<double> > solve(Poly const & pp) {
     Poly p(pp);
     p.normalize();
-    gsl_poly_complex_workspace * w 
+    gsl_poly_complex_workspace * w
         = gsl_poly_complex_workspace_alloc (p.size());
-       
+
     gsl_complex_packed_ptr z = new double[p.degree()*2];
     double* a = new double[p.size()];
     for(unsigned int i = 0; i < p.size(); i++)
         a[i] = p[i];
     std::vector<std::complex<double> > roots;
-    //roots.resize(p.degree());
-    
+
     gsl_poly_complex_solve (a, p.size(), w, z);
     delete[]a;
-     
+
     gsl_poly_complex_workspace_free (w);
-     
+
     for (unsigned int i = 0; i < p.degree(); i++) {
         roots.emplace_back(z[2*i] ,z[2*i+1]);
-        //printf ("z%d = %+.18f %+.18f\n", i, z[2*i], z[2*i+1]);
-    }    
+    }
     delete[] z;
     return roots;
 }
@@ -110,7 +104,7 @@ std::vector<std::complex<double> > solve(Poly const & pp) {
 std::vector<double > solve_reals(Poly const & p) {
     std::vector<std::complex<double> > roots = solve(p);
     std::vector<double> real_roots;
-    
+
     for(auto & root : roots) {
         if(root.imag() == 0) // should be more lenient perhaps
             real_roots.push_back(root.real());
@@ -121,7 +115,7 @@ std::vector<double > solve_reals(Poly const & p) {
 
 double polish_root(Poly const & p, double guess, double tol) {
     Poly dp = derivative(p);
-    
+
     double fn = p(guess);
     while(fabs(fn) > tol) {
         guess -= fn/dp(guess);
@@ -132,7 +126,7 @@ double polish_root(Poly const & p, double guess, double tol) {
 
 Poly integral(Poly const & p) {
     Poly result;
-    
+
     result.reserve(p.size()+1);
     result.push_back(0); // arbitrary const
     for(unsigned i = 0; i < p.size(); i++) {
@@ -144,7 +138,7 @@ Poly integral(Poly const & p) {
 
 Poly derivative(Poly const & p) {
     Poly result;
-    
+
     if(p.size() <= 1)
         return Poly(0);
     result.reserve(p.size()-1);
@@ -156,58 +150,34 @@ Poly derivative(Poly const & p) {
 
 Poly compose(Poly const & a, Poly const & b) {
     Poly result;
-    
+
     for(unsigned i = a.size(); i > 0; i--) {
         result = Poly(a[i-1]) + result * b;
     }
     return result;
-    
-}
 
-/* This version is backwards - dividing taylor terms
-Poly divide(Poly const &a, Poly const &b, Poly &r) {
-    Poly c;
-    r = a; // remainder
-    
-    const unsigned k = a.size();
-    r.resize(k, 0);
-    c.resize(k, 0);
-
-    for(unsigned i = 0; i < k; i++) {
-        double ci = r[i]/b[0];
-        c[i] += ci;
-        Poly bb = ci*b;
-        std::cout << ci <<"*" << b << ", r= " << r << std::endl;
-        r -= bb.shifted(i);
-    }
-    
-    return c;
 }
-*/
 
 Poly divide(Poly const &a, Poly const &b, Poly &r) {
     Poly c;
     r = a; // remainder
     assert(b.size() > 0);
-    
+
     const unsigned k = a.degree();
     const unsigned l = b.degree();
     c.resize(k, 0.);
-    
+
     for(unsigned i = k; i >= l; i--) {
         //assert(i >= 0);
         double ci = r.back()/b.back();
         c[i-l] += ci;
         Poly bb = ci*b;
-        //std::cout << ci <<"*(" << b.shifted(i-l) << ") = " 
-        //          << bb.shifted(i-l) << "     r= " << r << std::endl;
         r -= bb.shifted(i-l);
         r.pop_back();
     }
-    //std::cout << "r= " << r << std::endl;
     r.normalize();
     c.normalize();
-    
+
     return c;
 }
 
@@ -330,6 +300,18 @@ std::vector<Coord> solve_quartic(Coord a, Coord b, Coord c, Coord d, Coord e)
         std::sort(result.begin(), result.end());
         return result;
     }
+    if (b == 0 && d == 0) { // Biquadratic equation
+        std::vector<Coord> result;
+        for (Coord const squared_root : solve_quadratic(a, c, e)) {
+            if (squared_root >= 0) {
+                double const root = std::sqrt(squared_root);
+                result.push_back(-root);
+                result.push_back(root);
+            }
+        }
+        std::sort(result.begin(), result.end());
+        return result;
+    }
 
     // Divide out by a so that the leading coefficient is 1.
     b /= a;
@@ -338,18 +320,34 @@ std::vector<Coord> solve_quartic(Coord a, Coord b, Coord c, Coord d, Coord e)
     e /= a;
 
     // Solve the resolvent cubic
-    auto const resolvent_solutions = solve_cubic(1, -c, b * d - 4 * e, 4 * c * e - sqr(b) * e - sqr(d));
-    // If there are 3 solutions, pick the middle one, else the first one.
-    auto const y = resolvent_solutions[resolvent_solutions.size() == 3];
-
-    // Find the quadratic factors
-    auto linear_terms = solve_quadratic(1, -b, c - y);
-    auto constant_terms = solve_quadratic(1, -y, e);
-    if (linear_terms.size() < 2 || constant_terms.size() < 2) {
-        return {}; // There are no roots
+    auto resolvent_solutions = solve_cubic(1, -c, b * d - 4 * e, 4 * c * e - sqr(b) * e - sqr(d));
+    // If there are 3 solutions, start with the middle one, else the first one.
+    if (resolvent_solutions.size() == 3) {
+        std::swap(resolvent_solutions[0], resolvent_solutions[1]);
     }
 
-    {
+    std::vector<double> linear_terms, constant_terms;
+    bool factored = false;
+    for (double const y : resolvent_solutions) {
+        // Find the quadratic factors
+        linear_terms = solve_quadratic(1, -b, c - y);
+        constant_terms = solve_quadratic(1, -y, e);
+        if (!linear_terms.empty() && !constant_terms.empty()) {
+            factored = true;
+            break;
+        }
+    }
+    if (!factored) {
+        return {};
+    }
+    if (linear_terms.size() > constant_terms.size()) {
+        constant_terms.push_back(constant_terms.back());
+    } else if (constant_terms.size() > linear_terms.size()) {
+        linear_terms.push_back(linear_terms.size());
+    }
+    assert(linear_terms.size() == constant_terms.size());
+
+    if (linear_terms.size() == 2) {
         // Reorder constant terms if needed so that they correspond to linear terms
         auto const current_cross = linear_terms[0] * constant_terms[1] + linear_terms[1] * constant_terms[0];
         auto const reordered_cross = linear_terms[0] * constant_terms[0] + linear_terms[1] * constant_terms[1];
@@ -360,7 +358,7 @@ std::vector<Coord> solve_quartic(Coord a, Coord b, Coord c, Coord d, Coord e)
 
     std::vector<Coord> result;
     result.reserve(4);
-    for (size_t i : {0, 1}) {
+    for (size_t i = 0; i < linear_terms.size(); ++i) {
         auto const factor_roots = solve_quadratic(1, linear_terms[i], constant_terms[i]);
         result.insert(result.end(), factor_roots.begin(), factor_roots.end());
     }
