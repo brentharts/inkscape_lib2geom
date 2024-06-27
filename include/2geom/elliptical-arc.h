@@ -7,7 +7,7 @@
  *    MenTaLguY <mental@rydia.net>
  *    Marco Cecchetti <mrcekets at gmail.com>
  *    Krzysztof Kosiński <tweenk.pl@gmail.com>
- * 
+ *
  * Copyright 2007-2009 Authors
  *
  * This library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@
 #include <2geom/sbasis-curve.h>  // for non-native methods
 #include <2geom/utils.h>
 
-namespace Geom 
+namespace Geom
 {
 
 class EllipticalArc : public Curve
@@ -276,15 +276,14 @@ public:
         return SBasisCurve(toSBasis()).boundsLocal(i, deg);
     }
     std::vector<double> roots(double v, Dim2 d) const override;
-#ifdef HAVE_GSL
-    std::vector<double> allNearestTimes( Point const& p, double from = 0, double to = 1 ) const override;
-    double nearestTime( Point const& p, double from = 0, double to = 1 ) const override {
-        if ( are_near(ray(X), ray(Y)) && are_near(center(), p) ) {
+
+    std::vector<double> allNearestTimes(Point const& p, double from = 0, double to = 1) const override;
+    double nearestTime(Point const& p, double from = 0, double to = 1) const override {
+        if (are_near(ray(X), ray(Y)) && are_near(center(), p)) {
             return from;
         }
         return allNearestTimes(p, from, to).front();
     }
-#endif
     std::vector<CurveIntersection> intersect(Curve const &other, Coord eps=EPSILON) const override;
     int degreesOfFreedom() const override { return 7; }
     Curve *derivative() const override;

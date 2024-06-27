@@ -45,14 +45,6 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(2GEOM_STANDALONE TRUE)
 endif()
 
-option(2GEOM_TESTING "Build tests" "${2GEOM_STANDALONE}")
-
-if (2GEOM_TESTING)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
-
-
 check_cxx_source_compiles("#include <math.h>\nint main() { double a=0.5,b=0.5,c=0.5; sincos(a, &b, &c); return 0; }" HAVE_SINCOS)
 if(HAVE_SINCOS)
     add_definitions(-DHAVE_SINCOS)
@@ -67,6 +59,12 @@ if(PYCAIRO_FOUND)
     add_definitions(-DHAVE_PYCAIRO)
 endif()
 
+option(2GEOM_TESTING "Build tests" "${2GEOM_STANDALONE}")
+
+if (2GEOM_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 #    SET(NEEDS_GSL
 #        differential-constraint
