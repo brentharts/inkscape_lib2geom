@@ -244,18 +244,18 @@ public:
 
     template<typename T>
     T evaluate_at(T x, T y) const {
-        return c[0]*x*x + c[1]*x*y + c[2]*y*y + c[3]*x + c[4]*y + c[5];
+        return (c[0]*x + c[3])*x + c[1]*x*y + (c[2]*y + c[4])*y + c[5];
+    }
+
+    template<typename T>
+    T evaluate_at(T x, T y, T w) const {
+        return c[0]*x*x + c[1]*x*y + c[2]*y*y + (c[3]*x + c[4]*y + c[5]*w)*w;
     }
 
     double valueAt(Point P) const;
 
     std::vector<double> implicit_form_coefficients() const {
         return std::vector<double>(c, c+6);
-    }
-
-    template<typename T>
-    T evaluate_at(T x, T y, T w) const {
-        return c[0]*x*x + c[1]*x*y + c[2]*y*y + c[3]*x*w + c[4]*y*w + c[5]*w*w;
     }
 
     xAx scale(double sx, double sy) const;
@@ -508,7 +508,14 @@ public:
 
 };
 
-std::vector<Point> intersect(const xAx & C1, const xAx & C2);
+/** @brief Compute all points of intersection of two conic sections.
+ *         Correctness of the algorithm is not guaranteed if the two conics
+ *         are identical or very close.
+ * @param  first The first conic section.
+ * @param second The second conic section.
+ * @return A vector containing all points where both sections simultaneously evaluate to zero.
+ */
+std::vector<Point> intersect(const xAx &first, const xAx &second);
 
 bool clip (std::vector<RatQuad> & rq, const xAx & cs, const Rect & R);
 
