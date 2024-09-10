@@ -78,7 +78,8 @@ To run tests and performance tests:
     make test
     make perf
 
-**Note**: Tests are disabled by default. To enable tests pass `-D2GEOM_TESTING=ON` to `cmake` command.  
+**Note**: Tests are enabled by default. To disable tests pass
+`-D2GEOM_TESTING=OFF` to `cmake` command.  
 
 Also check out some of the interactive programs in src/toys.
 
